@@ -1,0 +1,1151 @@
+{
+  "jobs": [
+    {
+      "id": "farm_laborer",
+      "name": "Farm laborer",
+      "category": "Agriculture",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "agriculture": 15
+      },
+      "abilities": {
+        "spatial": 0.4,
+        "memory": 0.6
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 3500
+    },
+    {
+      "id": "farmer",
+      "name": "Farmer",
+      "category": "Agriculture",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "agriculture": 45,
+        "commerce": 20
+      },
+      "abilities": {
+        "reasoning": 0.5,
+        "spatial": 0.5
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [
+        "land",
+        "equipment"
+      ],
+      "monthly_income_cents": 5500
+    },
+    {
+      "id": "farm_manager",
+      "name": "Farm manager",
+      "category": "Agriculture",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "agriculture": 65,
+        "leadership": 45,
+        "commerce": 40
+      },
+      "abilities": {
+        "reasoning": 0.7,
+        "memory": 0.3
+      },
+      "interest": "commercial",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 8500
+    },
+    {
+      "id": "domestic_worker",
+      "name": "Domestic worker",
+      "category": "Household",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "household": 25
+      },
+      "abilities": {
+        "memory": 1
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 3000
+    },
+    {
+      "id": "factory_worker",
+      "name": "Factory worker",
+      "category": "Industry",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "technical": 15
+      },
+      "abilities": {
+        "spatial": 1
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 4500
+    },
+    {
+      "id": "machine_operator",
+      "name": "Machine operator",
+      "category": "Industry",
+      "education_level": 1,
+      "qualification": "technical_certificate",
+      "skills": {
+        "technical": 45,
+        "mathematics": 25
+      },
+      "abilities": {
+        "spatial": 0.6,
+        "reasoning": 0.4
+      },
+      "interest": "technical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 6500
+    },
+    {
+      "id": "carpenter",
+      "name": "Carpenter",
+      "category": "Trades",
+      "education_level": 0,
+      "qualification": "carpentry_apprenticeship",
+      "skills": {
+        "craft": 50,
+        "mathematics": 25
+      },
+      "abilities": {
+        "spatial": 0.8,
+        "reasoning": 0.2
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 8500
+    },
+    {
+      "id": "builder",
+      "name": "Mason / builder",
+      "category": "Trades",
+      "education_level": 0,
+      "qualification": "construction_apprenticeship",
+      "skills": {
+        "craft": 45,
+        "technical": 30
+      },
+      "abilities": {
+        "spatial": 1
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 6500
+    },
+    {
+      "id": "mechanic",
+      "name": "Blacksmith / mechanic",
+      "category": "Trades",
+      "education_level": 0,
+      "qualification": "mechanical_apprenticeship",
+      "skills": {
+        "technical": 50,
+        "craft": 35
+      },
+      "abilities": {
+        "reasoning": 0.5,
+        "spatial": 0.5
+      },
+      "interest": "technical",
+      "helpful_traits": {
+        "conscientiousness": 1,
+        "openness": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 7500
+    },
+    {
+      "id": "tailor",
+      "name": "Tailor / seamstress",
+      "category": "Trades",
+      "education_level": 0,
+      "qualification": "sewing_apprenticeship",
+      "skills": {
+        "craft": 45,
+        "art": 20
+      },
+      "abilities": {
+        "spatial": 0.7,
+        "memory": 0.3
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 5500
+    },
+    {
+      "id": "cook",
+      "name": "Cook",
+      "category": "Household",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "cooking": 45,
+        "household": 30
+      },
+      "abilities": {
+        "memory": 1
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1,
+        "emotional_stability": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 5000
+    },
+    {
+      "id": "shop_assistant",
+      "name": "Shop assistant",
+      "category": "Commerce",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "literacy": 30,
+        "mathematics": 25,
+        "commerce": 25
+      },
+      "abilities": {
+        "verbal": 0.5,
+        "reasoning": 0.5
+      },
+      "interest": "social",
+      "helpful_traits": {
+        "agreeableness": 1,
+        "extraversion": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 7000
+    },
+    {
+      "id": "merchant",
+      "name": "Merchant / trader",
+      "category": "Commerce",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "commerce": 55,
+        "persuasion": 40,
+        "mathematics": 35
+      },
+      "abilities": {
+        "verbal": 0.5,
+        "reasoning": 0.5
+      },
+      "interest": "commercial",
+      "helpful_traits": {
+        "openness": 0.5,
+        "extraversion": 0.5
+      },
+      "access": [
+        "capital",
+        "suppliers"
+      ],
+      "monthly_income_cents": 9000
+    },
+    {
+      "id": "shopkeeper",
+      "name": "Shopkeeper",
+      "category": "Commerce",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "commerce": 55,
+        "accounting": 35
+      },
+      "abilities": {
+        "reasoning": 0.5,
+        "verbal": 0.5
+      },
+      "interest": "commercial",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [
+        "premises",
+        "capital"
+      ],
+      "monthly_income_cents": 8000
+    },
+    {
+      "id": "salesperson",
+      "name": "Salesperson",
+      "category": "Commerce",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "persuasion": 45,
+        "commerce": 30
+      },
+      "abilities": {
+        "verbal": 1
+      },
+      "interest": "social",
+      "helpful_traits": {
+        "extraversion": 1,
+        "emotional_stability": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 6000
+    },
+    {
+      "id": "bookkeeper",
+      "name": "Bookkeeper",
+      "category": "Administration",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "accounting": 45,
+        "mathematics": 40,
+        "literacy": 35
+      },
+      "abilities": {
+        "reasoning": 0.7,
+        "memory": 0.3
+      },
+      "interest": "commercial",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 6500
+    },
+    {
+      "id": "accountant",
+      "name": "Accountant",
+      "category": "Administration",
+      "education_level": 2,
+      "qualification": "accounting_certificate",
+      "skills": {
+        "accounting": 65,
+        "mathematics": 50
+      },
+      "abilities": {
+        "reasoning": 0.8,
+        "memory": 0.2
+      },
+      "interest": "commercial",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 10000
+    },
+    {
+      "id": "clerk",
+      "name": "Clerk / secretary",
+      "category": "Administration",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "literacy": 45,
+        "household": 25
+      },
+      "abilities": {
+        "verbal": 0.5,
+        "memory": 0.5
+      },
+      "interest": "practical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 5500
+    },
+    {
+      "id": "teacher",
+      "name": "Teacher",
+      "category": "Education and care",
+      "education_level": 2,
+      "qualification": "teaching_certificate",
+      "skills": {
+        "literacy": 60,
+        "teaching": 50,
+        "empathy": 40
+      },
+      "abilities": {
+        "verbal": 0.6,
+        "memory": 0.4
+      },
+      "interest": "academic",
+      "helpful_traits": {
+        "agreeableness": 1,
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 8500
+    },
+    {
+      "id": "nurse",
+      "name": "Nurse",
+      "category": "Education and care",
+      "education_level": 1,
+      "qualification": "nursing_certificate",
+      "skills": {
+        "care": 55,
+        "medicine": 40,
+        "empathy": 35
+      },
+      "abilities": {
+        "memory": 0.6,
+        "reasoning": 0.4
+      },
+      "interest": "social",
+      "helpful_traits": {
+        "conscientiousness": 1,
+        "emotional_stability": 1
+      },
+      "access": [],
+      "monthly_income_cents": 7000
+    },
+    {
+      "id": "doctor",
+      "name": "Doctor",
+      "category": "Professions",
+      "education_level": 3,
+      "qualification": "medical_degree",
+      "skills": {
+        "medicine": 70,
+        "science": 55,
+        "care": 40
+      },
+      "abilities": {
+        "reasoning": 0.5,
+        "memory": 0.5
+      },
+      "interest": "academic",
+      "helpful_traits": {
+        "conscientiousness": 1,
+        "emotional_stability": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 16000
+    },
+    {
+      "id": "lawyer",
+      "name": "Lawyer",
+      "category": "Professions",
+      "education_level": 3,
+      "qualification": "law_degree",
+      "skills": {
+        "law": 65,
+        "literacy": 65,
+        "persuasion": 40
+      },
+      "abilities": {
+        "verbal": 0.7,
+        "reasoning": 0.3
+      },
+      "interest": "academic",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 14000
+    },
+    {
+      "id": "engineer",
+      "name": "Engineer",
+      "category": "Professions",
+      "education_level": 3,
+      "qualification": "engineering_degree",
+      "skills": {
+        "mathematics": 65,
+        "technical": 65,
+        "science": 45
+      },
+      "abilities": {
+        "reasoning": 0.65,
+        "spatial": 0.35
+      },
+      "interest": "technical",
+      "helpful_traits": {
+        "conscientiousness": 1,
+        "openness": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 14000
+    },
+    {
+      "id": "architect",
+      "name": "Architect",
+      "category": "Professions",
+      "education_level": 3,
+      "qualification": "architecture_degree",
+      "skills": {
+        "design": 65,
+        "mathematics": 50,
+        "technical": 45
+      },
+      "abilities": {
+        "spatial": 0.75,
+        "reasoning": 0.25
+      },
+      "interest": "artistic",
+      "helpful_traits": {
+        "openness": 1,
+        "conscientiousness": 1
+      },
+      "access": [],
+      "monthly_income_cents": 14000
+    },
+    {
+      "id": "surveyor",
+      "name": "Surveyor",
+      "category": "Professions",
+      "education_level": 2,
+      "qualification": "surveying_certificate",
+      "skills": {
+        "mathematics": 50,
+        "technical": 45
+      },
+      "abilities": {
+        "spatial": 0.7,
+        "reasoning": 0.3
+      },
+      "interest": "technical",
+      "helpful_traits": {
+        "conscientiousness": 1
+      },
+      "access": [
+        "instruments"
+      ],
+      "monthly_income_cents": 9500
+    },
+    {
+      "id": "researcher",
+      "name": "Scientist / researcher",
+      "category": "Professions",
+      "education_level": 4,
+      "qualification": "research_degree",
+      "skills": {
+        "science": 75,
+        "mathematics": 60,
+        "literacy": 60
+      },
+      "abilities": {
+        "reasoning": 0.7,
+        "memory": 0.3
+      },
+      "interest": "academic",
+      "helpful_traits": {
+        "openness": 1,
+        "conscientiousness": 1
+      },
+      "access": [
+        "institution"
+      ],
+      "monthly_income_cents": 13000
+    },
+    {
+      "id": "journalist",
+      "name": "Journalist",
+      "category": "Arts and communication",
+      "education_level": 2,
+      "qualification": "",
+      "skills": {
+        "literacy": 60,
+        "persuasion": 35
+      },
+      "abilities": {
+        "verbal": 0.8,
+        "reasoning": 0.2
+      },
+      "interest": "social",
+      "helpful_traits": {
+        "openness": 1,
+        "extraversion": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 8000
+    },
+    {
+      "id": "writer",
+      "name": "Writer",
+      "category": "Arts and communication",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "literacy": 70,
+        "art": 35
+      },
+      "abilities": {
+        "verbal": 1
+      },
+      "interest": "artistic",
+      "helpful_traits": {
+        "openness": 1,
+        "conscientiousness": 0.5
+      },
+      "access": [
+        "publisher"
+      ],
+      "monthly_income_cents": 6000
+    },
+    {
+      "id": "artist",
+      "name": "Artist / designer",
+      "category": "Arts and communication",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "art": 65,
+        "design": 40
+      },
+      "abilities": {
+        "spatial": 1
+      },
+      "interest": "artistic",
+      "helpful_traits": {
+        "openness": 1
+      },
+      "access": [
+        "materials"
+      ],
+      "monthly_income_cents": 6000
+    },
+    {
+      "id": "musician",
+      "name": "Musician",
+      "category": "Arts and communication",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "music": 65
+      },
+      "abilities": {
+        "memory": 0.7,
+        "learning_speed": 0.3
+      },
+      "interest": "artistic",
+      "helpful_traits": {
+        "conscientiousness": 1,
+        "openness": 0.5
+      },
+      "access": [
+        "instrument"
+      ],
+      "monthly_income_cents": 6000
+    },
+    {
+      "id": "manager",
+      "name": "Business manager",
+      "category": "Commerce",
+      "education_level": 1,
+      "qualification": "",
+      "skills": {
+        "leadership": 55,
+        "commerce": 50,
+        "accounting": 35
+      },
+      "abilities": {
+        "reasoning": 0.5,
+        "verbal": 0.5
+      },
+      "interest": "commercial",
+      "helpful_traits": {
+        "conscientiousness": 1,
+        "extraversion": 0.5
+      },
+      "access": [],
+      "monthly_income_cents": 11000
+    },
+    {
+      "id": "entrepreneur",
+      "name": "Entrepreneur",
+      "category": "Commerce",
+      "education_level": 0,
+      "qualification": "",
+      "skills": {
+        "commerce": 50,
+        "leadership": 35
+      },
+      "abilities": {
+        "reasoning": 0.6,
+        "verbal": 0.4
+      },
+      "interest": "commercial",
+      "helpful_traits": {
+        "openness": 1
+      },
+      "access": [
+        "capital",
+        "opportunity"
+      ],
+      "monthly_income_cents": 8000
+    }
+  ],
+  "programs": [
+    {
+      "id": "primary",
+      "name": "Basic schooling",
+      "education_level": "primary",
+      "qualification": "",
+      "required_level": 0,
+      "skills": {
+        "literacy": 35,
+        "mathematics": 30
+      },
+      "months": 24,
+      "monthly_cost_cents": 200,
+      "interest": "academic",
+      "abilities": {
+        "learning_speed": 1
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "secondary",
+      "name": "Secondary education",
+      "education_level": "secondary",
+      "qualification": "",
+      "required_level": 1,
+      "skills": {
+        "literacy": 60,
+        "mathematics": 55,
+        "science": 40
+      },
+      "months": 36,
+      "monthly_cost_cents": 800,
+      "interest": "academic",
+      "abilities": {
+        "reasoning": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "carpentry",
+      "name": "Carpentry apprenticeship",
+      "education_level": "none",
+      "qualification": "carpentry_apprenticeship",
+      "required_level": 0,
+      "skills": {
+        "craft": 55,
+        "mathematics": 30
+      },
+      "months": 24,
+      "monthly_cost_cents": 300,
+      "interest": "practical",
+      "abilities": {
+        "spatial": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "construction",
+      "name": "Construction apprenticeship",
+      "education_level": "none",
+      "qualification": "construction_apprenticeship",
+      "required_level": 0,
+      "skills": {
+        "craft": 50,
+        "technical": 35
+      },
+      "months": 24,
+      "monthly_cost_cents": 300,
+      "interest": "practical",
+      "abilities": {
+        "spatial": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "mechanical",
+      "name": "Mechanical apprenticeship",
+      "education_level": "none",
+      "qualification": "mechanical_apprenticeship",
+      "required_level": 0,
+      "skills": {
+        "technical": 55,
+        "craft": 40
+      },
+      "months": 24,
+      "monthly_cost_cents": 300,
+      "interest": "technical",
+      "abilities": {
+        "spatial": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "sewing",
+      "name": "Sewing apprenticeship",
+      "education_level": "none",
+      "qualification": "sewing_apprenticeship",
+      "required_level": 0,
+      "skills": {
+        "craft": 50,
+        "art": 25
+      },
+      "months": 24,
+      "monthly_cost_cents": 300,
+      "interest": "practical",
+      "abilities": {
+        "spatial": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "technical",
+      "name": "Technical certificate",
+      "education_level": "secondary",
+      "qualification": "technical_certificate",
+      "required_level": 1,
+      "skills": {
+        "technical": 50,
+        "mathematics": 35
+      },
+      "months": 24,
+      "monthly_cost_cents": 700,
+      "interest": "technical",
+      "abilities": {
+        "reasoning": 0.5,
+        "spatial": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "commercial",
+      "name": "Commercial training",
+      "education_level": "none",
+      "qualification": "",
+      "required_level": 1,
+      "skills": {
+        "commerce": 60,
+        "accounting": 50,
+        "persuasion": 45,
+        "mathematics": 40
+      },
+      "months": 18,
+      "monthly_cost_cents": 600,
+      "interest": "commercial",
+      "abilities": {
+        "verbal": 0.5,
+        "reasoning": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "accounting",
+      "name": "Accounting certificate",
+      "education_level": "secondary",
+      "qualification": "accounting_certificate",
+      "required_level": 2,
+      "skills": {
+        "accounting": 70,
+        "mathematics": 55
+      },
+      "months": 24,
+      "monthly_cost_cents": 1000,
+      "interest": "commercial",
+      "abilities": {
+        "reasoning": 0.7,
+        "learning_speed": 0.3
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "teaching",
+      "name": "Teacher training",
+      "education_level": "secondary",
+      "qualification": "teaching_certificate",
+      "required_level": 2,
+      "skills": {
+        "teaching": 55,
+        "literacy": 65,
+        "empathy": 45
+      },
+      "months": 24,
+      "monthly_cost_cents": 1000,
+      "interest": "academic",
+      "abilities": {
+        "verbal": 0.7,
+        "learning_speed": 0.3
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "nursing",
+      "name": "Nursing training",
+      "education_level": "primary",
+      "qualification": "nursing_certificate",
+      "required_level": 1,
+      "skills": {
+        "care": 60,
+        "medicine": 45,
+        "empathy": 40
+      },
+      "months": 24,
+      "monthly_cost_cents": 800,
+      "interest": "social",
+      "abilities": {
+        "memory": 0.6,
+        "learning_speed": 0.4
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "engineering",
+      "name": "Engineering college",
+      "education_level": "university",
+      "qualification": "engineering_degree",
+      "required_level": 2,
+      "skills": {
+        "mathematics": 70,
+        "technical": 70,
+        "science": 50
+      },
+      "months": 48,
+      "monthly_cost_cents": 1800,
+      "interest": "technical",
+      "abilities": {
+        "reasoning": 0.65,
+        "spatial": 0.35
+      },
+      "entry_skills": {
+        "mathematics": 45
+      }
+    },
+    {
+      "id": "architecture",
+      "name": "Architecture college",
+      "education_level": "university",
+      "qualification": "architecture_degree",
+      "required_level": 2,
+      "skills": {
+        "design": 70,
+        "mathematics": 55,
+        "technical": 50
+      },
+      "months": 48,
+      "monthly_cost_cents": 1800,
+      "interest": "artistic",
+      "abilities": {
+        "spatial": 0.75,
+        "reasoning": 0.25
+      },
+      "entry_skills": {
+        "mathematics": 40
+      }
+    },
+    {
+      "id": "medicine",
+      "name": "Medical college",
+      "education_level": "university",
+      "qualification": "medical_degree",
+      "required_level": 2,
+      "skills": {
+        "medicine": 75,
+        "science": 60,
+        "care": 45
+      },
+      "months": 72,
+      "monthly_cost_cents": 2200,
+      "interest": "academic",
+      "abilities": {
+        "reasoning": 0.5,
+        "memory": 0.5
+      },
+      "entry_skills": {
+        "science": 35
+      }
+    },
+    {
+      "id": "law",
+      "name": "Law college",
+      "education_level": "university",
+      "qualification": "law_degree",
+      "required_level": 2,
+      "skills": {
+        "law": 70,
+        "literacy": 70,
+        "persuasion": 45
+      },
+      "months": 48,
+      "monthly_cost_cents": 1800,
+      "interest": "academic",
+      "abilities": {
+        "verbal": 0.7,
+        "reasoning": 0.3
+      },
+      "entry_skills": {
+        "literacy": 50
+      }
+    },
+    {
+      "id": "surveying",
+      "name": "Surveying certificate",
+      "education_level": "secondary",
+      "qualification": "surveying_certificate",
+      "required_level": 2,
+      "skills": {
+        "mathematics": 55,
+        "technical": 50
+      },
+      "months": 24,
+      "monthly_cost_cents": 1000,
+      "interest": "technical",
+      "abilities": {
+        "spatial": 0.7,
+        "reasoning": 0.3
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "research",
+      "name": "Research studies",
+      "education_level": "advanced",
+      "qualification": "research_degree",
+      "required_level": 3,
+      "skills": {
+        "science": 80,
+        "mathematics": 65,
+        "literacy": 65
+      },
+      "months": 36,
+      "monthly_cost_cents": 2000,
+      "interest": "academic",
+      "abilities": {
+        "reasoning": 0.7,
+        "memory": 0.3
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "art",
+      "name": "Art and design training",
+      "education_level": "none",
+      "qualification": "",
+      "required_level": 0,
+      "skills": {
+        "art": 70,
+        "design": 65
+      },
+      "months": 30,
+      "monthly_cost_cents": 800,
+      "interest": "artistic",
+      "abilities": {
+        "spatial": 0.7,
+        "learning_speed": 0.3
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "music",
+      "name": "Music training",
+      "education_level": "none",
+      "qualification": "",
+      "required_level": 0,
+      "skills": {
+        "music": 70
+      },
+      "months": 36,
+      "monthly_cost_cents": 800,
+      "interest": "artistic",
+      "abilities": {
+        "memory": 0.7,
+        "learning_speed": 0.3
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "agriculture",
+      "name": "Agricultural training",
+      "education_level": "none",
+      "qualification": "",
+      "required_level": 0,
+      "skills": {
+        "agriculture": 70,
+        "commerce": 40
+      },
+      "months": 18,
+      "monthly_cost_cents": 500,
+      "interest": "practical",
+      "abilities": {
+        "reasoning": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "household",
+      "name": "Household and cooking training",
+      "education_level": "none",
+      "qualification": "",
+      "required_level": 0,
+      "skills": {
+        "household": 55,
+        "cooking": 50
+      },
+      "months": 12,
+      "monthly_cost_cents": 300,
+      "interest": "practical",
+      "abilities": {
+        "memory": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {}
+    },
+    {
+      "id": "writing",
+      "name": "Writing and reporting training",
+      "education_level": "none",
+      "qualification": "",
+      "required_level": 1,
+      "skills": {
+        "literacy": 75,
+        "persuasion": 40,
+        "art": 40
+      },
+      "months": 24,
+      "monthly_cost_cents": 600,
+      "interest": "artistic",
+      "abilities": {
+        "verbal": 0.7,
+        "learning_speed": 0.3
+      },
+      "entry_skills": {}
+    }
+  ]
+}

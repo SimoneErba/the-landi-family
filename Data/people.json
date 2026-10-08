@@ -1,0 +1,1468 @@
+{
+  "Giovanni": {
+    "name": "Giovanni Landi",
+    "relationship": "You · Family head",
+    "summary": "You work a small Tuscan podere, selling grain, wine, and olive oil at the village market. Keeping the Landi household together now feels harder than tending the land.",
+    "temperament": {
+      "known": [
+        "Methodical and persistent",
+        "Speaks directly when worried"
+      ],
+      "suspected": [
+        "Finds it hard to change a plan once he has made it"
+      ],
+      "unknown": [
+        "How much fear shapes his decisions about the children"
+      ]
+    },
+    "values": {
+      "known": [
+        "Keeping the family secure",
+        "Passing on the farm and house"
+      ],
+      "suspected": [
+        "Being respected as the person who held things together"
+      ],
+      "unknown": [
+        "Whether Carlo's happiness matters more to him than the business"
+      ]
+    },
+    "learned_tendencies": {
+      "known": [
+        "Takes responsibility himself when money is tight",
+        "Offers practical help more easily than an apology"
+      ],
+      "suspected": [
+        "May mistake disagreement for disloyalty"
+      ],
+      "unknown": [
+        "Whether he could ask Pietro to share a difficult decision"
+      ]
+    },
+    "current_state": {
+      "known": [
+        "Worried about Carlo's interest in Florence",
+        "Tired after a difficult winter at the farm"
+      ],
+      "suspected": [
+        "Afraid the next generation will not want the life he made"
+      ],
+      "unknown": [
+        "What he would offer Carlo if asked to compromise"
+      ]
+    },
+    "experiences": [
+      "Took over the farm after his father's illness.",
+      "Shared the ancestral house with Pietro after their father died."
+    ],
+    "evidence": [
+      "Has covered the farm's shortfalls with personal savings.",
+      "Has asked Carlo to stay late at work three times this month."
+    ],
+    "job": "Smallholder (farm and market earnings)",
+    "monthly_income_cents": 8000,
+    "birth": {
+      "year": 1747,
+      "month": 4
+    },
+    "branch_id": "Giovanni",
+    "parent_ids": [],
+    "spouse_id": "Maria",
+    "roles": [
+      "Family head",
+      "Shopkeeper"
+    ],
+    "goals": [
+      {
+        "kind": "family_business",
+        "description": "Preserve the farm and prepare a successor",
+        "status": "active"
+      }
+    ],
+    "psychology": {
+      "temperament": {
+        "openness": 0.35,
+        "conscientiousness": 0.9,
+        "extraversion": 0.55,
+        "agreeableness": 0.4,
+        "emotional_stability": 0.55
+      },
+      "values": {
+        "family_loyalty": 0.9,
+        "tradition": 0.85,
+        "security": 0.95,
+        "status": 0.7
+      },
+      "learned_tendencies": {
+        "trust": 0.55,
+        "conflict_avoidance": 0.2,
+        "forgiveness": 0.4,
+        "need_for_autonomy": 0.7
+      },
+      "current_state": {
+        "stress": 0.45,
+        "happiness": 0.65,
+        "resentment": 0.1
+      }
+    },
+    "relationships": {
+      "Maria": {
+        "kinship": "spouse",
+        "affection": 0.8,
+        "respect": 0.75,
+        "trust": 0.75,
+        "resentment": 0.1
+      },
+      "Carlo": {
+        "kinship": "child",
+        "affection": 0.85,
+        "respect": 0.65,
+        "trust": 0.7,
+        "resentment": 0.1
+      },
+      "Anna": {
+        "kinship": "child",
+        "affection": 0.85,
+        "respect": 0.65,
+        "trust": 0.7,
+        "resentment": 0.1
+      },
+      "Pietro": {
+        "kinship": "sibling",
+        "affection": 0.75,
+        "respect": 0.6,
+        "trust": 0.65,
+        "resentment": 0.2
+      }
+    },
+    "memories": [
+      {
+        "kind": "formative_experience",
+        "description": "Took over the farm after his father's illness.",
+        "date": "Before January 1800",
+        "participants": []
+      },
+      {
+        "kind": "formative_experience",
+        "description": "Shared the ancestral house with Pietro after their father died.",
+        "date": "Before January 1800",
+        "participants": []
+      }
+    ],
+    "conversation_topics": [],
+    "education": {
+      "level": "primary",
+      "qualifications": [],
+      "study": {}
+    },
+    "abilities": {
+      "reasoning": 65,
+      "verbal": 62,
+      "spatial": 50,
+      "memory": 70,
+      "learning_speed": 52
+    },
+    "skills": {
+      "literacy": 45,
+      "mathematics": 50,
+      "commerce": 78,
+      "accounting": 65,
+      "leadership": 70,
+      "persuasion": 60
+    },
+    "interests": {
+      "commercial": 85,
+      "practical": 65
+    },
+    "career_access": [
+      "premises",
+      "land",
+      "suppliers",
+      "capital"
+    ],
+    "career_knowledge": {
+      "Giovanni": {
+        "abilities": [
+          "reasoning"
+        ],
+        "skills": [
+          "commerce",
+          "accounting",
+          "leadership"
+        ],
+        "interests": [
+          "commercial",
+          "practical"
+        ]
+      }
+    },
+    "career_id": "farmer",
+    "portrait": {
+      "seed": 538131488,
+      "genetics": {
+        "face_length": 0.8,
+        "jaw_width": 0.55,
+        "eye_spacing": 0.45,
+        "nose_length": 0.8,
+        "skin_tone": 0.55,
+        "hair_wave": 0.6
+      },
+      "appearance": {
+        "presentation": "masculine",
+        "base_face": "giovanni"
+      }
+    }
+  },
+  "Maria": {
+    "name": "Maria Landi",
+    "relationship": "Wife · Household manager",
+    "summary": "Maria keeps daily life in the house moving. She often notices tensions before anyone else says them aloud.",
+    "temperament": {
+      "known": [
+        "Patient and attentive",
+        "Prefers private conversation to public argument"
+      ],
+      "suspected": [
+        "Holds back her own opinion until she knows how others feel"
+      ],
+      "unknown": [
+        "How she responds when her patience runs out"
+      ]
+    },
+    "values": {
+      "known": [
+        "Family closeness",
+        "A home where both branches feel welcome"
+      ],
+      "suspected": [
+        "Anna having choices Maria never had"
+      ],
+      "unknown": [
+        "How strongly she wants Carlo to stay"
+      ]
+    },
+    "learned_tendencies": {
+      "known": [
+        "Smooths over quarrels before they grow",
+        "Checks on people after a difficult conversation"
+      ],
+      "suspected": [
+        "May carry too many worries without asking for help"
+      ],
+      "unknown": [
+        "Whether she would openly oppose Giovanni over the children"
+      ]
+    },
+    "current_state": {
+      "known": [
+        "Talking with Carlo more often",
+        "Managing a crowded household"
+      ],
+      "suspected": [
+        "Trying to understand what Carlo has not told Giovanni"
+      ],
+      "unknown": [
+        "Whether she has made Carlo a promise"
+      ]
+    },
+    "experiences": [
+      "Helped keep the household running while Giovanni expanded the farm.",
+      "Cared for Giovanni's father during his final illness."
+    ],
+    "evidence": [
+      "Carlo seeks her out after arguments with Giovanni.",
+      "She has quietly rearranged household chores so Anna can study."
+    ],
+    "job": "Household manager (unpaid)",
+    "monthly_income_cents": 0,
+    "birth": {
+      "year": 1750,
+      "month": 9
+    },
+    "branch_id": "Giovanni",
+    "parent_ids": [],
+    "spouse_id": "Giovanni",
+    "roles": [
+      "Household manager"
+    ],
+    "goals": [
+      {
+        "kind": "family_cohesion",
+        "description": "Keep both branches close without overburdening Anna",
+        "status": "active"
+      }
+    ],
+    "psychology": {
+      "temperament": {
+        "openness": 0.55,
+        "conscientiousness": 0.85,
+        "extraversion": 0.45,
+        "agreeableness": 0.9,
+        "emotional_stability": 0.75
+      },
+      "values": {
+        "family_loyalty": 0.95,
+        "security": 0.8,
+        "independence": 0.6
+      },
+      "learned_tendencies": {
+        "trust": 0.8,
+        "conflict_avoidance": 0.75,
+        "need_for_approval": 0.55,
+        "forgiveness": 0.85
+      },
+      "current_state": {
+        "stress": 0.25,
+        "happiness": 0.65,
+        "resentment": 0.1
+      }
+    },
+    "relationships": {
+      "Giovanni": {
+        "kinship": "spouse",
+        "affection": 0.8,
+        "respect": 0.75,
+        "trust": 0.75,
+        "resentment": 0.1
+      },
+      "Carlo": {
+        "kinship": "child",
+        "affection": 0.85,
+        "respect": 0.65,
+        "trust": 0.7,
+        "resentment": 0.1
+      },
+      "Anna": {
+        "kinship": "child",
+        "affection": 0.85,
+        "respect": 0.65,
+        "trust": 0.7,
+        "resentment": 0.1
+      }
+    },
+    "memories": [
+      {
+        "kind": "formative_experience",
+        "description": "Helped keep the household running while Giovanni expanded the farm.",
+        "date": "Before January 1800",
+        "participants": []
+      },
+      {
+        "kind": "formative_experience",
+        "description": "Cared for Giovanni's father during his final illness.",
+        "date": "Before January 1800",
+        "participants": []
+      }
+    ],
+    "conversation_topics": [
+      {
+        "layer": "values",
+        "finding": "Wants Anna to have time for her education",
+        "replaces": "Anna having choices Maria never had",
+        "response": "“I want Anna to keep studying. She should have choices I never had.”",
+        "evidence": "Maria said she wants Anna to continue her studies."
+      }
+    ],
+    "education": {
+      "level": "primary",
+      "qualifications": [],
+      "study": {}
+    },
+    "abilities": {
+      "reasoning": 62,
+      "verbal": 72,
+      "spatial": 55,
+      "memory": 75,
+      "learning_speed": 60
+    },
+    "skills": {
+      "literacy": 50,
+      "mathematics": 40,
+      "household": 90,
+      "cooking": 75,
+      "care": 75,
+      "empathy": 85
+    },
+    "interests": {
+      "social": 85,
+      "practical": 75
+    },
+    "career_access": [],
+    "career_knowledge": {
+      "Giovanni": {
+        "abilities": [],
+        "skills": [
+          "household",
+          "care",
+          "empathy"
+        ],
+        "interests": [
+          "social",
+          "practical"
+        ]
+      }
+    },
+    "portrait": {
+      "seed": 229081743,
+      "genetics": {
+        "face_length": 0.4,
+        "jaw_width": 0.4,
+        "eye_spacing": 0.6,
+        "nose_length": 0.35,
+        "skin_tone": 0.45,
+        "hair_wave": 0.4
+      },
+      "appearance": {
+        "presentation": "feminine",
+        "base_face": "maria"
+      }
+    },
+    "life_state": {
+      "can_be_pregnant": true
+    }
+  },
+  "Carlo": {
+    "name": "Carlo Landi",
+    "relationship": "Son · Shop worker",
+    "summary": "Carlo works in the family farm, but his attention has begun to drift toward a life outside this village.",
+    "temperament": {
+      "known": [
+        "Curious about new places",
+        "Usually avoids a direct argument"
+      ],
+      "suspected": [
+        "More ambitious than his quiet manner suggests"
+      ],
+      "unknown": [
+        "How he acts once he has firmly decided to leave"
+      ]
+    },
+    "values": {
+      "known": [
+        "Independence",
+        "Being trusted with meaningful work"
+      ],
+      "suspected": [
+        "Recognition from Giovanni"
+      ],
+      "unknown": [
+        "Whether family duty could outweigh a chance in Florence"
+      ]
+    },
+    "learned_tendencies": {
+      "known": [
+        "Says 'I'll think about it' when pressed",
+        "Withdraws after criticism at work"
+      ],
+      "suspected": [
+        "May agree to avoid conflict without changing his plans"
+      ],
+      "unknown": [
+        "Who he turns to when he feels trapped"
+      ]
+    },
+    "current_state": {
+      "known": [
+        "Has been asking about Florence",
+        "No longer stays late at the farm"
+      ],
+      "suspected": [
+        "Considering a move, perhaps soon"
+      ],
+      "unknown": [
+        "Whether he has already found work elsewhere"
+      ]
+    },
+    "experiences": [
+      "Started helping in the farm as a child.",
+      "His suggestion for changing the farm was dismissed last year."
+    ],
+    "evidence": [
+      "Asked how much rent costs in Florence.",
+      "Left before closing on three recent evenings.",
+      "Maria has been speaking with him privately."
+    ],
+    "job": "Farm worker",
+    "monthly_income_cents": 7000,
+    "birth": {
+      "year": 1776,
+      "month": 6
+    },
+    "branch_id": "Giovanni",
+    "parent_ids": [
+      "Giovanni",
+      "Maria"
+    ],
+    "spouse_id": "",
+    "roles": [
+      "Shop worker"
+    ],
+    "goals": [
+      {
+        "kind": "independent_career",
+        "description": "Find meaningful work with more independence",
+        "status": "active"
+      }
+    ],
+    "psychology": {
+      "temperament": {
+        "openness": 0.85,
+        "conscientiousness": 0.7,
+        "extraversion": 0.4,
+        "agreeableness": 0.65,
+        "emotional_stability": 0.55
+      },
+      "values": {
+        "independence": 0.95,
+        "achievement": 0.85,
+        "family_loyalty": 0.6
+      },
+      "learned_tendencies": {
+        "trust": 0.5,
+        "conflict_avoidance": 0.8,
+        "need_for_approval": 0.8,
+        "need_for_autonomy": 0.95
+      },
+      "current_state": {
+        "stress": 0.45,
+        "happiness": 0.5,
+        "resentment": 0.35
+      }
+    },
+    "relationships": {
+      "Giovanni": {
+        "kinship": "parent",
+        "affection": 0.75,
+        "respect": 0.65,
+        "trust": 0.6,
+        "resentment": 0.25
+      },
+      "Maria": {
+        "kinship": "parent",
+        "affection": 0.75,
+        "respect": 0.65,
+        "trust": 0.6,
+        "resentment": 0.1
+      },
+      "Anna": {
+        "kinship": "sibling",
+        "affection": 0.75,
+        "respect": 0.6,
+        "trust": 0.65,
+        "resentment": 0.2
+      }
+    },
+    "memories": [
+      {
+        "kind": "formative_experience",
+        "description": "Started helping in the farm as a child.",
+        "date": "Before January 1800",
+        "participants": []
+      },
+      {
+        "kind": "formative_experience",
+        "description": "His suggestion for changing the farm was dismissed last year.",
+        "date": "Before January 1800",
+        "participants": []
+      }
+    ],
+    "conversation_topics": [
+      {
+        "layer": "values",
+        "finding": "Wants recognition for his own ideas at work",
+        "replaces": "Recognition from Giovanni",
+        "response": "“It is not that I hate the farm. I want my ideas to matter there.”",
+        "evidence": "Carlo said his frustration concerns having no say in the farm."
+      }
+    ],
+    "education": {
+      "level": "secondary",
+      "qualifications": [],
+      "study": {}
+    },
+    "abilities": {
+      "reasoning": 78,
+      "verbal": 65,
+      "spatial": 72,
+      "memory": 68,
+      "learning_speed": 80
+    },
+    "skills": {
+      "literacy": 62,
+      "mathematics": 60,
+      "science": 42,
+      "technical": 35,
+      "commerce": 55,
+      "persuasion": 42
+    },
+    "interests": {
+      "technical": 85,
+      "commercial": 55
+    },
+    "career_access": [],
+    "career_knowledge": {
+      "Giovanni": {
+        "abilities": [
+          "reasoning",
+          "learning_speed"
+        ],
+        "skills": [
+          "commerce",
+          "mathematics"
+        ],
+        "interests": [
+          "technical",
+          "commercial"
+        ]
+      }
+    },
+    "career_id": "farm_laborer",
+    "portrait": {
+      "seed": 217222646,
+      "genetics": {
+        "face_length": 0.7,
+        "jaw_width": 0.45,
+        "eye_spacing": 0.5,
+        "nose_length": 0.55,
+        "skin_tone": 0.5,
+        "hair_wave": 0.5
+      },
+      "appearance": {
+        "presentation": "masculine",
+        "base_face": "carlo"
+      }
+    }
+  },
+  "Anna": {
+    "name": "Anna Landi",
+    "relationship": "Daughter · Student",
+    "summary": "Anna helps with the house and takes her studies seriously. Both demands have begun to compete for her time.",
+    "temperament": {
+      "known": [
+        "Conscientious and observant",
+        "More outspoken with Carlo than with older relatives"
+      ],
+      "suspected": [
+        "Pushes herself harder than others expect"
+      ],
+      "unknown": [
+        "How she handles a major disappointment"
+      ]
+    },
+    "values": {
+      "known": [
+        "Education",
+        "Being useful to the family"
+      ],
+      "suspected": [
+        "A career of her own"
+      ],
+      "unknown": [
+        "Whether she would leave home to continue studying"
+      ]
+    },
+    "learned_tendencies": {
+      "known": [
+        "Accepts tasks before checking whether she has time",
+        "Protects Carlo when he is criticized"
+      ],
+      "suspected": [
+        "May hide frustration to avoid seeming ungrateful"
+      ],
+      "unknown": [
+        "Whether she can say no to Maria"
+      ]
+    },
+    "current_state": {
+      "known": [
+        "Preparing for examinations",
+        "Helping Maria with the household"
+      ],
+      "suspected": [
+        "Worried she will fall behind"
+      ],
+      "unknown": [
+        "What support she would ask for if invited to speak freely"
+      ]
+    },
+    "experiences": [
+      "Helped care for her grandfather when she was younger.",
+      "A teacher encouraged her to continue her education."
+    ],
+    "evidence": [
+      "Studies after the others have gone to bed.",
+      "Maria has given some of Anna's chores to other family members."
+    ],
+    "job": "Studying with a private tutor",
+    "monthly_income_cents": 0,
+    "birth": {
+      "year": 1780,
+      "month": 11
+    },
+    "branch_id": "Giovanni",
+    "parent_ids": [
+      "Giovanni",
+      "Maria"
+    ],
+    "spouse_id": "",
+    "roles": [
+      "Student"
+    ],
+    "goals": [
+      {
+        "kind": "education",
+        "description": "Pass examinations and continue studying",
+        "status": "active"
+      }
+    ],
+    "psychology": {
+      "temperament": {
+        "openness": 0.8,
+        "conscientiousness": 0.95,
+        "extraversion": 0.35,
+        "agreeableness": 0.75,
+        "emotional_stability": 0.5
+      },
+      "values": {
+        "achievement": 0.95,
+        "family_loyalty": 0.85,
+        "independence": 0.75
+      },
+      "learned_tendencies": {
+        "trust": 0.7,
+        "need_for_approval": 0.8,
+        "sensitivity_to_rejection": 0.75,
+        "conflict_avoidance": 0.65
+      },
+      "current_state": {
+        "stress": 0.45,
+        "happiness": 0.65,
+        "resentment": 0.1
+      }
+    },
+    "relationships": {
+      "Giovanni": {
+        "kinship": "parent",
+        "affection": 0.75,
+        "respect": 0.65,
+        "trust": 0.6,
+        "resentment": 0.1
+      },
+      "Maria": {
+        "kinship": "parent",
+        "affection": 0.75,
+        "respect": 0.65,
+        "trust": 0.6,
+        "resentment": 0.1
+      },
+      "Carlo": {
+        "kinship": "sibling",
+        "affection": 0.75,
+        "respect": 0.6,
+        "trust": 0.65,
+        "resentment": 0.2
+      }
+    },
+    "memories": [
+      {
+        "kind": "formative_experience",
+        "description": "Helped care for her grandfather when she was younger.",
+        "date": "Before January 1800",
+        "participants": []
+      },
+      {
+        "kind": "formative_experience",
+        "description": "A teacher encouraged her to continue her education.",
+        "date": "Before January 1800",
+        "participants": []
+      }
+    ],
+    "conversation_topics": [
+      {
+        "layer": "values",
+        "finding": "Wants to pursue a career of her own",
+        "replaces": "A career of her own",
+        "response": "“I want to finish my studies and have work of my own. I still want to help here.”",
+        "evidence": "Anna described wanting a career alongside her family responsibilities."
+      }
+    ],
+    "education": {
+      "level": "secondary",
+      "qualifications": [],
+      "study": {}
+    },
+    "abilities": {
+      "reasoning": 82,
+      "verbal": 80,
+      "spatial": 72,
+      "memory": 85,
+      "learning_speed": 83
+    },
+    "skills": {
+      "literacy": 75,
+      "mathematics": 62,
+      "science": 50,
+      "design": 30,
+      "teaching": 25,
+      "empathy": 55
+    },
+    "interests": {
+      "academic": 95,
+      "artistic": 75
+    },
+    "career_access": [],
+    "career_knowledge": {
+      "Giovanni": {
+        "abilities": [
+          "verbal",
+          "memory"
+        ],
+        "skills": [
+          "literacy",
+          "mathematics"
+        ],
+        "interests": [
+          "academic",
+          "artistic"
+        ]
+      }
+    },
+    "portrait": {
+      "seed": 2088933027,
+      "genetics": {
+        "face_length": 0.65,
+        "jaw_width": 0.45,
+        "eye_spacing": 0.55,
+        "nose_length": 0.45,
+        "skin_tone": 0.5,
+        "hair_wave": 0.5
+      },
+      "appearance": {
+        "presentation": "feminine",
+        "base_face": "anna"
+      }
+    },
+    "life_state": {
+      "can_be_pregnant": true
+    }
+  },
+  "Pietro": {
+    "name": "Pietro Landi",
+    "relationship": "Brother · Carpenter",
+    "summary": "Pietro's branch shares the ancestral house. He wants its upkeep to be a decision between owners, not a favor from Giovanni.",
+    "temperament": {
+      "known": [
+        "Practical and quick to speak",
+        "Calmer while working than in family meetings"
+      ],
+      "suspected": [
+        "Sensitive to being treated as the younger brother"
+      ],
+      "unknown": [
+        "Whether he can forgive an old slight without discussing it"
+      ]
+    },
+    "values": {
+      "known": [
+        "Fairness between the branches",
+        "Pride in his trade"
+      ],
+      "suspected": [
+        "Being seen as an equal owner of the house"
+      ],
+      "unknown": [
+        "Whether he would sell his share if money became scarce"
+      ]
+    },
+    "learned_tendencies": {
+      "known": [
+        "Challenges decisions made without him",
+        "Offers hands-on help after a quarrel"
+      ],
+      "suspected": [
+        "May read Giovanni's help as a reminder of dependence"
+      ],
+      "unknown": [
+        "How he reacts when Lucia disagrees with him"
+      ]
+    },
+    "current_state": {
+      "known": [
+        "Concerned about a leaking roof",
+        "Wants to discuss repair costs"
+      ],
+      "suspected": [
+        "Resents that Giovanni spoke to a contractor first"
+      ],
+      "unknown": [
+        "How much his branch can contribute this year"
+      ]
+    },
+    "experiences": [
+      "Inherited a share of the house alongside Giovanni.",
+      "Built his carpentry trade without working in the family farm."
+    ],
+    "evidence": [
+      "Asked to see the contractor's estimate.",
+      "Offered to repair the roof himself if materials are paid for."
+    ],
+    "job": "Carpenter",
+    "monthly_income_cents": 8500,
+    "birth": {
+      "year": 1752,
+      "month": 2
+    },
+    "branch_id": "Pietro",
+    "parent_ids": [],
+    "spouse_id": "Lucia",
+    "roles": [
+      "Co-owner"
+    ],
+    "goals": [
+      {
+        "kind": "shared_ownership",
+        "description": "Have an equal say in the house and repair its roof",
+        "status": "active"
+      }
+    ],
+    "psychology": {
+      "temperament": {
+        "openness": 0.4,
+        "conscientiousness": 0.8,
+        "extraversion": 0.7,
+        "agreeableness": 0.5,
+        "emotional_stability": 0.6
+      },
+      "values": {
+        "independence": 0.85,
+        "achievement": 0.8,
+        "family_loyalty": 0.75
+      },
+      "learned_tendencies": {
+        "trust": 0.5,
+        "need_for_autonomy": 0.9,
+        "forgiveness": 0.4,
+        "conflict_avoidance": 0.2
+      },
+      "current_state": {
+        "stress": 0.25,
+        "happiness": 0.65,
+        "resentment": 0.35
+      }
+    },
+    "relationships": {
+      "Lucia": {
+        "kinship": "spouse",
+        "affection": 0.8,
+        "respect": 0.75,
+        "trust": 0.75,
+        "resentment": 0.1
+      },
+      "Sofia": {
+        "kinship": "child",
+        "affection": 0.85,
+        "respect": 0.65,
+        "trust": 0.7,
+        "resentment": 0.1
+      },
+      "Giovanni": {
+        "kinship": "sibling",
+        "affection": 0.75,
+        "respect": 0.6,
+        "trust": 0.65,
+        "resentment": 0.2
+      }
+    },
+    "memories": [
+      {
+        "kind": "formative_experience",
+        "description": "Inherited a share of the house alongside Giovanni.",
+        "date": "Before January 1800",
+        "participants": []
+      },
+      {
+        "kind": "formative_experience",
+        "description": "Built his carpentry trade without working in the family farm.",
+        "date": "Before January 1800",
+        "participants": []
+      }
+    ],
+    "conversation_topics": [
+      {
+        "layer": "values",
+        "finding": "Wants decisions about the house to be made jointly",
+        "replaces": "Being seen as an equal owner of the house",
+        "response": "“Ask me before bringing in a contractor. It is my house too.”",
+        "evidence": "Pietro asked to be included before repairs are arranged."
+      }
+    ],
+    "education": {
+      "level": "primary",
+      "qualifications": [
+        "carpentry_apprenticeship"
+      ],
+      "study": {}
+    },
+    "abilities": {
+      "reasoning": 68,
+      "verbal": 55,
+      "spatial": 88,
+      "memory": 65,
+      "learning_speed": 60
+    },
+    "skills": {
+      "literacy": 40,
+      "mathematics": 42,
+      "craft": 85,
+      "technical": 60,
+      "commerce": 40
+    },
+    "interests": {
+      "practical": 90,
+      "technical": 70
+    },
+    "career_access": [
+      "equipment"
+    ],
+    "career_knowledge": {
+      "Giovanni": {
+        "abilities": [
+          "spatial"
+        ],
+        "skills": [
+          "craft",
+          "technical"
+        ],
+        "interests": [
+          "practical",
+          "technical"
+        ]
+      }
+    },
+    "career_id": "carpenter",
+    "portrait": {
+      "seed": 1243685592,
+      "genetics": {
+        "face_length": 0.6,
+        "jaw_width": 0.8,
+        "eye_spacing": 0.45,
+        "nose_length": 0.75,
+        "skin_tone": 0.55,
+        "hair_wave": 0.8
+      },
+      "appearance": {
+        "presentation": "masculine",
+        "base_face": "pietro"
+      }
+    }
+  },
+  "Lucia": {
+    "name": "Lucia Landi",
+    "relationship": "Sister-in-law · Seamstress",
+    "summary": "Lucia supports Pietro's branch through her sewing work. She rarely takes sides in front of the whole family.",
+    "temperament": {
+      "known": [
+        "Reserved with the wider family",
+        "Warm and talkative with Sofia"
+      ],
+      "suspected": [
+        "More decisive in private than she appears"
+      ],
+      "unknown": [
+        "How she acts when her branch is threatened"
+      ]
+    },
+    "values": {
+      "known": [
+        "Security for Sofia",
+        "Keeping her work and earnings respected"
+      ],
+      "suspected": [
+        "A quieter home of their own"
+      ],
+      "unknown": [
+        "How attached she is to the ancestral house"
+      ]
+    },
+    "learned_tendencies": {
+      "known": [
+        "Avoids family arguments at the table",
+        "Discusses difficult matters with Pietro afterward"
+      ],
+      "suspected": [
+        "May agree publicly while urging Pietro to resist privately"
+      ],
+      "unknown": [
+        "Whether she trusts Maria with a serious concern"
+      ]
+    },
+    "current_state": {
+      "known": [
+        "Taking on more sewing work",
+        "Keeping an eye on Sofia's apprenticeship"
+      ],
+      "suspected": [
+        "Worried about the cost of the roof repair"
+      ],
+      "unknown": [
+        "Whether she has considered moving out"
+      ]
+    },
+    "experiences": [
+      "Kept her own sewing clients after marrying Pietro.",
+      "Moved into the ancestral house when Sofia was small."
+    ],
+    "evidence": [
+      "Has declined Maria's offer to combine household spending.",
+      "Asked Pietro about the repair estimate after dinner."
+    ],
+    "job": "Seamstress",
+    "monthly_income_cents": 3500,
+    "birth": {
+      "year": 1754,
+      "month": 8
+    },
+    "branch_id": "Pietro",
+    "parent_ids": [],
+    "spouse_id": "Pietro",
+    "roles": [
+      "Seamstress"
+    ],
+    "goals": [
+      {
+        "kind": "child_security",
+        "description": "Secure Sofia’s future through sewing income",
+        "status": "active"
+      }
+    ],
+    "psychology": {
+      "temperament": {
+        "openness": 0.5,
+        "conscientiousness": 0.85,
+        "extraversion": 0.3,
+        "agreeableness": 0.65,
+        "emotional_stability": 0.65
+      },
+      "values": {
+        "security": 0.95,
+        "independence": 0.8,
+        "family_loyalty": 0.85
+      },
+      "learned_tendencies": {
+        "trust": 0.45,
+        "conflict_avoidance": 0.85,
+        "need_for_autonomy": 0.85
+      },
+      "current_state": {
+        "stress": 0.25,
+        "happiness": 0.65,
+        "resentment": 0.1
+      }
+    },
+    "relationships": {
+      "Pietro": {
+        "kinship": "spouse",
+        "affection": 0.8,
+        "respect": 0.75,
+        "trust": 0.75,
+        "resentment": 0.1
+      },
+      "Sofia": {
+        "kinship": "child",
+        "affection": 0.85,
+        "respect": 0.65,
+        "trust": 0.7,
+        "resentment": 0.1
+      }
+    },
+    "memories": [
+      {
+        "kind": "formative_experience",
+        "description": "Kept her own sewing clients after marrying Pietro.",
+        "date": "Before January 1800",
+        "participants": []
+      },
+      {
+        "kind": "formative_experience",
+        "description": "Moved into the ancestral house when Sofia was small.",
+        "date": "Before January 1800",
+        "participants": []
+      }
+    ],
+    "conversation_topics": [
+      {
+        "layer": "values",
+        "finding": "Would like a quieter home for her branch",
+        "replaces": "A quieter home of their own",
+        "response": "“Sometimes I imagine a little home with fewer arguments. That does not mean we are leaving.”",
+        "evidence": "Lucia spoke about wanting a quieter home without announcing a move."
+      }
+    ],
+    "education": {
+      "level": "primary",
+      "qualifications": [
+        "sewing_apprenticeship"
+      ],
+      "study": {}
+    },
+    "abilities": {
+      "reasoning": 62,
+      "verbal": 58,
+      "spatial": 78,
+      "memory": 72,
+      "learning_speed": 60
+    },
+    "skills": {
+      "literacy": 40,
+      "mathematics": 35,
+      "craft": 80,
+      "art": 50,
+      "household": 65
+    },
+    "interests": {
+      "practical": 85,
+      "artistic": 65
+    },
+    "career_access": [
+      "equipment"
+    ],
+    "career_knowledge": {
+      "Giovanni": {
+        "abilities": [
+          "spatial"
+        ],
+        "skills": [
+          "craft",
+          "art"
+        ],
+        "interests": [
+          "practical",
+          "artistic"
+        ]
+      }
+    },
+    "career_id": "tailor",
+    "portrait": {
+      "seed": 228598227,
+      "genetics": {
+        "face_length": 0.5,
+        "jaw_width": 0.65,
+        "eye_spacing": 0.6,
+        "nose_length": 0.4,
+        "skin_tone": 0.55,
+        "hair_wave": 0.5
+      },
+      "appearance": {
+        "presentation": "feminine",
+        "base_face": "lucia"
+      }
+    },
+    "life_state": {
+      "can_be_pregnant": true
+    }
+  },
+  "Sofia": {
+    "name": "Sofia Landi",
+    "relationship": "Niece · Apprentice seamstress",
+    "summary": "Sofia is learning her mother's trade. Her questions about Anna's school suggest she may be imagining another path.",
+    "temperament": {
+      "known": [
+        "Sociable and quick to ask questions",
+        "Gets restless with repetitive work"
+      ],
+      "suspected": [
+        "Adapts quickly when given a new challenge"
+      ],
+      "unknown": [
+        "How she handles conflict with her parents"
+      ]
+    },
+    "values": {
+      "known": [
+        "Friendship with Anna",
+        "Having choices about her future"
+      ],
+      "suspected": [
+        "Education beyond the apprenticeship"
+      ],
+      "unknown": [
+        "Whether she wants to leave the family trade"
+      ]
+    },
+    "learned_tendencies": {
+      "known": [
+        "Tests an idea with Anna before mentioning it at home",
+        "Tries new tasks eagerly"
+      ],
+      "suspected": [
+        "May downplay her ambitions around Pietro"
+      ],
+      "unknown": [
+        "Whether she would make a bold choice without family support"
+      ]
+    },
+    "current_state": {
+      "known": [
+        "Learning to sew with Lucia",
+        "Asking Anna about school"
+      ],
+      "suspected": [
+        "Unsure whether the apprenticeship suits her"
+      ],
+      "unknown": [
+        "What she hopes to do next year"
+      ]
+    },
+    "experiences": [
+      "Grew up sharing the house with Anna and Carlo.",
+      "Started apprenticing with Lucia this year."
+    ],
+    "evidence": [
+      "Borrowed one of Anna's schoolbooks.",
+      "Asked how Anna qualified for her examinations."
+    ],
+    "job": "Apprentice seamstress",
+    "monthly_income_cents": 1500,
+    "birth": {
+      "year": 1782,
+      "month": 12
+    },
+    "branch_id": "Pietro",
+    "parent_ids": [
+      "Pietro",
+      "Lucia"
+    ],
+    "spouse_id": "",
+    "roles": [
+      "Apprentice"
+    ],
+    "goals": [
+      {
+        "kind": "education",
+        "description": "Explore schooling beyond the sewing apprenticeship",
+        "status": "active"
+      }
+    ],
+    "psychology": {
+      "temperament": {
+        "openness": 0.85,
+        "conscientiousness": 0.55,
+        "extraversion": 0.85,
+        "agreeableness": 0.75,
+        "emotional_stability": 0.7
+      },
+      "values": {
+        "independence": 0.85,
+        "achievement": 0.75,
+        "family_loyalty": 0.7
+      },
+      "learned_tendencies": {
+        "trust": 0.8,
+        "risk_tolerance": 0.75,
+        "need_for_autonomy": 0.8
+      },
+      "current_state": {
+        "stress": 0.25,
+        "happiness": 0.65,
+        "resentment": 0.1
+      }
+    },
+    "relationships": {
+      "Pietro": {
+        "kinship": "parent",
+        "affection": 0.75,
+        "respect": 0.65,
+        "trust": 0.6,
+        "resentment": 0.1
+      },
+      "Lucia": {
+        "kinship": "parent",
+        "affection": 0.75,
+        "respect": 0.65,
+        "trust": 0.6,
+        "resentment": 0.1
+      }
+    },
+    "memories": [
+      {
+        "kind": "formative_experience",
+        "description": "Grew up sharing the house with Anna and Carlo.",
+        "date": "Before January 1800",
+        "participants": []
+      },
+      {
+        "kind": "formative_experience",
+        "description": "Started apprenticing with Lucia this year.",
+        "date": "Before January 1800",
+        "participants": []
+      }
+    ],
+    "conversation_topics": [
+      {
+        "layer": "values",
+        "finding": "Wants to learn what further schooling would involve",
+        "replaces": "Education beyond the apprenticeship",
+        "response": "“Could Anna tell me how her examinations work? I want to know what it would take.”",
+        "evidence": "Sofia asked about qualifications for further schooling."
+      }
+    ],
+    "education": {
+      "level": "primary",
+      "qualifications": [],
+      "study": {}
+    },
+    "abilities": {
+      "reasoning": 70,
+      "verbal": 78,
+      "spatial": 72,
+      "memory": 65,
+      "learning_speed": 82
+    },
+    "skills": {
+      "literacy": 45,
+      "mathematics": 35,
+      "craft": 35,
+      "art": 40,
+      "persuasion": 35
+    },
+    "interests": {
+      "artistic": 85,
+      "social": 80,
+      "academic": 70
+    },
+    "career_access": [],
+    "career_knowledge": {
+      "Giovanni": {
+        "abilities": [
+          "learning_speed"
+        ],
+        "skills": [
+          "craft"
+        ],
+        "interests": [
+          "artistic",
+          "social",
+          "academic"
+        ]
+      }
+    },
+    "portrait": {
+      "seed": 236687319,
+      "genetics": {
+        "face_length": 0.55,
+        "jaw_width": 0.7,
+        "eye_spacing": 0.55,
+        "nose_length": 0.6,
+        "skin_tone": 0.55,
+        "hair_wave": 0.7
+      },
+      "appearance": {
+        "presentation": "feminine",
+        "base_face": "sofia"
+      }
+    },
+    "life_state": {
+      "can_be_pregnant": true
+    }
+  }
+}

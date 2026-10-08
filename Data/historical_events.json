@@ -1,0 +1,1556 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "history_marengo",
+      "category": "history",
+      "title": "News from Marengo",
+      "body": "Napoleon has defeated the Austrians at Marengo in northern Italy. On the Tuscan roads, carriers fear another change of rulers and hesitate to bring grain to market.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1800,
+          "month": 6
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "war",
+          "months": 6,
+          "food_multiplier": 1.25,
+          "income_multiplier": 0.85
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_etruria",
+      "category": "history",
+      "title": "Tuscany becomes the Kingdom of Etruria",
+      "body": "A Bourbon monarchy replaces the Grand Duchy under the Napoleonic settlement. At the village market, the Landis ask which officials will now collect dues and recognize their papers.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1801,
+          "month": 8
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_annexation",
+      "category": "history",
+      "title": "Tuscany passes under French rule",
+      "body": "The Kingdom of Etruria is dissolved and French rule follows. The family must deal with new officials while keeping the farm accounts and household documents in order.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1807,
+          "month": 12
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_restoration",
+      "category": "history",
+      "title": "The Grand Duke returns",
+      "body": "Ferdinand III returns to Tuscany after Napoleon’s fall. The household wonders which wartime arrangements and official papers will still be recognized.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1814,
+          "month": 9
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_vienna",
+      "category": "history",
+      "title": "Europe is redrawn at Vienna",
+      "body": "The Congress of Vienna confirms the restored order across the Italian states. Peace brings more dependable roads, but relatives disagree about the rulers now back in power.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1815,
+          "month": 6
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Spend on repairs and a shared meal",
+          "result": "A repaired home and a meal together offer a modest new beginning.",
+          "effects": {
+            "cash": -1500,
+            "condition": 3,
+            "household_happiness": 0.04
+          }
+        },
+        {
+          "label": "Share the work of rebuilding",
+          "result": "Family labor improves the house, but recovery brings extra duties.",
+          "effects": {
+            "condition": 2,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Save for the years ahead",
+          "result": "The household acknowledges the news and keeps its reserves.",
+          "effects": {
+            "household_happiness": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_carbonari",
+      "category": "history",
+      "title": "News of the Carbonari revolts",
+      "body": "A constitutional revolt in the Kingdom of the Two Sicilies becomes the subject of cautious conversation at the Tuscan market. The family must decide how openly to discuss political hopes.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1820,
+          "month": 7
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_piedmont",
+      "category": "history",
+      "title": "Revolt in Piedmont",
+      "body": "An uprising in Piedmont calls for constitutional government. Travelers carry conflicting accounts to Tuscany, and a political argument follows them into the Landi kitchen.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1821,
+          "month": 3
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_fiorino",
+      "category": "history",
+      "title": "A new currency: the Tuscan fiorino",
+      "body": "Leopold II’s monetary reform introduces the fiorino, divided into 100 quattrini. One fiorino is worth 1⅔ Tuscan lire: 100 Tuscan lire become 60 fiorini. The Landis must learn a new way of counting the same savings and obligations.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1826,
+          "month": 1
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Convert the family accounts",
+          "result": "The household adopts the new currency. Savings, earnings, and commitments retain their value.",
+          "effects": {
+            "currency": "tuscan_fiorino"
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_young_italy",
+      "category": "history",
+      "title": "Mazzini’s Young Italy",
+      "body": "Giuseppe Mazzini founds Young Italy, calling for a united republic. A pamphlet reaches the village and sparks a disagreement about whether distant ideals deserve local risks.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1831,
+          "month": 7
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_first_independence",
+      "category": "history",
+      "title": "The First War of Independence",
+      "body": "Piedmont goes to war against Austria, and Tuscan volunteers and troops join the campaign. In the countryside, families debate service, supplies, and who will finish the spring work.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1848,
+          "month": 3
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "war",
+          "months": 13,
+          "food_multiplier": 1.25,
+          "income_multiplier": 0.85
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_tuscan_restoration",
+      "category": "history",
+      "title": "The Tuscan revolution collapses",
+      "body": "The revolutionary government in Tuscany falls and the grand-ducal restoration follows. Neighbors fear reprisals, while the Landis argue over what should be said in public.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1849,
+          "month": 4
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_tuscan_departure",
+      "category": "history",
+      "title": "The Grand Duke leaves Tuscany",
+      "body": "On 27 April, Leopold II leaves Florence as the Second War of Independence begins. A provisional government takes charge; the farm still needs hands while the family follows news from the city.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1859,
+          "month": 4
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "war",
+          "months": 4,
+          "food_multiplier": 1.25,
+          "income_multiplier": 0.85
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_italian_lira",
+      "category": "history",
+      "title": "Tuscany adopts the Italian lira",
+      "body": "Under the provisional government, the new Italian lira becomes the accounting currency from November. One Tuscan fiorino converts to 1.40 Italian lire: 60 fiorini become 84 lire. The farm’s purse, wages, and costs will now be shown in lire and centesimi.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1859,
+          "month": 11
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Convert the family accounts",
+          "result": "The household adopts the new currency. Savings, earnings, and commitments retain their value.",
+          "effects": {
+            "currency": "italian_lira"
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_tuscan_plebiscite",
+      "category": "history",
+      "title": "Tuscany votes for union",
+      "body": "The plebiscite of 11–12 March favors joining the Kingdom of Sardinia. The Landis debate what union will mean for local administration, taxes, and the future of their children.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1860,
+          "month": 3
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_thousand",
+      "category": "history",
+      "title": "Garibaldi sails with the Thousand",
+      "body": "Garibaldi’s expedition sails for Sicily. Stories of volunteers reach the Tuscan village, where enthusiasm for unity competes with concern for livelihoods and absent relatives.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1860,
+          "month": 5
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_kingdom_italy",
+      "category": "history",
+      "title": "The Kingdom of Italy is proclaimed",
+      "body": "On 17 March, the Kingdom of Italy is proclaimed. Tuscany is part of the new state, and the Landis must decide how to mark unity without neglecting the farm or silencing disagreement.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1861,
+          "month": 3
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_third_independence",
+      "category": "history",
+      "title": "The Third War of Independence",
+      "body": "Italy enters war against Austria alongside Prussia. New uncertainty over transport and provisions reaches Tuscany; the household must protect its reserves while work continues.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1866,
+          "month": 6
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "war",
+          "months": 5,
+          "food_multiplier": 1.25,
+          "income_multiplier": 0.85
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_rome",
+      "category": "history",
+      "title": "Rome is taken",
+      "body": "Italian troops enter Rome on 20 September, ending papal temporal rule there. Around the Landi table, national hopes and religious loyalties do not always point in the same direction.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1870,
+          "month": 9
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_capital",
+      "category": "history",
+      "title": "The capital moves from Florence to Rome",
+      "body": "Rome takes over as the capital of Italy from Florence. Tuscan market contacts wonder how the departure of government offices will change orders and opportunities.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1871,
+          "month": 7
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_schooling",
+      "category": "history",
+      "title": "The Coppino education law",
+      "body": "The new education law strengthens compulsory elementary schooling. Rural families face a familiar tension: children need instruction, but the fields and household also need help.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1877,
+          "month": 7
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_triple_alliance",
+      "category": "history",
+      "title": "Italy signs the Triple Alliance",
+      "body": "Italy allies with Germany and Austria-Hungary. News from the market opens old arguments about Austria, national unity, and whether the agreement will keep another war away.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1882,
+          "month": 5
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_adwa",
+      "category": "history",
+      "title": "Defeat at Adwa",
+      "body": "Italy’s colonial army is defeated by Ethiopia at Adwa. The news provokes grief and anger; the Landis discuss the costs of distant wars while deciding whether to help affected families.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1896,
+          "month": 3
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_bread_riots",
+      "category": "history",
+      "title": "Bread protests and repression",
+      "body": "High bread prices fuel unrest across Italy, and troops violently suppress protests in Milan. The reports reach Tuscany as the family struggles with its own cost of provisions.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1898,
+          "month": 5
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "historical_shortage",
+          "months": 6,
+          "food_multiplier": 1.2,
+          "income_multiplier": 1.0
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_umberto",
+      "category": "history",
+      "title": "King Umberto I is assassinated",
+      "body": "Umberto I is assassinated at Monza on 29 July. Vittorio Emanuele III succeeds him, and the Landis hear anxious arguments about monarchy, repression, and the century ahead.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1900,
+          "month": 7
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_libya",
+      "category": "history",
+      "title": "Italy invades Ottoman Libya",
+      "body": "Italy goes to war against the Ottoman Empire over Libya. Even far from the fighting, the Tuscan household faces uncertain orders, military demands, and arguments about colonial expansion.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1911,
+          "month": 9
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "war",
+          "months": 14,
+          "food_multiplier": 1.25,
+          "income_multiplier": 0.85
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_neutrality",
+      "category": "history",
+      "title": "Europe at war; Italy remains neutral",
+      "body": "War spreads across Europe, while Italy declares neutrality. Tuscan traders worry about supplies, and relatives divide over whether the country should join the fighting.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1914,
+          "month": 8
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "historical_shortage",
+          "months": 9,
+          "food_multiplier": 1.2,
+          "income_multiplier": 1.0
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_great_war",
+      "category": "history",
+      "title": "Italy enters the Great War",
+      "body": "Italy enters the First World War against Austria-Hungary in May. The Landis prepare for years of disruption, while relatives disagree over duty, sacrifice, and who must keep the household afloat.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1915,
+          "month": 5
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "war",
+          "months": 42,
+          "food_multiplier": 1.25,
+          "income_multiplier": 0.85
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_caporetto",
+      "category": "history",
+      "title": "The retreat after Caporetto",
+      "body": "The Italian defeat at Caporetto sends soldiers and civilians retreating from the northeast. Reports and appeals for aid reach Tuscany as supplies become harder to secure.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1917,
+          "month": 10
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "historical_shortage",
+          "months": 13,
+          "food_multiplier": 1.2,
+          "income_multiplier": 1.0
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_armistice",
+      "category": "history",
+      "title": "The armistice of Villa Giusti",
+      "body": "The armistice takes effect on 4 November. Trento and Trieste come under Italian control, extending national unity; returning soldiers and bereaved households face a difficult peace.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1918,
+          "month": 11
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Spend on repairs and a shared meal",
+          "result": "A repaired home and a meal together offer a modest new beginning.",
+          "effects": {
+            "cash": -1500,
+            "condition": 3,
+            "household_happiness": 0.04
+          }
+        },
+        {
+          "label": "Share the work of rebuilding",
+          "result": "Family labor improves the house, but recovery brings extra duties.",
+          "effects": {
+            "condition": 2,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Save for the years ahead",
+          "result": "The household acknowledges the news and keeps its reserves.",
+          "effects": {
+            "household_happiness": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_march_rome",
+      "category": "history",
+      "title": "The March on Rome",
+      "body": "After the Fascist March on Rome, the king appoints Mussolini prime minister. Political intimidation reaches everyday life, and the Landis must decide how to protect each other while preserving trust.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1922,
+          "month": 10
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_racial_laws",
+      "category": "history",
+      "title": "The Fascist racial laws",
+      "body": "The regime’s antisemitic laws exclude Jewish people from schools, jobs, and public life. News of neighbors losing their livelihoods forces the household to confront persecution and the risks of offering help.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1938,
+          "month": 11
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Offer practical help to affected neighbors",
+          "result": "A contribution supports people facing upheaval and gives the family a shared purpose.",
+          "effects": {
+            "cash": -1000,
+            "household_happiness": 0.025
+          }
+        },
+        {
+          "label": "Let relatives speak freely at home",
+          "result": "A private discussion makes room for disagreement, though tensions remain.",
+          "effects": {
+            "household_happiness": 0.015,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Ask for caution in public",
+          "result": "Caution offers reassurance to some, but leaves others frustrated.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_second_war",
+      "category": "history",
+      "title": "Italy enters the Second World War",
+      "body": "On 10 June, Italy declares war on France and Britain. The Tuscan household braces for restricted supplies, interrupted earnings, and another division over what the future demands.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1940,
+          "month": 6
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "war",
+          "months": 63,
+          "food_multiplier": 1.25,
+          "income_multiplier": 0.85
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_armistice_1943",
+      "category": "history",
+      "title": "Armistice, occupation, and resistance",
+      "body": "The armistice is announced on 8 September. German occupation follows in much of Italy, including Tuscany; the Landis face disrupted roads and dangerous choices about whom to shelter or trust.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1943,
+          "month": 9
+        }
+      },
+      "on_trigger": {
+        "crisis": {
+          "kind": "historical_shortage",
+          "months": 20,
+          "food_multiplier": 1.2,
+          "income_multiplier": 1.0
+        },
+        "household_stress": 0.06
+      },
+      "choices": [
+        {
+          "label": "Buy a household reserve",
+          "result": "Stored provisions cushion the disruption, at the cost of savings.",
+          "effects": {
+            "cash": -2000,
+            "relief": 0.15,
+            "household_stress": -0.02
+          }
+        },
+        {
+          "label": "Arrange help with neighboring farms",
+          "result": "Shared work and provisions ease anxiety, but place new demands on the family.",
+          "effects": {
+            "household_stress": -0.015,
+            "household_happiness": -0.01
+          }
+        },
+        {
+          "label": "Preserve the purse and carry on",
+          "result": "The family keeps its savings and faces the disruption with what it has.",
+          "effects": {
+            "household_stress": 0.025
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_florence_liberation",
+      "category": "history",
+      "title": "Florence is liberated",
+      "body": "Fighting and resistance bring liberation to Florence in August. Across the surrounding countryside, damaged routes and displaced families still need help, even as hope returns.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1944,
+          "month": 8
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Spend on repairs and a shared meal",
+          "result": "A repaired home and a meal together offer a modest new beginning.",
+          "effects": {
+            "cash": -1500,
+            "condition": 3,
+            "household_happiness": 0.04
+          }
+        },
+        {
+          "label": "Share the work of rebuilding",
+          "result": "Family labor improves the house, but recovery brings extra duties.",
+          "effects": {
+            "condition": 2,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Save for the years ahead",
+          "result": "The household acknowledges the news and keeps its reserves.",
+          "effects": {
+            "household_happiness": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_liberation",
+      "category": "history",
+      "title": "Liberation in Italy",
+      "body": "The liberation of northern Italy is marked on 25 April. With the war ending, the Landis turn to repairs and reconciliation, knowing that household arguments and losses will outlast the fighting.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1945,
+          "month": 4
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Spend on repairs and a shared meal",
+          "result": "A repaired home and a meal together offer a modest new beginning.",
+          "effects": {
+            "cash": -1500,
+            "condition": 3,
+            "household_happiness": 0.04
+          }
+        },
+        {
+          "label": "Share the work of rebuilding",
+          "result": "Family labor improves the house, but recovery brings extra duties.",
+          "effects": {
+            "condition": 2,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Save for the years ahead",
+          "result": "The household acknowledges the news and keeps its reserves.",
+          "effects": {
+            "household_happiness": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_republic",
+      "category": "history",
+      "title": "Italy chooses a republic",
+      "body": "The referendum of 2 June chooses a republic, and women participate in the national vote. The family debates a new political beginning alongside the familiar work of rebuilding home and livelihood.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1946,
+          "month": 6
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "id": "history_constitution",
+      "category": "history",
+      "title": "The republican Constitution takes effect",
+      "body": "The Constitution enters into force on 1 January. The Landis discuss the rights and responsibilities of the republic, and what those promises could mean for the next generation in rural Tuscany.",
+      "weight": 0.0,
+      "cooldown_months": 0,
+      "conditions": {
+        "historical_date": {
+          "year": 1948,
+          "month": 1
+        }
+      },
+      "on_trigger": {},
+      "choices": [
+        {
+          "label": "Pay for advice and updated papers",
+          "result": "The family gains reassurance about the new arrangements.",
+          "effects": {
+            "cash": -1000,
+            "household_stress": -0.025
+          }
+        },
+        {
+          "label": "Discuss the changes at the family table",
+          "result": "Everyone has a chance to speak, though agreement takes effort.",
+          "effects": {
+            "household_happiness": 0.025,
+            "household_stress": 0.01
+          }
+        },
+        {
+          "label": "Keep attention on the farm",
+          "result": "Fieldwork continues while questions about the changes remain.",
+          "effects": {
+            "household_stress": 0.015
+          }
+        }
+      ]
+    }
+  ]
+}
