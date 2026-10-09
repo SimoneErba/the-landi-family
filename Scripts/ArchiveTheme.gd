@@ -2,6 +2,7 @@ extends RefCounted
 ## Native Godot nine-patch furniture frames and readable archive typography.
 
 const SERIF = preload("res://Assets/UI/Fonts/ArchiveSerif.ttf")
+const ITALIC = preload("res://Assets/UI/Fonts/ArchiveSerif-Italic.ttf")
 const HEADING = preload("res://Assets/UI/Fonts/ArchiveSerif-Bold.ttf")
 const FRAME = preload("res://Assets/UI/walnut-frame.svg")
 const PORTRAIT = preload("res://Assets/UI/portrait-frame.svg")
@@ -55,6 +56,11 @@ static func create() -> Theme:
 	var theme := Theme.new()
 	theme.default_font = SERIF
 	theme.default_font_size = 16
+	# Keep narrative asides visually quieter than facts and decisions.
+	theme.set_type_variation("FlavorText", "Label")
+	theme.set_font("font", "FlavorText", ITALIC)
+	theme.set_font_size("font_size", "FlavorText", 15)
+	theme.set_color("font_color", "FlavorText", Color("#786b59"))
 	theme.set_color("font_color", "Label", Color("#392b20"))
 	theme.set_stylebox("panel", "PanelContainer", window_frame())
 	theme.set_stylebox("panel", "PopupPanel", window_frame())
@@ -98,3 +104,10 @@ static func create() -> Theme:
 	theme.set_color("font_selected_color", "TabContainer", Color("#fff0d0"))
 	theme.set_color("font_unselected_color", "TabContainer", Color("#dec9a1"))
 	return theme
+
+
+static func flavor_quote(value: String) -> String:
+	var text := value.strip_edges()
+	if text.is_empty() or text.begins_with("“") or text.begins_with("\""):
+		return text
+	return "“%s”" % text

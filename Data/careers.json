@@ -1146,6 +1146,27 @@
         "learning_speed": 0.3
       },
       "entry_skills": {}
+    },
+    {
+      "id": "leadership",
+      "name": "Leadership and public speaking",
+      "education_level": "secondary",
+      "qualification": "",
+      "required_level": 2,
+      "skills": {
+        "leadership": 65,
+        "persuasion": 65
+      },
+      "months": 24,
+      "monthly_cost_cents": 1200,
+      "interest": "social",
+      "abilities": {
+        "verbal": 0.6,
+        "learning_speed": 0.4
+      },
+      "entry_skills": {
+        "literacy": 40
+      }
     }
   ]
 }

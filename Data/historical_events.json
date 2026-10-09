@@ -295,7 +295,7 @@
       "id": "history_fiorino",
       "category": "history",
       "title": "A new currency: the Tuscan fiorino",
-      "body": "Leopold II’s monetary reform introduces the fiorino, divided into 100 quattrini. One fiorino is worth 1⅔ Tuscan lire: 100 Tuscan lire become 60 fiorini. The Landis must learn a new way of counting the same savings and obligations.",
+      "body": "Leopold II’s monetary reform introduces the Tuscan fiorino. Markets and banks adjust their accounts; the family ledger continues to use the same lire for clear comparisons across generations.",
       "weight": 0.0,
       "cooldown_months": 0,
       "conditions": {
@@ -307,8 +307,8 @@
       "on_trigger": {},
       "choices": [
         {
-          "label": "Convert the family accounts",
-          "result": "The household adopts the new currency. Savings, earnings, and commitments retain their value.",
+          "label": "Acknowledge the reform",
+          "result": "Savings, earnings, and commitments retain their value. The family ledger continues in lire.",
           "effects": {
             "currency": "tuscan_fiorino"
           }
@@ -497,7 +497,7 @@
       "id": "history_italian_lira",
       "category": "history",
       "title": "Tuscany adopts the Italian lira",
-      "body": "Under the provisional government, the new Italian lira becomes the accounting currency from November. One Tuscan fiorino converts to 1.40 Italian lire: 60 fiorini become 84 lire. The farm’s purse, wages, and costs will now be shown in lire and centesimi.",
+      "body": "Under the provisional government, the Italian lira becomes the accounting currency from November. The family ledger continues to use the same lire for clear comparisons across generations.",
       "weight": 0.0,
       "cooldown_months": 0,
       "conditions": {
@@ -509,8 +509,8 @@
       "on_trigger": {},
       "choices": [
         {
-          "label": "Convert the family accounts",
-          "result": "The household adopts the new currency. Savings, earnings, and commitments retain their value.",
+          "label": "Acknowledge the reform",
+          "result": "Savings, earnings, and commitments retain their value. The family ledger continues in lire.",
           "effects": {
             "currency": "italian_lira"
           }

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ckuvw7445u5at"
+
+[deps]
+
+files=["res://Reports/Simulations/event-check/annual.seed.translation", "res://Reports/Simulations/event-check/annual.month.translation", "res://Reports/Simulations/event-check/annual.year.translation", "res://Reports/Simulations/event-check/annual.cash.translation", "res://Reports/Simulations/event-check/annual.real.translation", "res://Reports/Simulations/event-check/annual.living.translation", "res://Reports/Simulations/event-check/annual.residents.translation", "res://Reports/Simulations/event-check/annual.births.translation", "res://Reports/Simulations/event-check/annual.graduates.translation", "res://Reports/Simulations/event-check/annual.influential.translation", "res://Reports/Simulations/event-check/annual.stress.translation", "res://Reports/Simulations/event-check/annual.resentment.translation", "res://Reports/Simulations/event-check/annual.house.translation", "res://Reports/Simulations/event-check/annual.house.translation", "res://Reports/Simulations/event-check/annual.family.translation", "res://Reports/Simulations/event-check/annual.family.translation", "res://Reports/Simulations/event-check/annual.village.translation", "res://Reports/Simulations/event-check/annual.living.translation", "res://Reports/Simulations/event-check/annual.unfulfilled.translation", "res://Reports/Simulations/event-check/annual.wealth.translation", "res://Reports/Simulations/event-check/annual.population.translation"]
+
+source_file="res://Reports/Simulations/event-check/annual.csv"
+dest_files=["res://Reports/Simulations/event-check/annual.seed.translation", "res://Reports/Simulations/event-check/annual.month.translation", "res://Reports/Simulations/event-check/annual.year.translation", "res://Reports/Simulations/event-check/annual.cash.translation", "res://Reports/Simulations/event-check/annual.real.translation", "res://Reports/Simulations/event-check/annual.living.translation", "res://Reports/Simulations/event-check/annual.residents.translation", "res://Reports/Simulations/event-check/annual.births.translation", "res://Reports/Simulations/event-check/annual.graduates.translation", "res://Reports/Simulations/event-check/annual.influential.translation", "res://Reports/Simulations/event-check/annual.stress.translation", "res://Reports/Simulations/event-check/annual.resentment.translation", "res://Reports/Simulations/event-check/annual.house.translation", "res://Reports/Simulations/event-check/annual.house.translation", "res://Reports/Simulations/event-check/annual.family.translation", "res://Reports/Simulations/event-check/annual.family.translation", "res://Reports/Simulations/event-check/annual.village.translation", "res://Reports/Simulations/event-check/annual.living.translation", "res://Reports/Simulations/event-check/annual.unfulfilled.translation", "res://Reports/Simulations/event-check/annual.wealth.translation", "res://Reports/Simulations/event-check/annual.population.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

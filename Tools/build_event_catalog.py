@@ -292,7 +292,7 @@ for category, stories in STORIES.items():
         if category=='care':conditions.update(min_stress=.3)
         if category in ('drought','famine'):conditions['months']=[5,6,7,8,9] if category=='drought' else list(range(1,13))
         if category=='war':conditions.update(wartime_only=True)
-        if category=='illness': conditions.update(target='healthy',min_age=1)
+        if category=='illness': conditions.update(target='healthy',min_age=1,allow_travel=True)
         if category=='pregnancy':conditions.update(target='pregnancy',min_age=18,max_age=45)
         if category=='expansion':conditions.update(max_capacity=20)
         if category=='celebration' and i==3: conditions.update(min_year=1860)
@@ -377,9 +377,20 @@ for category, stories in STORIES.items():
                      option('Share preparations within the family','The family prepares with existing resources and shared effort.',stress=-.025,household_stress=.02),
                      option('Wait before spending','The pregnancy continues, but preparations are deferred.',stress=.035)]
         event['choices']=choices
+        crisis = event['on_trigger'].get('crisis')
+        if category == 'war' and crisis:
+            crisis.update(business_cost_multiplier=1.15, travel_delay_months=2)
+            event['body'] += ' Business inputs cost more during the disruption; departures and journeys on the road wait for two months. Existing placements can continue.'
+        elif category == 'drought' and crisis:
+            crisis['farm_multiplier'] = 0.65
+            event['body'] += ' Farms produce fewer sales while the drought lasts, including neighboring farms. Workshops retain their normal output.'
+        elif category == 'famine' and crisis:
+            crisis['business_cost_multiplier'] = 1.1
+            event['body'] += ' Scarce supplies also raise business operating costs. Household relief reduces food prices, but does not restore business supply chains.'
         catalog.append(event)
 for key,title,body in [('graduation','Graduation','{person} has completed {course}. A new chapter can begin.'),('birth','A new child in the family','{person} welcomes {child}. The household has another person to care for.'),('recovery','Recovery','{person} is well enough to resume ordinary life.')]:
     catalog.append({'id':key,'category':'milestone','title':title,'body':body,'weight':0,'cooldown_months':0,'conditions':{'automatic_only':True},'on_trigger':{},'choices':[option('Mark this in the family history','The family acknowledges this turning point.')]})
-catalog.extend(json.loads(Path('Data/historical_events.json').read_text())['events'])
-Path('Data/events.json').write_text(json.dumps({'schema_version':1,'events':catalog},ensure_ascii=False,indent=2)+'\n')
+catalog.extend(json.loads(Path('Data/historical_events.json').read_text(encoding='utf-8'))['events'])
+catalog.extend(json.loads(Path('Data/property_events.json').read_text(encoding='utf-8'))['events'])
+Path('Data/events.json').write_text(json.dumps({'schema_version':1,'events':catalog},ensure_ascii=False,indent=2)+'\n', encoding='utf-8', newline='\n')
 print(f'Wrote {len(catalog)} events in {len(STORIES)} categories plus milestones')

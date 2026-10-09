@@ -1,0 +1,1108 @@
+{
+  "completed": true,
+  "config": {
+    "bonus": "discount",
+    "objective": "wealth",
+    "seed_start": 1,
+    "seeds": 1,
+    "strategies": [
+      "passive",
+      "frugal",
+      "education",
+      "enterprise",
+      "family"
+    ],
+    "years": 1
+  },
+  "format_version": 1,
+  "generated_utc": "2026-10-09T13:20:58",
+  "limitations": [
+    "Policies use eligibility rules to choose proposals; they are scripted test players, not a model of human knowledge or optimal play.",
+    "All policies share the configured bonus, objective and seed list; different actions can cause random streams to diverge.",
+    "The runner resolves pauses through legal event choices and records pause months. Debt continues as unpaid bills; it does not fabricate a recovery.",
+    "Marriage requests currently create goals, and mortality/succession remain incomplete. Century results do not certify a complete generational game."
+  ],
+  "runs": [
+    {
+      "business_net_basis_cents": 0,
+      "checkpoints": [
+        {
+          "births": 0,
+          "cash_basis_cents": 10000,
+          "cash_italian_lire": 84.0,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 0,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 100.0,
+          "resentment": 0.171428571428571,
+          "residents": 7,
+          "stress": 0.335714285714286,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.000084,
+          "year": 1800
+        },
+        {
+          "births": 0,
+          "cash_basis_cents": 232606,
+          "cash_italian_lire": 1953.8904,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 12,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 2314.46113757721,
+          "resentment": 0.167142857142857,
+          "residents": 6,
+          "stress": 0.238571428571428,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.0019538904,
+          "year": 1801
+        }
+      ],
+      "debt_months": 0,
+      "decisions": {
+        "event": 6,
+        "outcome:resolved": 6
+      },
+      "error": "",
+      "final": {
+        "births": 0,
+        "cash_basis_cents": 232606,
+        "cash_italian_lire": 1953.8904,
+        "family_businesses": 0,
+        "family_properties": 1,
+        "graduates": 0,
+        "house_capacity": 7,
+        "house_condition": 80,
+        "influential": 0,
+        "living": 7,
+        "living_over_100": 0,
+        "month": 12,
+        "objective_completed": false,
+        "population_fraction": 0.07,
+        "real_cash_starting_lire": 2314.46113757721,
+        "resentment": 0.167142857142857,
+        "residents": 6,
+        "stress": 0.238571428571428,
+        "unfulfilled_marriage_goals": 0,
+        "village_buildings": 18,
+        "wealth_fraction": 0.0019538904,
+        "year": 1801
+      },
+      "first_debt_month": -1,
+      "last_100_decisions": [
+        {
+          "kind": "event",
+          "month": 1,
+          "outcome": "resolved",
+          "response": "Make time for a family discussion",
+          "target": "conflict_02"
+        },
+        {
+          "kind": "event",
+          "month": 3,
+          "outcome": "resolved",
+          "response": "Support the request",
+          "target": "family_requests_04"
+        },
+        {
+          "kind": "event",
+          "month": 4,
+          "outcome": "resolved",
+          "response": "Make a contribution",
+          "target": "community_06"
+        },
+        {
+          "kind": "event",
+          "month": 5,
+          "outcome": "resolved",
+          "response": "Buy a household reserve",
+          "target": "history_marengo"
+        },
+        {
+          "kind": "event",
+          "month": 6,
+          "outcome": "resolved",
+          "response": "Arrange care and baby supplies",
+          "target": "pregnancy_12"
+        },
+        {
+          "kind": "event",
+          "month": 9,
+          "outcome": "resolved",
+          "response": "Finance the small arrangement",
+          "target": "trade_11"
+        }
+      ],
+      "major_pause_months": 7,
+      "minimum_cash_cents": 10000,
+      "months_simulated": 12,
+      "objective_completed_month": -1,
+      "peak_living": 7,
+      "seed": 1,
+      "status": "completed",
+      "strategy": "passive",
+      "warnings": []
+    },
+    {
+      "business_net_basis_cents": 0,
+      "checkpoints": [
+        {
+          "births": 0,
+          "cash_basis_cents": 10000,
+          "cash_italian_lire": 84.0,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 0,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 100.0,
+          "resentment": 0.171428571428571,
+          "residents": 7,
+          "stress": 0.335714285714286,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.000084,
+          "year": 1800
+        },
+        {
+          "births": 0,
+          "cash_basis_cents": 286113,
+          "cash_italian_lire": 2403.3492,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 12,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 2846.86301924984,
+          "resentment": 0.172142857142857,
+          "residents": 6,
+          "stress": 0.272142857142857,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.0024033492,
+          "year": 1801
+        }
+      ],
+      "debt_months": 0,
+      "decisions": {
+        "event": 6,
+        "outcome:accepted": 2,
+        "outcome:resolved": 6,
+        "request": 2
+      },
+      "error": "",
+      "final": {
+        "births": 0,
+        "cash_basis_cents": 286113,
+        "cash_italian_lire": 2403.3492,
+        "family_businesses": 0,
+        "family_properties": 1,
+        "graduates": 0,
+        "house_capacity": 7,
+        "house_condition": 80,
+        "influential": 0,
+        "living": 7,
+        "living_over_100": 0,
+        "month": 12,
+        "objective_completed": false,
+        "population_fraction": 0.07,
+        "real_cash_starting_lire": 2846.86301924984,
+        "resentment": 0.172142857142857,
+        "residents": 6,
+        "stress": 0.272142857142857,
+        "unfulfilled_marriage_goals": 0,
+        "village_buildings": 18,
+        "wealth_fraction": 0.0024033492,
+        "year": 1801
+      },
+      "first_debt_month": -1,
+      "last_100_decisions": [
+        {
+          "kind": "request",
+          "month": 0,
+          "outcome": "accepted",
+          "response": "Yes. This could be a future I want.",
+          "target": "Maria:work:clerk"
+        },
+        {
+          "kind": "event",
+          "month": 1,
+          "outcome": "resolved",
+          "response": "Make time for a family discussion",
+          "target": "conflict_02"
+        },
+        {
+          "kind": "event",
+          "month": 3,
+          "outcome": "resolved",
+          "response": "Decline for now",
+          "target": "family_requests_04"
+        },
+        {
+          "kind": "request",
+          "month": 3,
+          "outcome": "accepted",
+          "response": "Yes. This could be a future I want.",
+          "target": "Carlo:work:journalist"
+        },
+        {
+          "kind": "event",
+          "month": 4,
+          "outcome": "resolved",
+          "response": "Offer family time instead",
+          "target": "community_06"
+        },
+        {
+          "kind": "event",
+          "month": 5,
+          "outcome": "resolved",
+          "response": "Arrange help with neighboring farms",
+          "target": "history_marengo"
+        },
+        {
+          "kind": "event",
+          "month": 6,
+          "outcome": "resolved",
+          "response": "Share preparations within the family",
+          "target": "pregnancy_12"
+        },
+        {
+          "kind": "event",
+          "month": 9,
+          "outcome": "resolved",
+          "response": "Pass on the opportunity",
+          "target": "trade_11"
+        }
+      ],
+      "major_pause_months": 7,
+      "minimum_cash_cents": 10000,
+      "months_simulated": 12,
+      "objective_completed_month": -1,
+      "peak_living": 7,
+      "seed": 1,
+      "status": "completed",
+      "strategy": "frugal",
+      "warnings": []
+    },
+    {
+      "business_net_basis_cents": 0,
+      "checkpoints": [
+        {
+          "births": 0,
+          "cash_basis_cents": 10000,
+          "cash_italian_lire": 84.0,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 0,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 100.0,
+          "resentment": 0.171428571428571,
+          "residents": 7,
+          "stress": 0.335714285714286,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.000084,
+          "year": 1800
+        },
+        {
+          "births": 0,
+          "cash_basis_cents": 238133,
+          "cash_italian_lire": 2000.3172,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 12,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 2369.45553457208,
+          "resentment": 0.167142857142857,
+          "residents": 6,
+          "stress": 0.231428571428571,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.0020003172,
+          "year": 1801
+        }
+      ],
+      "debt_months": 0,
+      "decisions": {
+        "event": 6,
+        "outcome:accepted": 4,
+        "outcome:resolved": 6,
+        "request": 4
+      },
+      "error": "",
+      "final": {
+        "births": 0,
+        "cash_basis_cents": 238133,
+        "cash_italian_lire": 2000.3172,
+        "family_businesses": 0,
+        "family_properties": 1,
+        "graduates": 0,
+        "house_capacity": 7,
+        "house_condition": 80,
+        "influential": 0,
+        "living": 7,
+        "living_over_100": 0,
+        "month": 12,
+        "objective_completed": false,
+        "population_fraction": 0.07,
+        "real_cash_starting_lire": 2369.45553457208,
+        "resentment": 0.167142857142857,
+        "residents": 6,
+        "stress": 0.231428571428571,
+        "unfulfilled_marriage_goals": 0,
+        "village_buildings": 18,
+        "wealth_fraction": 0.0020003172,
+        "year": 1801
+      },
+      "first_debt_month": -1,
+      "last_100_decisions": [
+        {
+          "kind": "request",
+          "month": 0,
+          "outcome": "accepted",
+          "response": "Yes. This could be a future I want.",
+          "target": "Maria:work:clerk"
+        },
+        {
+          "kind": "event",
+          "month": 1,
+          "outcome": "resolved",
+          "response": "Make time for a family discussion",
+          "target": "conflict_02"
+        },
+        {
+          "kind": "event",
+          "month": 3,
+          "outcome": "resolved",
+          "response": "Support the request",
+          "target": "family_requests_04"
+        },
+        {
+          "kind": "request",
+          "month": 3,
+          "outcome": "accepted",
+          "response": "Yes. This could be a future I want.",
+          "target": "Carlo:work:journalist"
+        },
+        {
+          "kind": "event",
+          "month": 4,
+          "outcome": "resolved",
+          "response": "Make a contribution",
+          "target": "community_06"
+        },
+        {
+          "kind": "event",
+          "month": 5,
+          "outcome": "resolved",
+          "response": "Buy a household reserve",
+          "target": "history_marengo"
+        },
+        {
+          "kind": "event",
+          "month": 6,
+          "outcome": "resolved",
+          "response": "Arrange care and baby supplies",
+          "target": "pregnancy_12"
+        },
+        {
+          "kind": "request",
+          "month": 6,
+          "outcome": "accepted",
+          "response": "Yes. This could be a future I want.",
+          "target": "Maria:train:technical"
+        },
+        {
+          "kind": "event",
+          "month": 9,
+          "outcome": "resolved",
+          "response": "Pass on the opportunity",
+          "target": "trade_11"
+        },
+        {
+          "kind": "request",
+          "month": 9,
+          "outcome": "accepted",
+          "response": "Yes. This could be a future I want.",
+          "target": "Anna:train:engineering"
+        }
+      ],
+      "major_pause_months": 7,
+      "minimum_cash_cents": 10000,
+      "months_simulated": 12,
+      "objective_completed_month": -1,
+      "peak_living": 7,
+      "seed": 1,
+      "status": "completed",
+      "strategy": "education",
+      "warnings": []
+    },
+    {
+      "business_net_basis_cents": 0,
+      "checkpoints": [
+        {
+          "births": 0,
+          "cash_basis_cents": 10000,
+          "cash_italian_lire": 84.0,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 0,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 100.0,
+          "resentment": 0.171428571428571,
+          "residents": 7,
+          "stress": 0.335714285714286,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.000084,
+          "year": 1800
+        },
+        {
+          "births": 0,
+          "cash_basis_cents": 234763,
+          "cash_italian_lire": 1972.0092,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 12,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 2335.92357910388,
+          "resentment": 0.172142857142857,
+          "residents": 6,
+          "stress": 0.272142857142857,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.0019720092,
+          "year": 1801
+        }
+      ],
+      "debt_months": 0,
+      "decisions": {
+        "construction": 3,
+        "event": 6,
+        "land": 3,
+        "outcome:accepted": 1,
+        "outcome:commissioned": 3,
+        "outcome:purchased": 3,
+        "outcome:resolved": 6,
+        "request": 1
+      },
+      "error": "",
+      "final": {
+        "births": 0,
+        "cash_basis_cents": 234763,
+        "cash_italian_lire": 1972.0092,
+        "family_businesses": 0,
+        "family_properties": 1,
+        "graduates": 0,
+        "house_capacity": 7,
+        "house_condition": 80,
+        "influential": 0,
+        "living": 7,
+        "living_over_100": 0,
+        "month": 12,
+        "objective_completed": false,
+        "population_fraction": 0.07,
+        "real_cash_starting_lire": 2335.92357910388,
+        "resentment": 0.172142857142857,
+        "residents": 6,
+        "stress": 0.272142857142857,
+        "unfulfilled_marriage_goals": 0,
+        "village_buildings": 18,
+        "wealth_fraction": 0.0019720092,
+        "year": 1801
+      },
+      "first_debt_month": -1,
+      "last_100_decisions": [
+        {
+          "kind": "request",
+          "month": 0,
+          "outcome": "accepted",
+          "response": "Yes. This could be a future I want.",
+          "target": "Maria:work:clerk"
+        },
+        {
+          "kind": "event",
+          "month": 1,
+          "outcome": "resolved",
+          "response": "Make time for a family discussion",
+          "target": "conflict_02"
+        },
+        {
+          "kind": "event",
+          "month": 3,
+          "outcome": "resolved",
+          "response": "Decline for now",
+          "target": "family_requests_04"
+        },
+        {
+          "kind": "land",
+          "month": 3,
+          "outcome": "purchased",
+          "response": "The parcel now belongs to the family.",
+          "target": "parcel_19"
+        },
+        {
+          "kind": "construction",
+          "month": 3,
+          "outcome": "commissioned",
+          "response": "Construction started. The building will be ready in 12 months.",
+          "target": "parcel_19"
+        },
+        {
+          "kind": "event",
+          "month": 4,
+          "outcome": "resolved",
+          "response": "Offer family time instead",
+          "target": "community_06"
+        },
+        {
+          "kind": "event",
+          "month": 5,
+          "outcome": "resolved",
+          "response": "Arrange help with neighboring farms",
+          "target": "history_marengo"
+        },
+        {
+          "kind": "event",
+          "month": 6,
+          "outcome": "resolved",
+          "response": "Share preparations within the family",
+          "target": "pregnancy_12"
+        },
+        {
+          "kind": "land",
+          "month": 6,
+          "outcome": "purchased",
+          "response": "The parcel now belongs to the family.",
+          "target": "parcel_21"
+        },
+        {
+          "kind": "construction",
+          "month": 6,
+          "outcome": "commissioned",
+          "response": "Construction started. The building will be ready in 12 months.",
+          "target": "parcel_21"
+        },
+        {
+          "kind": "event",
+          "month": 9,
+          "outcome": "resolved",
+          "response": "Pass on the opportunity",
+          "target": "trade_11"
+        },
+        {
+          "kind": "land",
+          "month": 9,
+          "outcome": "purchased",
+          "response": "The parcel now belongs to the family.",
+          "target": "parcel_22"
+        },
+        {
+          "kind": "construction",
+          "month": 9,
+          "outcome": "commissioned",
+          "response": "Construction started. The building will be ready in 12 months.",
+          "target": "parcel_22"
+        }
+      ],
+      "major_pause_months": 7,
+      "minimum_cash_cents": 10000,
+      "months_simulated": 12,
+      "objective_completed_month": -1,
+      "peak_living": 7,
+      "seed": 1,
+      "status": "completed",
+      "strategy": "enterprise",
+      "warnings": []
+    },
+    {
+      "business_net_basis_cents": 0,
+      "checkpoints": [
+        {
+          "births": 0,
+          "cash_basis_cents": 10000,
+          "cash_italian_lire": 84.0,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 0,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 100.0,
+          "resentment": 0.171428571428571,
+          "residents": 7,
+          "stress": 0.335714285714286,
+          "unfulfilled_marriage_goals": 0,
+          "village_buildings": 18,
+          "wealth_fraction": 0.000084,
+          "year": 1800
+        },
+        {
+          "births": 0,
+          "cash_basis_cents": 229573,
+          "cash_italian_lire": 1928.4132,
+          "family_businesses": 0,
+          "family_properties": 1,
+          "graduates": 0,
+          "house_capacity": 7,
+          "house_condition": 80,
+          "influential": 0,
+          "living": 7,
+          "living_over_100": 0,
+          "month": 12,
+          "objective_completed": false,
+          "population_fraction": 0.07,
+          "real_cash_starting_lire": 2284.28237765583,
+          "resentment": 0.19,
+          "residents": 6,
+          "stress": 0.238571428571428,
+          "unfulfilled_marriage_goals": 1,
+          "village_buildings": 18,
+          "wealth_fraction": 0.0019284132,
+          "year": 1801
+        }
+      ],
+      "debt_months": 0,
+      "decisions": {
+        "event": 6,
+        "outcome:refused": 3,
+        "outcome:reluctant": 1,
+        "outcome:resolved": 6,
+        "request": 4
+      },
+      "error": "",
+      "final": {
+        "births": 0,
+        "cash_basis_cents": 229573,
+        "cash_italian_lire": 1928.4132,
+        "family_businesses": 0,
+        "family_properties": 1,
+        "graduates": 0,
+        "house_capacity": 7,
+        "house_condition": 80,
+        "influential": 0,
+        "living": 7,
+        "living_over_100": 0,
+        "month": 12,
+        "objective_completed": false,
+        "population_fraction": 0.07,
+        "real_cash_starting_lire": 2284.28237765583,
+        "resentment": 0.19,
+        "residents": 6,
+        "stress": 0.238571428571428,
+        "unfulfilled_marriage_goals": 1,
+        "village_buildings": 18,
+        "wealth_fraction": 0.0019284132,
+        "year": 1801
+      },
+      "first_debt_month": -1,
+      "last_100_decisions": [
+        {
+          "kind": "request",
+          "month": 0,
+          "outcome": "refused",
+          "response": "No. I have other plans right now. Marriage must be my choice.",
+          "target": "Carlo:marry"
+        },
+        {
+          "kind": "event",
+          "month": 1,
+          "outcome": "resolved",
+          "response": "Make time for a family discussion",
+          "target": "conflict_02"
+        },
+        {
+          "kind": "event",
+          "month": 3,
+          "outcome": "resolved",
+          "response": "Support the request",
+          "target": "family_requests_04"
+        },
+        {
+          "kind": "request",
+          "month": 3,
+          "outcome": "reluctant",
+          "response": "I will consider finding a partner, for your sake. But I am not happy about being asked.",
+          "target": "Anna:marry"
+        },
+        {
+          "kind": "event",
+          "month": 4,
+          "outcome": "resolved",
+          "response": "Make a contribution",
+          "target": "community_06"
+        },
+        {
+          "kind": "event",
+          "month": 5,
+          "outcome": "resolved",
+          "response": "Buy a household reserve",
+          "target": "history_marengo"
+        },
+        {
+          "kind": "event",
+          "month": 6,
+          "outcome": "resolved",
+          "response": "Arrange care and baby supplies",
+          "target": "pregnancy_12"
+        },
+        {
+          "kind": "request",
+          "month": 6,
+          "outcome": "refused",
+          "response": "No. I need room to build my own life.",
+          "target": "Carlo:stay"
+        },
+        {
+          "kind": "event",
+          "month": 9,
+          "outcome": "resolved",
+          "response": "Pass on the opportunity",
+          "target": "trade_11"
+        },
+        {
+          "kind": "request",
+          "month": 9,
+          "outcome": "refused",
+          "response": "No. I need room to build my own life.",
+          "target": "Carlo:join"
+        }
+      ],
+      "major_pause_months": 7,
+      "minimum_cash_cents": 10000,
+      "months_simulated": 12,
+      "objective_completed_month": -1,
+      "peak_living": 7,
+      "seed": 1,
+      "status": "completed",
+      "strategy": "family",
+      "warnings": [
+        "Accepted marriage requests remain goals; new partners are not generated."
+      ]
+    }
+  ],
+  "source_sha256": {
+    "Data/careers.json": "82efb9aac5b17b2ab5f037bbe2dfdff4f78926ffbd25ade90eade91d368ecb29",
+    "Data/events.json": "9dc930c0177b44cf7303ae88aec0de0ef46feb43e08987e1652c8c4a54d6e9c2",
+    "Data/people.json": "9afd136b9d9aa113f349cc96a42f3853f7e05b9e4f0eed3d3f7c9a9c48ff5300",
+    "Simulation/Activities/ActivitySystem.gd": "2084329daf0462cc467192b02aae254e010aa48af35c29a9dd6e25db69ee1f93",
+    "Simulation/Careers.gd": "63321d9995a09ddd2728449e8511bf08c46775fa76fbcdd30416a80d92eb5fcf",
+    "Simulation/DecisionSystem.gd": "2a05004c416ca6cbce5f58602172681b98348ab03a7ac37de70fdb73867f2872",
+    "Simulation/Economy.gd": "326b19ca5d9fdab3e4f4d6f8017bfaa586c7cd3f547cb200cc4cccb1a074037b",
+    "Simulation/EventSystem.gd": "deefee300dc6899545ef2b1b54ccd27aaa12b023259309e54b716704ed9554a1",
+    "Simulation/GameState.gd": "2ac7d633ff276133b32968a4f1a273a9a821a46f979074683f61b13e61c5cb2f",
+    "Simulation/Influence.gd": "1cd8814bb41ea720c83fd64e6bb61b147757843cad7ce02827404404da0c66cb",
+    "Simulation/Legacy.gd": "ff93838a6ea3c84c7f493f6b919a720faf613e78b603b2ab80e41c63f95f0610",
+    "Simulation/Person.gd": "f54b7b4a476f9e0ebe968b1d0c117438db0245e35852b022abdcd60e20b5fd46",
+    "Simulation/Testing/SimulatedPlayer.gd": "823e708734ea756eb4a56912cda08f0f50a633c27fb1282481014c8da467e2f5",
+    "Simulation/Testing/SimulationRunner.gd": "5f98505f089e38f2c9d54096c3c7a04039fbd5c4e899a83f3012756c78afd1ba",
+    "Simulation/Travel.gd": "6708e40c464b78933c4a75eed6f9066ebe769bc7bffa760d3fa9960f4bb1a0c4",
+    "Simulation/Village/VillageBusiness.gd": "d7c6c91da00c19fbdab5bee3791000fe7620a37304bcf211f9d6ee7a7a392126",
+    "Simulation/Village/VillageDevelopment.gd": "b7cb31942e009a9b76b956a44bf3ef5ce11cc282da50ab7fa905d4aab482e85e",
+    "Simulation/Village/VillageState.gd": "d8ebc4e3db90c7afc111694a1397731e965daad1821f40eec596605370f2c262"
+  },
+  "summary": {
+    "education": {
+      "completed_runs": 1,
+      "metrics": {
+        "cash_italian_lire": {
+          "max": 2000.3172,
+          "median": 2000.3172,
+          "min": 2000.3172
+        },
+        "family_businesses": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "graduates": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "influential": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "living": {
+          "max": 7,
+          "median": 7.0,
+          "min": 7
+        },
+        "resentment": {
+          "max": 0.167142857142857,
+          "median": 0.167142857142857,
+          "min": 0.167142857142857
+        },
+        "stress": {
+          "max": 0.231428571428571,
+          "median": 0.231428571428571,
+          "min": 0.231428571428571
+        },
+        "wealth_fraction": {
+          "max": 0.0020003172,
+          "median": 0.0020003172,
+          "min": 0.0020003172
+        }
+      },
+      "objective_wins": 0,
+      "runs": 1,
+      "runs_with_debt": 0
+    },
+    "enterprise": {
+      "completed_runs": 1,
+      "metrics": {
+        "cash_italian_lire": {
+          "max": 1972.0092,
+          "median": 1972.0092,
+          "min": 1972.0092
+        },
+        "family_businesses": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "graduates": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "influential": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "living": {
+          "max": 7,
+          "median": 7.0,
+          "min": 7
+        },
+        "resentment": {
+          "max": 0.172142857142857,
+          "median": 0.172142857142857,
+          "min": 0.172142857142857
+        },
+        "stress": {
+          "max": 0.272142857142857,
+          "median": 0.272142857142857,
+          "min": 0.272142857142857
+        },
+        "wealth_fraction": {
+          "max": 0.0019720092,
+          "median": 0.0019720092,
+          "min": 0.0019720092
+        }
+      },
+      "objective_wins": 0,
+      "runs": 1,
+      "runs_with_debt": 0
+    },
+    "family": {
+      "completed_runs": 1,
+      "metrics": {
+        "cash_italian_lire": {
+          "max": 1928.4132,
+          "median": 1928.4132,
+          "min": 1928.4132
+        },
+        "family_businesses": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "graduates": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "influential": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "living": {
+          "max": 7,
+          "median": 7.0,
+          "min": 7
+        },
+        "resentment": {
+          "max": 0.19,
+          "median": 0.19,
+          "min": 0.19
+        },
+        "stress": {
+          "max": 0.238571428571428,
+          "median": 0.238571428571428,
+          "min": 0.238571428571428
+        },
+        "wealth_fraction": {
+          "max": 0.0019284132,
+          "median": 0.0019284132,
+          "min": 0.0019284132
+        }
+      },
+      "objective_wins": 0,
+      "runs": 1,
+      "runs_with_debt": 0
+    },
+    "frugal": {
+      "completed_runs": 1,
+      "metrics": {
+        "cash_italian_lire": {
+          "max": 2403.3492,
+          "median": 2403.3492,
+          "min": 2403.3492
+        },
+        "family_businesses": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "graduates": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "influential": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "living": {
+          "max": 7,
+          "median": 7.0,
+          "min": 7
+        },
+        "resentment": {
+          "max": 0.172142857142857,
+          "median": 0.172142857142857,
+          "min": 0.172142857142857
+        },
+        "stress": {
+          "max": 0.272142857142857,
+          "median": 0.272142857142857,
+          "min": 0.272142857142857
+        },
+        "wealth_fraction": {
+          "max": 0.0024033492,
+          "median": 0.0024033492,
+          "min": 0.0024033492
+        }
+      },
+      "objective_wins": 0,
+      "runs": 1,
+      "runs_with_debt": 0
+    },
+    "passive": {
+      "completed_runs": 1,
+      "metrics": {
+        "cash_italian_lire": {
+          "max": 1953.8904,
+          "median": 1953.8904,
+          "min": 1953.8904
+        },
+        "family_businesses": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "graduates": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "influential": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "living": {
+          "max": 7,
+          "median": 7.0,
+          "min": 7
+        },
+        "resentment": {
+          "max": 0.167142857142857,
+          "median": 0.167142857142857,
+          "min": 0.167142857142857
+        },
+        "stress": {
+          "max": 0.238571428571428,
+          "median": 0.238571428571428,
+          "min": 0.238571428571428
+        },
+        "wealth_fraction": {
+          "max": 0.0019538904,
+          "median": 0.0019538904,
+          "min": 0.0019538904
+        }
+      },
+      "objective_wins": 0,
+      "runs": 1,
+      "runs_with_debt": 0
+    }
+  }
+}

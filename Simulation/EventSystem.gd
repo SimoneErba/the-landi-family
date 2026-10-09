@@ -25,6 +25,7 @@ func _init() -> void:
 
 
 func prepare_economy(state) -> void:
+	state.economy.price_multiplier = state.legacy.price_multiplier()
 	active = active.filter(func(effect): return int(effect["until_month"]) > state.elapsed_months)
 	state.economy.event_food_multiplier = 1.0
 	state.economy.event_income_multiplier = 1.0
@@ -80,13 +81,14 @@ func advance_month(state) -> void:
 		var targets: Array = eligible_targets(state, entry)
 		if targets.is_empty():
 			continue
-		total += float(entry["weight"])
-		candidates.append({"entry": entry, "targets": targets})
+		var weight: float = float(entry["weight"]) * (state.legacy.fertility_multiplier() if entry["category"] == "pregnancy" else 1.0)
+		total += weight
+		candidates.append({"entry": entry, "targets": targets, "weight": weight})
 	if candidates.is_empty():
 		return
 	var draw := rng.randf() * total
 	for candidate in candidates:
-		draw -= float(candidate["entry"]["weight"])
+		draw -= float(candidate["weight"])
 		if draw <= 0.0:
 			var targets: Array = candidate["targets"]
 			trigger(state, candidate["entry"]["id"], targets[rng.randi_range(0, targets.size() - 1)])
@@ -113,9 +115,12 @@ func eligible_targets(state, entry: Dictionary) -> Array:
 				return []
 	if not rules.has("target"):
 		return [""]
+	if rules["target"] == "family_property":
+		return [""] if not property_targets(state, rules).is_empty() else []
 	var targets: Array = []
 	for person in state.people.values():
-		if not person.alive or not person.in_household or person.age < int(rules.get("min_age", 0)) or person.age > int(rules.get("max_age", 200)):
+		var available: bool = person.in_household or (rules.get("allow_travel",false) and not state.travel.current(person.id).is_empty())
+		if not person.alive or not available or person.age < int(rules.get("min_age", 0)) or person.age > int(rules.get("max_age", 200)):
 			continue
 		if rules["target"] == "relative" and person.id == state.head_id:
 			continue
@@ -133,12 +138,39 @@ func eligible_targets(state, entry: Dictionary) -> Array:
 			if not state.people.has(person.spouse_id):
 				continue
 			var spouse = state.people[person.spouse_id]
-			if not spouse.alive or not spouse.in_household or spouse.age < 18:
+			if not spouse.alive or not spouse.in_household or spouse.age < 18 or needs_family_care(state,person):
 				continue
 			if state.elapsed_months < int(person.life_state.get("next_pregnancy_month", 0)):
 				continue
 		targets.append(person.id)
 	return targets
+
+func property_targets(state, rules: Dictionary) -> Array[String]:
+	var ids: Array[String] = []
+	for building in state.village.development.buildings.values():
+		if building["owner_id"] == "landi" and building["status"] == "standing" and building["type"] in rules.get("building_types",[]) and not state.village.development._occupied_project(building["parcel_id"]):
+			ids.append(building["id"])
+	return ids
+
+func business_multiplier(state, key: String, completed_month: bool = false) -> float:
+	var multiplier := 1.0
+	var month: int = state.elapsed_months-1 if completed_month else state.elapsed_months
+	for effect in active:
+		if effect["until_month"] > month:
+			multiplier *= float(effect.get(key,1.0))
+	return clampf(multiplier,.25,3.0)
+
+func travel_disruption(state, completed_month: bool = false) -> String:
+	var month: int = state.elapsed_months-1 if completed_month else state.elapsed_months
+	for effect in active:
+		if effect.get("travel_until_month",-1) > month:
+			return "Regional transport is disrupted by " + str(effect["kind"]) + "."
+	return ""
+
+func needs_family_care(state, person, completed_month: bool = false) -> bool:
+	var pregnancy: Dictionary = person.life_state.get("pregnancy",{})
+	var month: int = state.elapsed_months-1 if completed_month else state.elapsed_months
+	return (not pregnancy.is_empty() and pregnancy["due_month"] <= month+2) or person.life_state.get("recovery_until_month",-1) > month
 
 
 func is_wartime(year: int, month: int) -> bool:
@@ -170,6 +202,11 @@ func trigger(state, event_id: String, person_id: String = "") -> bool:
 	if person_id not in eligible_targets(state, entry):
 		return false
 	var event: Dictionary = _instance(state, entry, person_id)
+	if entry["conditions"].get("target","") == "family_property":
+		var ids := property_targets(state,entry["conditions"])
+		event["building_id"] = ids[rng.randi_range(0,ids.size()-1)]
+		event["condition_before"] = float(state.village.development.buildings[event["building_id"]]["condition"])
+		event["body"] = event["body"].replace("{property}",state.village.development.buildings[event["building_id"]]["address"])
 	if entry["conditions"].get("needs_program", false):
 		event["program_id"] = preferred_program(state, state.people[person_id])
 		event["body"] = event["body"].replace("{course}", str(state.careers.programs[event["program_id"]]["name"]))
@@ -177,6 +214,14 @@ func trigger(state, event_id: String, person_id: String = "") -> bool:
 	last_seen[event_id] = state.elapsed_months
 	category_seen[entry["category"]] = state.elapsed_months
 	_effects(state, event, entry["on_trigger"])
+	if entry["category"] == "illness" and state.people.has(person_id):
+		var traveler: Dictionary = state.travel.current(person_id)
+		if not traveler.is_empty():
+			event["body"] += "\nNews from " + state.travel.CITIES[traveler["city_id"]]["name"] + ": illness pauses an active placement until recovery."
+		if not state.village.business.commitment(person_id).is_empty():
+			event["body"] += "\nTheir family business cannot produce while its manager is ill; upkeep still falls due."
+	if entry["category"] == "pregnancy":
+		event["body"] += "\nLate pregnancy and three months of recovery after birth pause family activities and business management. Regular wages continue, and courses can continue."
 	prepare_economy(state)
 	state.chronicle.append({"date": state.date_text(), "description": event["title"] + " — " + event["body"]})
 	state.major_event = true
@@ -199,6 +244,10 @@ func queue_milestone(state, event_id: String, person_id: String, details: Dictio
 	var event := _instance(state, catalog[event_id], person_id)
 	for key in details:
 		event["body"] = event["body"].replace("{" + key + "}", str(details[key]))
+	if event_id == "birth":
+		event["body"] += "\nThe parent has three months of recovery; family activities and business management pause during this leave."
+		if state.household["members"].size() > state.household["capacity"]:
+			event["body"] += "\nThe household now has %d residents for %d places; overcrowding adds pressure." % [state.household["members"].size(),state.household["capacity"]]
 	pending.append(event)
 	state.major_event = true
 
@@ -207,7 +256,13 @@ func choice_reason(state, event: Dictionary, index: int) -> String:
 	if index < 0 or index >= event["choices"].size():
 		return "Unknown choice."
 	var effects: Dictionary = event["choices"][index]["effects"]
-	if int(effects.get("cash", 0)) < 0 and state.economy.cash_cents < -int(effects["cash"]):
+	if effects.get("property_condition",0) > 0:
+		var building: Dictionary = state.village.development.buildings.get(event.get("building_id",""),{})
+		if building.is_empty() or building["owner_id"] != "landi" or building["status"] != "standing":
+			return "This property no longer belongs to the family or cannot be repaired."
+		if state.village.development._occupied_project(building["parcel_id"]):
+			return "Building work already covers this property."
+	if int(effects.get("cash", 0)) < 0 and state.economy.cash_cents < state.economy.purchase_cost(-int(effects["cash"])):
 		return "The shared purse cannot cover this expense."
 	if effects.get("study", false):
 		if not state.people.has(event["person_id"]) or not state.people[event["person_id"]].alive:
@@ -220,7 +275,7 @@ func choice_reason(state, event: Dictionary, index: int) -> String:
 			return reason
 		# Reserve the first month's food and all tuition; commitments affect future wages.
 		var budget: Dictionary = state.economy.budget(state.people, state.household["members"])
-		var tuition: int = state.careers.programs[event["program_id"]]["monthly_cost_cents"]
+		var tuition: int = state.economy.purchase_cost(int(state.careers.programs[event["program_id"]]["monthly_cost_cents"]))
 		if state.economy.cash_cents + int(budget["income_cents"]) - person.monthly_income_cents - int(budget["food_cents"]) < int(budget["planned_tuition_cents"]) + tuition:
 			return "There is not enough funding after the household's food and existing courses."
 	return ""
@@ -245,11 +300,14 @@ func resolve(state, serial: int, index: int) -> Dictionary:
 			if person.knowledge.has(state.head_id):
 				person.knowledge[state.head_id]["evidence"].append(state.date_text() + " — " + description)
 		pending.erase(event)
+		state.legacy.evaluate(state)
 		return {"ok": true, "message": choice["result"]}
 	return {"ok": false, "message": "This event has already been resolved."}
 
 
-func _cash(state, amount: int, description: String) -> void:
+func _cash(state, amount: int, description: String, purchase: bool = true) -> void:
+	if purchase and amount < 0:
+		amount = -state.economy.purchase_cost(-amount)
 	state.economy.cash_cents += amount
 	transactions.append({"date": state.date_text(), "amount_cents": amount, "description": description})
 
@@ -261,9 +319,21 @@ func _effects(state, event: Dictionary, effects: Dictionary) -> void:
 	if effects.has("cash"):
 		_cash(state, int(effects["cash"]), event["title"])
 	if effects.has("cash_loss"):
-		_cash(state, -mini(maxi(0, state.economy.cash_cents), int(effects["cash_loss"])), event["title"])
+		_cash(state, -mini(maxi(0, state.economy.cash_cents), int(effects["cash_loss"])), event["title"], false)
 	if effects.has("condition"):
 		state.household["condition"] = clampi(int(state.household.get("condition", 80)) + int(effects["condition"]), 0, 100)
+		var dev = state.village.development
+		dev.buildings["home"]["condition"] = float(state.household["condition"])
+		dev._record(state,event["title"]+" changed the ancestral house condition.",["home"])
+	if effects.has("property_condition"):
+		var dev = state.village.development
+		var id: String = event.get("building_id","")
+		if dev.buildings.has(id) and dev.buildings[id]["owner_id"] == "landi" and dev.buildings[id]["status"] == "standing":
+			var change: float = effects["property_condition"]
+			if change > 0:
+				change = minf(change,maxf(0,float(event.get("condition_before",100.0))-dev.buildings[id]["condition"]))
+			dev.buildings[id]["condition"] = clampf(dev.buildings[id]["condition"]+change,0,100)
+			dev._record(state,event["title"]+" changed the building condition.",[id])
 	if effects.has("room"):
 		state.household["rooms"].append(str(effects["room"]))
 		state.household["capacity"] = int(state.household.get("capacity", 7)) + int(effects.get("capacity", 0))
@@ -272,6 +342,8 @@ func _effects(state, event: Dictionary, effects: Dictionary) -> void:
 		crisis["months"] = int(crisis["months"])
 		crisis["until_month"] = state.elapsed_months + int(crisis["months"])
 		crisis["event_serial"] = event["serial"]
+		if crisis.has("travel_delay_months"):
+			crisis["travel_until_month"] = state.elapsed_months+int(crisis["travel_delay_months"])
 		active.append(crisis)
 	if effects.has("relief"):
 		for crisis in active:
@@ -294,7 +366,7 @@ func _effects(state, event: Dictionary, effects: Dictionary) -> void:
 		bond["trust"] = clampf(float(bond.get("trust", 0.4)) + float(effects["trust"]), 0.0, 1.0)
 		person.relationships[state.head_id] = bond
 	if effects.has("skill"):
-		person.skills[effects["skill"]] = clampf(float(person.skills[effects["skill"]]) + float(effects["skill_gain"]), 0.0, 100.0)
+		person.skills[effects["skill"]] = clampf(float(person.skills[effects["skill"]]) + float(effects["skill_gain"]) * state.legacy.learning_multiplier(), 0.0, 100.0)
 	if effects.get("stay_release", false):
 		person.decision_state["stay_until"] = state.elapsed_months
 	if effects.get("study", false):
@@ -326,6 +398,7 @@ func _birth(state, person, pregnancy: Dictionary) -> void:
 		surname = "Family"
 	var child = state.add_person(child_id, {"name": given_name + " " + surname, "birth": {"year": state.year, "month": state.month}, "parent_ids": parents, "branch_id": person.branch_id, "in_household": person.in_household, "relationship": "New child", "life_state": {"can_be_pregnant": can_be_pregnant}, "portrait": {"appearance": {"presentation": "feminine" if can_be_pregnant else "masculine"}}})
 	person.life_state["pregnancy"] = {}
+	person.life_state["recovery_until_month"] = state.elapsed_months+3
 	person.life_state["next_pregnancy_month"] = state.elapsed_months + 18
 	for parent_id in parents:
 		child.relationships[parent_id] = {"affection": 0.8, "trust": 0.8}

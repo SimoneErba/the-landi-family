@@ -1,0 +1,481 @@
+{
+  "method": {
+    "before_event_seeds_per_policy": 8,
+    "after_event_seeds_per_policy": 2,
+    "months_per_run": 1200,
+    "intermediate_runs": 4,
+    "controlled_manager_skill": 50,
+    "controlled_building_condition": 80,
+    "payback_basis": "Building cost plus renovations to the recorded level; excludes land and downtime.",
+    "before_annual_food_inflation": 0.02,
+    "after_annual_food_inflation": 0.005
+  },
+  "before": {
+    "businesses": [
+      {
+        "annual_net_lire": 81.24,
+        "level": 1,
+        "type": "farm",
+        "worst_month_lire": 3.65,
+        "capital_payback_years": 1.47710487444609
+      },
+      {
+        "annual_net_lire": 149.32,
+        "level": 3,
+        "type": "farm",
+        "worst_month_lire": 7.14,
+        "capital_payback_years": 2.4109295472810057
+      },
+      {
+        "annual_net_lire": 38.16,
+        "level": 1,
+        "type": "workshop",
+        "worst_month_lire": 3.18,
+        "capital_payback_years": 3.14465408805031
+      },
+      {
+        "annual_net_lire": 82.92,
+        "level": 3,
+        "type": "workshop",
+        "worst_month_lire": 6.91,
+        "capital_payback_years": 4.34153400868308
+      },
+      {
+        "annual_net_lire": 46.08,
+        "level": 1,
+        "type": "factory",
+        "worst_month_lire": 3.84,
+        "capital_payback_years": 2.60416666666667
+      },
+      {
+        "annual_net_lire": 119.16,
+        "level": 3,
+        "type": "factory",
+        "worst_month_lire": 9.93,
+        "capital_payback_years": 3.0211480362537895
+      },
+      {
+        "annual_net_lire": 34.8,
+        "level": 1,
+        "type": "tavern",
+        "worst_month_lire": 2.9,
+        "capital_payback_years": 3.44827586206897
+      },
+      {
+        "annual_net_lire": 74.28,
+        "level": 3,
+        "type": "tavern",
+        "worst_month_lire": 6.19,
+        "capital_payback_years": 4.84652665589661
+      }
+    ],
+    "households": [
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": 0.0,
+        "year": 0
+      },
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": -3.61939244110197,
+        "year": 10
+      },
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": -12.6361364726095,
+        "year": 50
+      },
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": -17.289421802993,
+        "year": 100
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": 15.0,
+        "year": 0
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": 8.66361358073729,
+        "year": 10
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": -7.11334955276268,
+        "year": 50
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": -15.2560101121909,
+        "year": 100
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": 60.0,
+        "year": 0
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": 45.512631646255,
+        "year": 10
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": 9.45501120677772,
+        "year": 50
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": -9.15577503978474,
+        "year": 100
+      }
+    ],
+    "runs": [
+      {
+        "buildings": 37,
+        "ending_lire": 101182.42,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 8,
+        "policy": "save",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 1,
+        "wealth_goal_fraction": 0.0849932328
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 143761.07,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 2,
+        "wealth_goal_fraction": 0.1207592988
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 127500.59,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 3,
+        "wealth_goal_fraction": 0.1071004956
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 136080.03,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 16.68,
+        "seed": 4,
+        "wealth_goal_fraction": 0.1143072252
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 122351.92,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 5,
+        "wealth_goal_fraction": 0.1027756128
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 123647.58,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 22.29,
+        "seed": 6,
+        "wealth_goal_fraction": 0.1038639672
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 119468.6,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 15.82,
+        "seed": 7,
+        "wealth_goal_fraction": 0.100353624
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 118652.24,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 8,
+        "wealth_goal_fraction": 0.0996678816
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 77258.49,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 8,
+        "policy": "support",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 1,
+        "wealth_goal_fraction": 0.0648971316
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 149184.74,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 16.66,
+        "seed": 2,
+        "wealth_goal_fraction": 0.1253151816
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 135716.43,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 3,
+        "wealth_goal_fraction": 0.1140018012
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 133826.38,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 19.74,
+        "seed": 4,
+        "wealth_goal_fraction": 0.1124141592
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 153222.85,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 5,
+        "wealth_goal_fraction": 0.128707194
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 168860.48,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 6,
+        "wealth_goal_fraction": 0.1418428032
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 134569.43,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 7,
+        "wealth_goal_fraction": 0.1130383212
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 174553.56,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 22.05,
+        "seed": 8,
+        "wealth_goal_fraction": 0.1466249904
+      }
+    ]
+  },
+  "after": {
+    "businesses": [
+      {
+        "annual_net_lire": 81.24,
+        "capital_payback_years": 1.47710487444609,
+        "level": 1,
+        "type": "farm",
+        "worst_month_lire": 3.65
+      },
+      {
+        "annual_net_lire": 149.32,
+        "capital_payback_years": 2.41092954728101,
+        "level": 3,
+        "type": "farm",
+        "worst_month_lire": 7.14
+      },
+      {
+        "annual_net_lire": 38.16,
+        "capital_payback_years": 3.14465408805031,
+        "level": 1,
+        "type": "workshop",
+        "worst_month_lire": 3.18
+      },
+      {
+        "annual_net_lire": 82.92,
+        "capital_payback_years": 4.34153400868307,
+        "level": 3,
+        "type": "workshop",
+        "worst_month_lire": 6.91
+      },
+      {
+        "annual_net_lire": 79.92,
+        "capital_payback_years": 1.5015015015015,
+        "level": 1,
+        "type": "factory",
+        "worst_month_lire": 6.66
+      },
+      {
+        "annual_net_lire": 183.24,
+        "capital_payback_years": 1.96463654223969,
+        "level": 3,
+        "type": "factory",
+        "worst_month_lire": 15.27
+      },
+      {
+        "annual_net_lire": 34.8,
+        "capital_payback_years": 3.44827586206897,
+        "level": 1,
+        "type": "tavern",
+        "worst_month_lire": 2.9
+      },
+      {
+        "annual_net_lire": 74.28,
+        "capital_payback_years": 4.84652665589661,
+        "level": 3,
+        "type": "tavern",
+        "worst_month_lire": 6.19
+      }
+    ],
+    "households": [
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": 0.0,
+        "year": 0
+      },
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": -0.9702641170494,
+        "year": 10
+      },
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": -4.42381878509514,
+        "year": 50
+      },
+      {
+        "base_wage_lire": 20.0,
+        "real_net_lire": -7.87358785802733,
+        "year": 100
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": 15.0,
+        "year": 0
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": 13.2983258395594,
+        "year": 10
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": 7.25880124596597,
+        "year": 50
+      },
+      {
+        "base_wage_lire": 35.0,
+        "real_net_lire": 1.22531952798268,
+        "year": 100
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": 60.0,
+        "year": 0
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": 56.1040957093859,
+        "year": 10
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": 42.3066613391493,
+        "year": 50
+      },
+      {
+        "base_wage_lire": 80.0,
+        "real_net_lire": 28.5220416860127,
+        "year": 100
+      }
+    ],
+    "runs": [
+      {
+        "buildings": 37,
+        "ending_lire": 234041.17,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 8,
+        "policy": "save",
+        "poorest_neighbor_lire": 447.97,
+        "seed": 1,
+        "wealth_goal_fraction": 0.1965945828
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 254709.96,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "save",
+        "poorest_neighbor_lire": 447.97,
+        "seed": 2,
+        "wealth_goal_fraction": 0.2139563664
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 246409.11,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 8,
+        "policy": "support",
+        "poorest_neighbor_lire": 447.97,
+        "seed": 1,
+        "wealth_goal_fraction": 0.2069836524
+      },
+      {
+        "buildings": 37,
+        "ending_lire": 294502.18,
+        "first_debt_month": -1,
+        "months": 1200,
+        "peak_living": 7,
+        "policy": "support",
+        "poorest_neighbor_lire": 447.3,
+        "seed": 2,
+        "wealth_goal_fraction": 0.2473818312
+      }
+    ]
+  }
+}

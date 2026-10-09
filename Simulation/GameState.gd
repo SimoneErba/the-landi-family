@@ -3,6 +3,10 @@ extends RefCounted
 
 const MONTH_NAMES := ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
+const Travel = preload("res://Simulation/Travel.gd")
+const Activities = preload("res://Simulation/Activities/ActivitySystem.gd")
+const Village = preload("res://Simulation/Village/VillageState.gd")
+const Legacy = preload("res://Simulation/Legacy.gd")
 const Economy = preload("res://Simulation/Economy.gd")
 const Person = preload("res://Simulation/Person.gd")
 const Influence = preload("res://Simulation/Influence.gd")
@@ -15,6 +19,10 @@ var month: int = 1
 var elapsed_months: int = 0
 var people: Dictionary = {}
 var economy = Economy.new()
+var legacy = Legacy.new()
+var travel = Travel.new()
+var activities = Activities.new()
+var village = Village.new()
 var careers = Careers.new()
 var events = EventSystem.new()
 var major_event: bool = false
@@ -25,6 +33,9 @@ var household: Dictionary = {"members": [], "rooms": ["Bedroom", "Kitchen", "Out
 
 
 func initialize(initial_people: Dictionary) -> void:
+	village.initialize()
+	activities = Activities.new()
+	travel = Travel.new()
 	people = {}
 	for person_id in initial_people:
 		people[person_id] = Person.new(person_id, initial_people[person_id], year, month, head_id)
@@ -58,7 +69,9 @@ func _resolve_portrait(person_id: String, source: Dictionary, resolved: Dictiona
 
 
 func request(person_id: String, action: String) -> Dictionary:
-	return Influence.request(self, person_id, action)
+	var result: Dictionary = Influence.request(self, person_id, action)
+	legacy.evaluate(self)
+	return result
 
 
 func add_person(person_id: String, source: Dictionary) -> RefCounted:
@@ -100,7 +113,11 @@ func advance_month() -> void:
 	# Evaluate after all birthdays, learning, and financial pressure are applied.
 	for person in people.values():
 		DecisionSystem.advance_month(self, person)
+	travel.advance_month(self)
+	activities.advance_month(self)
+	village.advance_month(self)
 	events.advance_month(self)
+	legacy.evaluate(self)
 
 
 func _update_monthly() -> void:
@@ -120,7 +137,8 @@ func to_save_data() -> Dictionary:
 		"year": year, "month": month, "elapsed_months": elapsed_months,
 		"people": saved_people, "head_id": head_id, "household": household.duplicate(true),
 		"chronicle": chronicle.duplicate(true), "last_requests": last_requests.duplicate(true),
-		"major_event": major_event, "events": events.to_save_data(),
+		"travel": travel.to_save_data(), "activities": activities.to_save_data(), "village": village.to_save_data(),
+		"legacy": legacy.to_save_data(), "major_event": major_event, "events": events.to_save_data(),
 		"economy": {"currency": economy.currency, "cash_cents": economy.cash_cents, "price_index": economy.price_index,
 			"event_food_multiplier": economy.event_food_multiplier, "event_income_multiplier": economy.event_income_multiplier,
 			"ledger": economy.ledger.duplicate(true), "crisis_started": economy.crisis_started},
@@ -129,6 +147,16 @@ func to_save_data() -> Dictionary:
 
 
 func restore_save_data(data: Dictionary) -> void:
+	travel.restore_save_data(data.get("travel", {}))
+	if data.has("village"):
+		village.restore_save_data(data["village"])
+		if not data["village"].has("development"):
+			village.development.initialize(data["year"], data["elapsed_months"])
+	else:
+		village.initialize()
+	activities.restore_save_data(data.get("activities", {}))
+	legacy.restore_save_data(data.get("legacy", {}))
+	economy.price_multiplier = legacy.price_multiplier()
 	year = data["year"]
 	month = data["month"]
 	elapsed_months = data["elapsed_months"]

@@ -9,7 +9,14 @@ func _run() -> void:
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
 	root.add_child(screen)
 	screen.game_clock.state.events.monthly_chance = 0.0
-	screen.game_clock.state.events.trigger(screen.game_clock.state, "expansion_04")
+	var event_id := "expansion_04"
+	var person_id := ""
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--event="):
+			event_id = argument.trim_prefix("--event=")
+		if argument.begins_with("--person="):
+			person_id = argument.trim_prefix("--person=")
+	assert(screen.game_clock.state.events.trigger(screen.game_clock.state, event_id, person_id))
 	screen._show_pending_event()
 	await process_frame
 	await process_frame

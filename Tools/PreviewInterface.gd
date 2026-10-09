@@ -8,6 +8,7 @@ func _run() -> void:
 	root.size = Vector2i(1920, 1080)
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
 	root.add_child(screen)
+	screen._start_family_story("populous", "fertility")
 	await process_frame
 	await process_frame
 	await RenderingServer.frame_post_draw

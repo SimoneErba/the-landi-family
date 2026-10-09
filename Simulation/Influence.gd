@@ -8,6 +8,8 @@ static func unavailable_reason(state, person_id: String, action: String) -> Stri
 	var career_action := action.begins_with("train:") or action.begins_with("work:")
 	if (not ACTIONS.has(action) and not career_action) or not state.people.has(person_id):
 		return "This request is unavailable."
+	if not state.travel.current(person_id).is_empty():
+		return "They are away on a journey. Use the Italy map to request an early return."
 	var person = state.people[person_id]
 	if person_id == state.head_id:
 		return "You cannot make a request of yourself."

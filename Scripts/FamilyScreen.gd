@@ -1,6 +1,10 @@
 extends Control
 
+const TravelScreen = preload("res://Scripts/TravelScreen.gd")
+const GameplayScreens = preload("res://Scripts/GameplayScreens.gd")
 const Archive = preload("res://Scripts/ArchiveTheme.gd")
+const EventPresentation = preload("res://Scripts/EventPresentation.gd")
+const PersonStats = preload("res://Scripts/PersonStats.gd")
 const PEOPLE_PATH := "res://Data/people.json"
 const SaveGame = preload("res://Simulation/SaveGame.gd")
 const Clock = preload("res://Simulation/GameClock.gd")
@@ -28,9 +32,23 @@ var speed_buttons: Array[Button] = []
 var house_description: Label
 var clock_status: Label
 var cash_label: Label
+var travel_city_id: String = "florence"
+var travel_person_id: String = "Carlo"
+var travel_purpose_id: String = "study"
+var travel_result: String = ""
+var current_screen: String = "People"
+var gameplay_result: String = ""
+var gameplay_person_id: String = "Giovanni"
+var gameplay_activity_id: String = "study"
+var gameplay_target_id: String = "rossi"
+var village_view: Control
+var focus_overlay: Control
+var legacy_status: Label
 var finance_content: VBoxContainer
 var selected_person_id: String = ""
 var conversation_result: String = ""
+var profile_expanded := false
+var profile_section := "Activities"
 var influence_popup: PopupMenu
 var influence_person_id: String = ""
 var elsewhere_list: VBoxContainer
@@ -65,14 +83,16 @@ func _ready() -> void:
 	_build_influence_menu()
 	_build_navigation()
 	_build_menu()
-	var top_menu: Button = top_bar.get_node("Frame/Header/MenuButton")
+	var top_menu: Button = top_bar.get_node("Frame/Header/ClockModule/TimeControls/MenuButton")
 	_apply_period_button_style(top_menu)
-	top_menu.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top_menu.size_flags_vertical = Control.SIZE_FILL
 	top_menu.pressed.connect(_toggle_menu)
 	_connect_cards()
 	_build_elsewhere_list()
 	_refresh_people()
 	_update_page_bounds()
+	_show_screen("People")
+	_show_focus()
 
 
 func _build_archive_surround() -> void:
@@ -136,7 +156,7 @@ func _build_time_controls() -> void:
 	controls.name = "TimeControls"
 	controls.add_theme_constant_override("separation", 3)
 	clock_module.add_child(controls)
-	play_button = _add_time_button(controls, "▶", game_clock.play)
+	play_button = _add_time_button(controls, "▶", _play_game)
 	play_button.tooltip_text = "Play — advance one month at a time"
 	pause_button = _add_time_button(controls, "Ⅱ", game_clock.pause)
 	pause_button.tooltip_text = "Pause — preserve the current month"
@@ -144,6 +164,10 @@ func _build_time_controls() -> void:
 		var button := _add_time_button(controls, "x%d" % level, game_clock.set_speed.bind(level))
 		button.tooltip_text = "Speed preset %d · %s seconds per month" % [level, str(Clock.SECONDS_PER_MONTH[level - 1])]
 		speed_buttons.append(button)
+	var menu_button: Button = header.get_node("MenuButton")
+	header.remove_child(menu_button)
+	menu_button.custom_minimum_size = Vector2(82, 36)
+	controls.add_child(menu_button)
 	month_progress_bar = ProgressBar.new()
 	month_progress_bar.custom_minimum_size = Vector2(0, 3)
 	month_progress_bar.show_percentage = false
@@ -178,6 +202,7 @@ func _add_time_button(parent: Node, caption: String, action: Callable) -> Button
 func _refresh_time_controls() -> void:
 	period_label.text = game_clock.state.date_text()
 	cash_label.text = game_clock.state.economy.money(game_clock.state.economy.cash_cents)
+	cash_label.tooltip_text = "Shared family purse, in lire."
 	cash_label.add_theme_color_override("font_color", Color("#e09a81") if game_clock.state.economy.cash_cents < 0 else Color("#d9c28c"))
 	if is_instance_valid(finance_content):
 		_refresh_finances()
@@ -190,6 +215,11 @@ func _refresh_time_controls() -> void:
 		house_description.text = _house_summary()
 		if is_instance_valid(house_note):
 			house_note.text = "Rooms: " + ", ".join(game_clock.state.household["rooms"])
+	_refresh_legacy()
+	if current_screen == "Italy":
+		_show_screen(current_screen)
+	elif current_screen == "Village" and is_instance_valid(village_view):
+		village_view.refresh()
 	_refresh_clock_status()
 	_refresh_event_notice()
 	_refresh_people()
@@ -214,8 +244,8 @@ func _refresh_people() -> void:
 			count += 1
 			branches[person.branch_id] = true
 		card.get_node("Row/Details/Name").text = "%s · %d" % [person.name, person.age]
-		card.get_node("Row/Details/Role").text = person.status_text()
-		card.get_node("Row/Details/Observation").text = person.view_for(game_clock.state.head_id)["summary"]
+		card.get_node("Row/Details/Role").text = str(person.view_for(game_clock.state.head_id)["relationship"]).get_slice("·", 0).strip_edges() + " · " + person.job
+		PersonStats.refresh(self, card, person)
 		var face := card.get_node_or_null("Row/Portrait/Face")
 		if face != null:
 			face.show_person(person)
@@ -226,8 +256,9 @@ func _refresh_people() -> void:
 			var person = people[str(card.name)]
 			card.visible = person.alive and person.id not in game_clock.state.household["members"]
 			card.get_node("Row/Details/Name").text = "%s · %d" % [person.name, person.age]
-			card.get_node("Row/Details/Role").text = person.status_text()
-			card.get_node("Row/Details/Observation").text = person.view_for(game_clock.state.head_id)["summary"]
+			var location: String = game_clock.state.travel.location_text(person.id)
+			card.get_node("Row/Details/Role").text = person.job + (" · " + location if not location.is_empty() else " · Living elsewhere")
+			PersonStats.refresh(self, card, person)
 			card.get_node("Row/Portrait/Face").show_person(person)
 			if card.visible:
 				outside_count += 1
@@ -254,19 +285,25 @@ func _refresh_clock_status() -> void:
 
 func _update_page_bounds() -> void:
 	var available_width := maxf(0.0, size.x - NAV_WIDTH - 80.0)
-	var page_width := minf(1180.0, available_width)
+	var page_width := available_width
 	var left := NAV_WIDTH + 40.0 + (available_width - page_width) / 2.0
 	page.offset_left = left
 	page.offset_right = left + page_width
 	if family_frame != null:
 		family_frame.position = Vector2(left, 150)
 		family_frame.size = Vector2(page_width, maxf(0.0, size.y - 174))
+	if content_overlay != null:
+		content_overlay.offset_left = left
+		content_overlay.offset_right = left + page_width - size.x
 	if top_bar != null:
 		top_bar.offset_left = left
 		top_bar.offset_right = left + page_width - size.x
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(focus_overlay) and focus_overlay.visible:
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
 		if details_popup != null and details_popup.visible:
 			details_popup.hide()
@@ -300,9 +337,12 @@ func _build_navigation() -> void:
 	list.add_child(spacer)
 	_add_navigation_button(list, "People", "People", true)
 	_add_navigation_button(list, "House", "House")
+	_add_navigation_button(list, "Village", "Village")
+	_add_navigation_button(list, "Italy", "Italy")
 	_add_navigation_button(list, "Finances", "Finances")
 	_add_navigation_button(list, "Chronicle", "Chronicle")
 	_add_navigation_button(list, "Events", "Events")
+	legacy_status = _add_label(list, "", 13, Color("#d4b77e"))
 	var art_spacer := Control.new()
 	art_spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	list.add_child(art_spacer)
@@ -334,6 +374,7 @@ func _add_navigation_button(parent: VBoxContainer, caption: String, screen_name:
 
 
 func _show_screen(screen_name: String) -> void:
+	current_screen = screen_name
 	family_frame.visible = screen_name in ["People", "Events"]
 	for button in get_node("Navigation").find_children("*", "Button", true, false):
 		button.set_pressed_no_signal(button.text == screen_name)
@@ -366,6 +407,14 @@ func _show_screen(screen_name: String) -> void:
 		content_overlay.remove_child(child)
 		child.queue_free()
 	finance_content = null
+	if screen_name == "Italy":
+		TravelScreen.build(self)
+		content_overlay.show()
+		return
+	if screen_name == "Village":
+		GameplayScreens.village(self)
+		content_overlay.show()
+		return
 	if screen_name == "House":
 		_build_house_screen()
 		content_overlay.show()
@@ -385,6 +434,108 @@ func _show_screen(screen_name: String) -> void:
 	_add_label(column, screen_name, 34, TEXT_MAIN)
 	_add_label(column, "This screen is empty for now.", 17, TEXT_MUTED)
 	content_overlay.show()
+
+
+func _play_game() -> void:
+	if game_clock.state.legacy.objective_id.is_empty():
+		_show_focus()
+		return
+	game_clock.play()
+
+
+func _show_focus() -> void:
+	if not game_clock.state.legacy.objective_id.is_empty():
+		if is_instance_valid(focus_overlay):
+			focus_overlay.hide()
+		return
+	game_clock.pause()
+	if is_instance_valid(focus_overlay):
+		focus_overlay.show()
+		return
+	focus_overlay = Control.new()
+	focus_overlay.name = "StartingFocus"
+	focus_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	focus_overlay.z_index = 100
+	focus_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(focus_overlay)
+	var shade := ColorRect.new()
+	shade.color = Color(0.12, 0.09, 0.06, 0.8)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	focus_overlay.add_child(shade)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	focus_overlay.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(660, 0)
+	panel.add_theme_stylebox_override("panel", Archive.card())
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	for edge in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + edge, 32)
+	panel.add_child(margin)
+	var column := VBoxContainer.new()
+	column.custom_minimum_size.x = 600
+	column.add_theme_constant_override("separation", 18)
+	margin.add_child(column)
+	_add_label(column, "Choose your family focus", 32, TEXT_MAIN)
+	var legacy = game_clock.state.legacy
+	game_clock.pause()
+	_add_label(column, "Choose one objective and one lasting family bonus before beginning your story.", 17, TEXT_MUTED)
+	var objectives := OptionButton.new()
+	objectives.custom_minimum_size.y = 44
+	column.add_child(objectives)
+	for key in legacy.OBJECTIVES:
+		objectives.add_item(legacy.OBJECTIVES[key]["name"])
+	var objective_description := _add_label(column, legacy.OBJECTIVES["populous"]["description"], 17, TEXT_MAIN)
+	objectives.item_selected.connect(func(index): objective_description.text = legacy.OBJECTIVES[legacy.OBJECTIVES.keys()[index]]["description"])
+	_add_label(column, "Starting bonus", 24, TEXT_SUSPECTED)
+	var bonuses := OptionButton.new()
+	bonuses.custom_minimum_size.y = 44
+	column.add_child(bonuses)
+	for key in legacy.BONUSES:
+		bonuses.add_item(legacy.BONUSES[key]["name"])
+	var bonus_description := _add_label(column, legacy.BONUSES["fertility"]["description"], 17, TEXT_MAIN)
+	bonuses.item_selected.connect(func(index): bonus_description.text = legacy.BONUSES[legacy.BONUSES.keys()[index]]["description"])
+	_add_menu_button(column, "Begin family story", func():
+		_start_family_story(legacy.OBJECTIVES.keys()[objectives.selected], legacy.BONUSES.keys()[bonuses.selected]))
+	_add_menu_button(column, "Load saved family", _load_game)
+	# Keep keyboard navigation within the required choice dialog.
+	var choices: Array[Control] = [objectives, bonuses]
+	for child in column.get_children():
+		if child is Button and child != objectives and child != bonuses:
+			choices.append(child)
+	for index in choices.size():
+		var choice := choices[index]
+		choice.focus_next = choice.get_path_to(choices[(index + 1) % choices.size()])
+		choice.focus_previous = choice.get_path_to(choices[(index - 1 + choices.size()) % choices.size()])
+		for direction in ["left", "right", "top", "bottom"]:
+			choice.set("focus_neighbor_" + direction, choice.get_path_to(choice))
+	objectives.grab_focus()
+
+
+func _start_family_story(objective_id: String, bonus_id: String) -> bool:
+	var legacy = game_clock.state.legacy
+	if not legacy.choose(objective_id, bonus_id):
+		return false
+	game_clock.state.economy.price_multiplier = legacy.price_multiplier()
+	legacy.evaluate(game_clock.state)
+	game_clock.state.chronicle.append({"date": game_clock.state.date_text(), "description": "The family chose " + legacy.OBJECTIVES[legacy.objective_id]["name"] + " with the " + legacy.BONUSES[legacy.bonus_id]["name"] + " bonus."})
+	_show_focus()
+	_show_screen("People")
+	_refresh_time_controls()
+	return true
+
+
+func _refresh_legacy() -> void:
+	var legacy = game_clock.state.legacy
+	if not is_instance_valid(legacy_status):
+		return
+	if legacy.objective_id.is_empty():
+		legacy_status.text = "Choose your family focus"
+		return
+	var progress: Dictionary = legacy.progress(game_clock.state)
+	legacy_status.text = legacy.OBJECTIVES[legacy.objective_id]["name"] + (" · Achieved" if legacy.completed else "") + "\n" + progress["text"]
+	legacy_status.tooltip_text = legacy.OBJECTIVES[legacy.objective_id]["description"] + "\nStarting bonus · " + legacy.BONUSES[legacy.bonus_id]["name"]
 
 
 func _build_finances_screen() -> void:
@@ -409,7 +560,7 @@ func _finance_label(parent: Node, value: String, font_size: int, color: Color) -
 
 
 func _finance_money(amount: int) -> String:
-	return game_clock.state.economy.money(amount).replace("lire toscane", "L.").replace("lire italiane", "L.").replace("fiorini", "Fl.")
+	return game_clock.state.economy.money(amount).replace("lire", "L.")
 
 
 func _finance_icon(parent: Node, icon_name: String, hint: String) -> TextureRect:
@@ -476,7 +627,7 @@ func _refresh_finances() -> void:
 	var title := _finance_label(heading, "Finances", 34, TEXT_MAIN)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_finance_label(heading, state.date_text(), 17, TEXT_MUTED)
-	_finance_icon(heading, "info", "L. = lire; Fl. = fiorini; s = soldi; d = denari.\nShared household purse: all resident earnings enter this balance.\nTuscan lire: 20 soldi per lira, 12 denari per soldo.\nFrom 1826: 1 fiorino = 1⅔ Tuscan lire. From November 1859: 1 fiorino = 1.40 Italian lire. Currency changes preserve value.\nFood prices rise by 2% per year (monthly increments); wages stay fixed. Other living costs and separate branch purses are not yet simulated.")
+	_finance_icon(heading, "info", "L. = lire. All money uses this one gameplay currency throughout the run.\nShared household purse: all resident earnings enter this balance.\nFood prices rise by 0.5% per year (monthly increments); wages stay fixed. Other living costs and separate branch purses are not yet simulated.")
 
 	var summary := HBoxContainer.new()
 	summary.add_theme_constant_override("separation", 12)
@@ -536,11 +687,34 @@ func _refresh_finances() -> void:
 				amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 				amount.tooltip_text = hint
 
+	var commitments: Array = []
+	var businesses := _finance_section(finance_content, "income", "Family businesses")
+	_finance_label(businesses, "Property production settles separately from wages, food and tuition. Estimates vary with season, condition, skills, competition and infrastructure.", 14, TEXT_MUTED)
+	for building in state.village.development.buildings.values():
+		if building["owner_id"] == "landi" and building["type"] in state.village.business.CATALOG and building["status"] != "demolished":
+			var estimate: Dictionary = state.village.business.estimate(state, building["id"])
+			_finance_label(businesses, "%s · %s · estimated net %s" % [building["address"], estimate["status"], economy.money(estimate["net_cents"])], 16, TEXT_MAIN)
+	if not state.village.business.reports.is_empty():
+		var report: Dictionary = state.village.business.reports.back()
+		for entry in report["rows"]:
+			if entry["owner_id"] == "landi":
+				_finance_label(businesses, "%s · %s · sales %s · costs %s · net %s" % [report["date"], state.village.development.buildings[entry["building_id"]]["address"], economy.money(entry["revenue_cents"]), economy.money(entry["cost_cents"]), economy.money(entry["net_cents"])], 15, TEXT_MUTED)
+	for plan in state.activities.plans.values():
+		if plan.status in ["active", "interrupted"]:
+			commitments.append(plan)
+	if not commitments.is_empty():
+		var projects := _finance_section(finance_content, "wallet", "Family project commitments")
+		for plan in commitments:
+			_finance_label(projects, "%s · %s per active month · %s" % [state.activities.CATALOG[plan.activity_id]["name"], economy.money(economy.purchase_cost(plan.monthly_cost_cents)), plan.status], 16, TEXT_MAIN)
+		_finance_label(projects, "Paid after household bills. Progress pauses when funds are unavailable.", 14, TEXT_MUTED)
 	var events = state.events
 	for effect in events.active:
-		_finance_notice(residents, "%s · %d months" % [str(effect["kind"]).capitalize(), maxi(0, int(effect["until_month"]) - state.elapsed_months)], "Affects food prices and earnings.")
+		var hint: String = "Food prices ×%.2f · Wages and sales ×%.2f\nFarm output ×%.2f · Business costs ×%.2f" % [effect["food_multiplier"],effect["income_multiplier"],effect.get("farm_multiplier",1.0),effect.get("business_cost_multiplier",1.0)]
+		if effect.get("travel_until_month",-1) > state.elapsed_months:
+			hint += "\nTransport disrupted for %d more months." % (effect["travel_until_month"]-state.elapsed_months)
+		_finance_notice(residents, "%s · %d months" % [str(effect["kind"]).capitalize(), maxi(0, int(effect["until_month"]) - state.elapsed_months)], hint)
 	if not events.transactions.is_empty():
-		var transactions := _finance_section(finance_content, "wallet", "One-off payments")
+		var transactions := _finance_section(finance_content, "wallet", "Payments and sales")
 		for entry in events.transactions.slice(maxi(0, events.transactions.size() - 8)):
 			var row := HBoxContainer.new()
 			transactions.add_child(row)
@@ -647,7 +821,7 @@ func _toggle_menu() -> void:
 	if menu_popup.visible:
 		menu_popup.hide()
 	else:
-		var menu_button: Button = top_bar.get_node("Frame/Header/MenuButton")
+		var menu_button: Button = top_bar.get_node("Frame/Header/ClockModule/TimeControls/MenuButton")
 		var menu_size := Vector2i(300, 330)
 		var position := Vector2i(menu_button.global_position.x + menu_button.size.x - menu_size.x, menu_button.global_position.y + menu_button.size.y + 8)
 		position.x = clampi(position.x, 16, int(get_viewport_rect().size.x) - menu_size.x - 16)
@@ -683,6 +857,8 @@ func _load_game() -> void:
 	selected_person_id = ""
 	career_person_id = ""
 	conversation_result = ""
+	gameplay_result = ""
+	travel_result = ""
 	influence_person_id = ""
 	# Hide cards for people added after this save, retaining reusable scene cards.
 	var family_list := $PageMargins/Page/RosterScroll/FamilyList
@@ -696,6 +872,7 @@ func _load_game() -> void:
 			card.queue_free()
 	_show_screen("People")
 	_refresh_time_controls()
+	_show_focus()
 	_show_menu_message("Loaded the family in " + game_clock.state.date_text() + ". Time is paused.")
 	if not game_clock.state.events.pending.is_empty():
 		call_deferred("_show_pending_event")
@@ -739,7 +916,6 @@ func _add_missing_cards(connect_now: bool) -> void:
 		var template: PanelContainer = family_list.get_node("Giovanni")
 		var new_card: PanelContainer = template.duplicate(0)
 		new_card.name = person_id
-		new_card.get_node("Row/Details/Observation").text = people[person_id].view_for(game_clock.state.head_id)["summary"]
 		family_list.add_child(new_card)
 		if connect_now:
 			_configure_card(new_card)
@@ -771,12 +947,8 @@ func _bind_card_input(card: PanelContainer) -> void:
 func _apply_card_paper_colours(card: PanelContainer) -> void:
 	var name_label: Label = card.get_node("Row/Details/Name")
 	var role: Label = card.get_node("Row/Details/Role")
-	var observation: Label = card.get_node("Row/Details/Observation")
 	name_label.add_theme_color_override("font_color", TEXT_MAIN)
 	role.add_theme_color_override("font_color", TEXT_MUTED)
-	observation.add_theme_color_override("font_color", Color("#6f5e49"))
-	if str(card.name) == "Carlo":
-		observation.add_theme_color_override("font_color", Color("#8c4834"))
 
 
 func _install_portrait(frame: PanelContainer, model: RefCounted, width: int) -> void:
@@ -841,7 +1013,7 @@ func _build_details_popup() -> void:
 
 	details_content = VBoxContainer.new()
 	details_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	details_content.add_theme_constant_override("separation", 15)
+	details_content.add_theme_constant_override("separation", 12)
 	scroll.add_child(details_content)
 
 
@@ -850,97 +1022,39 @@ func _show_person(person_id: String, open_popup: bool = true) -> void:
 		return
 	if selected_person_id != person_id:
 		conversation_result = ""
+		gameplay_result = ""
+		profile_expanded = false
+		profile_section = "Activities"
 	selected_person_id = person_id
+	gameplay_person_id = person_id
 	for child in details_content.get_children():
 		details_content.remove_child(child)
 		child.queue_free()
-
-	var model = people[person_id]
-	var person: Dictionary = model.view_for(game_clock.state.head_id)
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 12)
-	details_content.add_child(header)
-	var title := _add_label(header, "%s  ·  %s" % [person["name"], person["age"]], 29, TEXT_MAIN)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var close_button := Button.new()
-	close_button.text = "Close"
-	close_button.pressed.connect(details_popup.hide)
-	header.add_child(close_button)
-
-	var identity_row := HBoxContainer.new()
-	identity_row.add_theme_constant_override("separation", 22)
-	details_content.add_child(identity_row)
-	var portrait_frame := PanelContainer.new()
-	portrait_frame.name = "Portrait"
-	identity_row.add_child(portrait_frame)
-	_install_portrait(portrait_frame, model, 176)
-	var biography := VBoxContainer.new()
-	biography.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	biography.add_theme_constant_override("separation", 9)
-	identity_row.add_child(biography)
-	_add_label(biography, str(person["relationship"]), 16, TEXT_SUSPECTED)
-	_add_label(biography, model.status_text(), 16, TEXT_MAIN)
-	var pregnancy: Dictionary = model.life_state.get("pregnancy", {})
-	if not pregnancy.is_empty():
-		_add_label(biography, "Expecting a child · due in about %d months" % maxi(0, int(pregnancy["due_month"]) - game_clock.state.elapsed_months), 15, TEXT_KNOWN)
-	if not model.spouse_id.is_empty() and people.has(model.spouse_id):
-		_add_label(biography, "Married to " + people[model.spouse_id].name, 15, TEXT_MAIN)
-	_add_label(biography, "Born %s %d · %s branch" % [game_clock.state.MONTH_NAMES[model.birth_month - 1], model.birth_year, model.branch_id], 14, TEXT_MUTED)
-	_add_label(biography, "Responsibilities: " + ", ".join(model.roles), 15, TEXT_MAIN)
-	_add_label(biography, "Education: " + str(model.education["level"]).capitalize(), 15, TEXT_MAIN)
-	var careers_button := Button.new()
-	careers_button.text = "Education & careers…"
-	_apply_period_button_style(careers_button)
-	careers_button.pressed.connect(_show_careers.bind(person_id, true))
-	details_content.add_child(careers_button)
-	if person_id == game_clock.state.head_id:
-		var own_goals: Array = []
-		for goal in model.goals:
-			if goal.get("status") == "active":
-				own_goals.append(str(goal["description"]))
-		_add_notes("Your current goals", own_goals)
-	else:
-		var talk_button := Button.new()
-		talk_button.text = "Talk with " + model.name.get_slice(" ", 0)
-		talk_button.disabled = not model.alive or not model.in_household
-		_apply_period_button_style(talk_button)
-		talk_button.pressed.connect(_talk_to_person.bind(person_id))
-		details_content.add_child(talk_button)
-		var request_button := Button.new()
-		request_button.text = "Make a request…"
-		_apply_period_button_style(request_button)
-		request_button.pressed.connect(_open_influence_menu.bind(person_id))
-		details_content.add_child(request_button)
-		for goal in model.goals:
-			if goal.get("kind") == "seek_marriage" and goal.get("status") == "active":
-				_add_label(details_content, "Expressed intention: find a partner of their own choosing.", 15, TEXT_KNOWN)
-		_add_notes("Goals they have shared with you", person["expressed_goals"])
-		var plan: Dictionary = model.decision_state.get("plan", {})
-		if model.in_household and not plan.is_empty():
-			var timing := "Waiting for agreement on education funding."
-			if not str(plan["action"]).begins_with("funding:"):
-				var remaining := maxi(0, int(plan["due_month"]) - game_clock.state.elapsed_months)
-				timing = "Preparing to act within %d month%s." % [remaining, "" if remaining == 1 else "s"]
-			_add_label(details_content, "Observed plan: " + str(plan["description"]) + ". " + timing, 15, TEXT_KNOWN)
-		if not conversation_result.is_empty():
-			_add_label(details_content, conversation_result, 17, TEXT_KNOWN)
-	_add_label(details_content, str(person["summary"]), 17, TEXT_MAIN)
-	_add_label(details_content, "Your understanding:  Known = observed or told  ·  Suspected = your reading  ·  Unknown = unanswered", 13, TEXT_MUTED)
-
-	_add_layer("Temperament", person["temperament"])
-	_add_layer("Values", person["values"])
-	_add_layer("Learned tendencies", person["learned_tendencies"])
-	_add_layer("Current state", person["current_state"])
-	_add_notes("Formative experiences", person["experiences"])
-	_add_notes("Evidence you have noticed", person["evidence"])
-
-	var viewport_size := get_viewport_rect().size
-	var popup_size := Vector2i(
-		int(minf(860.0, viewport_size.x - 32.0)),
-		int(minf(690.0, viewport_size.y - 32.0))
-	)
+	preload("res://Scripts/PersonProfile.gd").build(self, person_id)
 	if open_popup:
-		details_popup.popup_centered(popup_size)
+		game_clock.pause()
+		var viewport_size := get_viewport_rect().size
+		details_popup.popup_centered(Vector2i(int(minf(860.0,viewport_size.x-32)),int(minf(690.0 if profile_expanded else 450.0,viewport_size.y-32))))
+
+	elif details_popup.visible:
+		var height := 690 if profile_expanded else 450
+		var dimensions := Vector2i(int(minf(860,get_viewport_rect().size.x-32)),int(minf(height,get_viewport_rect().size.y-32)))
+		if details_popup.size != dimensions:
+			details_popup.popup_centered(dimensions)
+
+
+func _open_person_activity(activity_id: String = "", target_id: String = "") -> void:
+	var person_id: String = gameplay_person_id
+	if not people.has(person_id) or not people[person_id].alive or not people[person_id].in_household or people[person_id].age < 18:
+		person_id = game_clock.state.head_id
+	_show_person(person_id)
+	if not activity_id.is_empty():
+		gameplay_activity_id = activity_id
+	if not target_id.is_empty():
+		gameplay_target_id = target_id
+	profile_expanded = true
+	profile_section = "Activities"
+	_show_person(person_id,false)
 
 
 func _talk_to_person(person_id: String) -> void:
@@ -1049,7 +1163,7 @@ func _show_careers(person_id: String, open_popup: bool = true) -> void:
 	var study: Dictionary = model.education["study"]
 	if not study.is_empty() and state.careers.programs.has(study.get("program_id")):
 		var program: Dictionary = state.careers.programs[study["program_id"]]
-		_add_label(careers_content, "%s · %s · %d%% completed · %s/month" % [program["name"], study["status"], int(float(study["progress"]) / float(program["months"]) * 100.0), game_clock.state.economy.money(program["monthly_cost_cents"])], 17, TEXT_KNOWN)
+		_add_label(careers_content, "%s · %s · %d%% completed · %s/month" % [program["name"], study["status"], int(float(study["progress"]) / float(program["months"]) * 100.0), game_clock.state.economy.money(game_clock.state.economy.purchase_cost(int(program["monthly_cost_cents"])))], 17, TEXT_KNOWN)
 	_add_label(careers_content, "Your understanding of their abilities and interests", 21, TEXT_MAIN)
 	for layer in ["abilities", "skills", "interests"]:
 		var known: Array = []
@@ -1066,7 +1180,7 @@ func _show_careers(person_id: String, open_popup: bool = true) -> void:
 	for program_id in state.careers.programs:
 		var program: Dictionary = state.careers.programs[program_id]
 		var action: String = "train:" + program_id
-		_add_label(study_list, "%s · roughly %d months · %s/month" % [program["name"], program["months"], game_clock.state.economy.money(program["monthly_cost_cents"])], 18, TEXT_MAIN)
+		_add_label(study_list, "%s · roughly %d months · %s/month" % [program["name"], program["months"], game_clock.state.economy.money(game_clock.state.economy.purchase_cost(int(program["monthly_cost_cents"])))], 18, TEXT_MAIN)
 		var requirements: String = "Entry education: " + model.EDUCATION_LEVELS[int(program["required_level"])]
 		if not program["entry_skills"].is_empty():
 			requirements += " · Preparation: " + ", ".join(program["entry_skills"].keys())
@@ -1155,8 +1269,8 @@ func _build_chronicle_screen() -> void:
 		_add_label(column, entry["date"] + " — " + entry["description"], 17, TEXT_MAIN)
 
 
-func _add_layer(heading: String, layer: Dictionary) -> void:
-	var panel := _make_section()
+func _add_layer(heading: String, layer: Dictionary, parent: Node = null) -> void:
+	var panel := _make_section(parent)
 	var body := panel.get_child(0) as MarginContainer
 	var column := body.get_child(0) as VBoxContainer
 	_add_label(column, heading, 21, TEXT_MAIN)
@@ -1165,8 +1279,8 @@ func _add_layer(heading: String, layer: Dictionary) -> void:
 	_add_entries(column, "Unknown", layer["unknown"], TEXT_UNKNOWN)
 
 
-func _add_notes(heading: String, notes: Array) -> void:
-	var panel := _make_section()
+func _add_notes(heading: String, notes: Array, parent: Node = null) -> void:
+	var panel := _make_section(parent)
 	var body := panel.get_child(0) as MarginContainer
 	var column := body.get_child(0) as VBoxContainer
 	_add_label(column, heading, 21, TEXT_MAIN)
@@ -1179,10 +1293,10 @@ func _add_entries(parent: VBoxContainer, label: String, entries: Array, color: C
 		_add_label(parent, "%s  ·  %s" % [label, entry], 15, color)
 
 
-func _make_section() -> PanelContainer:
+func _make_section(parent: Node = null) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", Archive.card())
-	details_content.add_child(panel)
+	(parent if parent != null else details_content).add_child(panel)
 	var margins := MarginContainer.new()
 	margins.add_theme_constant_override("margin_left", 16)
 	margins.add_theme_constant_override("margin_top", 12)
@@ -1205,6 +1319,15 @@ func _add_label(parent: Node, value: String, font_size: int, color: Color) -> La
 	return label
 
 
+func _add_flavor(parent: Node, value: String, quoted: bool = true) -> Label:
+	var label := Label.new()
+	label.theme_type_variation = "FlavorText"
+	label.text = Archive.flavor_quote(value) if quoted else value
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	parent.add_child(label)
+	return label
+
+
 func _house_summary() -> String:
 	var house: Dictionary = game_clock.state.household
 	return "%s · Condition: %d/100 · Capacity: %d · %d rooms" % [game_clock.state.date_text(), int(house.get("condition", 80)), int(house.get("capacity", 7)), house["rooms"].size()]
@@ -1219,6 +1342,7 @@ func _build_event_popup() -> void:
 	for edge in ["left", "right", "top", "bottom"]:
 		margins.add_theme_constant_override("margin_" + edge, 24)
 	event_popup.add_child(margins)
+	margins.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	margins.add_child(scroll)
@@ -1273,31 +1397,63 @@ func _show_pending_event() -> void:
 	later.pressed.connect(event_popup.hide)
 	header.add_child(later)
 	_add_label(event_content, str(event["date"]) + " · " + str(event["category"]).replace("_", " ").capitalize(), 14, TEXT_MUTED)
-	_add_label(event_content, str(event["body"]), 19, TEXT_MAIN)
-	_add_label(event_content, "Choose a response before advancing to the next month. %d event%s awaiting a decision." % [state.events.pending.size(), "" if state.events.pending.size() == 1 else "s"], 14, TEXT_SUSPECTED)
+	var viewport_size := get_viewport_rect().size
+	var columns: BoxContainer = HBoxContainer.new() if viewport_size.x >= 820 else VBoxContainer.new()
+	columns.name = "EventColumns"
+	columns.add_theme_constant_override("separation", 24)
+	event_content.add_child(columns)
+	var story := VBoxContainer.new()
+	story.name = "Story"
+	story.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	story.size_flags_stretch_ratio = 0.9
+	story.add_theme_constant_override("separation", 16)
+	columns.add_child(story)
+	var illustration := PanelContainer.new()
+	illustration.name = "Illustration"
+	illustration.custom_minimum_size = Vector2(0, 230)
+	illustration.add_theme_stylebox_override("panel", Archive.card())
+	story.add_child(illustration)
+	# Reserved for event art; intentionally empty during the prototype.
+	var paper := ColorRect.new()
+	paper.color = Color("#d8c7a5")
+	paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	illustration.add_child(paper)
+	_add_flavor(story, str(event["body"]))
+	var triggered: Array = EventPresentation.consequences(state, event, event.get("on_trigger", {}))
+	if not triggered.is_empty():
+		_add_label(story, "What happened", 18, TEXT_MAIN)
+		EventPresentation.draw_rows(self, story, triggered)
+	var actions := VBoxContainer.new()
+	actions.name = "Actions"
+	actions.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	actions.add_theme_constant_override("separation", 12)
+	columns.add_child(actions)
+	_add_label(actions, "Your response", 20, TEXT_MAIN)
+	_add_label(actions, "Time is paused until you decide. %d event%s awaiting a response." % [state.events.pending.size(), "" if state.events.pending.size() == 1 else "s"], 13, TEXT_MUTED)
 	for index in range(event["choices"].size()):
 		var choice: Dictionary = event["choices"][index]
+		var card := PanelContainer.new()
+		card.name = "Choice%d" % index
+		card.add_theme_stylebox_override("panel", Archive.card())
+		actions.add_child(card)
+		var content := VBoxContainer.new()
+		content.add_theme_constant_override("separation", 7)
+		card.add_child(content)
 		var button := Button.new()
 		button.text = str(choice["label"])
 		button.custom_minimum_size = Vector2(0, 44)
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_apply_period_button_style(button)
 		var reason: String = state.events.choice_reason(state, event, index)
 		button.disabled = not reason.is_empty()
 		button.tooltip_text = reason if not reason.is_empty() else str(choice["result"])
 		button.pressed.connect(_resolve_event.bind(int(event["serial"]), index))
-		event_content.add_child(button)
-		var explanation: String = str(choice["result"])
-		var effects: Dictionary = choice["effects"]
-		if effects.has("cash"):
-			explanation += " " + ("Cost: " if int(effects["cash"]) < 0 else "Receives: ") + game_clock.state.economy.money(absi(int(effects["cash"]))) + "."
-		if effects.get("study", false):
-			var program: Dictionary = state.careers.programs.get(event.get("program_id", ""), {})
-			explanation += " Tuition: " + game_clock.state.economy.money(int(program.get("monthly_cost_cents", 0))) + "/month."
+		content.add_child(button)
+		_add_label(content, str(choice["result"]), 14, TEXT_MUTED)
+		EventPresentation.draw_rows(self, content, EventPresentation.consequences(state, event, choice["effects"]))
 		if not reason.is_empty():
-			explanation += " " + reason
-		_add_label(event_content, explanation, 14, TEXT_MUTED)
-	var viewport_size := get_viewport_rect().size
-	event_popup.popup_centered(Vector2i(int(minf(790, viewport_size.x - 32)), int(minf(680, viewport_size.y - 32))))
+			EventPresentation.draw_rows(self, content, [{"icon": "stress", "text": reason, "tone": -1}])
+	event_popup.popup_centered(Vector2i(int(minf(1080, viewport_size.x - 32)), int(minf(800, viewport_size.y - 32))))
 
 
 func _resolve_event(serial: int, choice: int) -> void:

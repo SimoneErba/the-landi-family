@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://c4idocynu7b78"
+
+[deps]
+
+files=["res://Reports/Simulations/smoke/annual.seed.translation", "res://Reports/Simulations/smoke/annual.month.translation", "res://Reports/Simulations/smoke/annual.year.translation", "res://Reports/Simulations/smoke/annual.cash.translation", "res://Reports/Simulations/smoke/annual.real.translation", "res://Reports/Simulations/smoke/annual.living.translation", "res://Reports/Simulations/smoke/annual.residents.translation", "res://Reports/Simulations/smoke/annual.births.translation", "res://Reports/Simulations/smoke/annual.graduates.translation", "res://Reports/Simulations/smoke/annual.influential.translation", "res://Reports/Simulations/smoke/annual.stress.translation", "res://Reports/Simulations/smoke/annual.resentment.translation", "res://Reports/Simulations/smoke/annual.house.translation", "res://Reports/Simulations/smoke/annual.house.translation", "res://Reports/Simulations/smoke/annual.family.translation", "res://Reports/Simulations/smoke/annual.family.translation", "res://Reports/Simulations/smoke/annual.village.translation", "res://Reports/Simulations/smoke/annual.living.translation", "res://Reports/Simulations/smoke/annual.unfulfilled.translation", "res://Reports/Simulations/smoke/annual.wealth.translation", "res://Reports/Simulations/smoke/annual.population.translation"]
+
+source_file="res://Reports/Simulations/smoke/annual.csv"
+dest_files=["res://Reports/Simulations/smoke/annual.seed.translation", "res://Reports/Simulations/smoke/annual.month.translation", "res://Reports/Simulations/smoke/annual.year.translation", "res://Reports/Simulations/smoke/annual.cash.translation", "res://Reports/Simulations/smoke/annual.real.translation", "res://Reports/Simulations/smoke/annual.living.translation", "res://Reports/Simulations/smoke/annual.residents.translation", "res://Reports/Simulations/smoke/annual.births.translation", "res://Reports/Simulations/smoke/annual.graduates.translation", "res://Reports/Simulations/smoke/annual.influential.translation", "res://Reports/Simulations/smoke/annual.stress.translation", "res://Reports/Simulations/smoke/annual.resentment.translation", "res://Reports/Simulations/smoke/annual.house.translation", "res://Reports/Simulations/smoke/annual.house.translation", "res://Reports/Simulations/smoke/annual.family.translation", "res://Reports/Simulations/smoke/annual.family.translation", "res://Reports/Simulations/smoke/annual.village.translation", "res://Reports/Simulations/smoke/annual.living.translation", "res://Reports/Simulations/smoke/annual.unfulfilled.translation", "res://Reports/Simulations/smoke/annual.wealth.translation", "res://Reports/Simulations/smoke/annual.population.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

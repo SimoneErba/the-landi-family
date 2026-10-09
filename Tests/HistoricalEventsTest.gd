@@ -17,9 +17,10 @@ func _state():
 func _run() -> void:
 	var state = _state()
 	assert(state.date_text() == "January 1800")
-	assert(state.economy.money(10000) == "100 lire toscane")
-	assert(state.economy.money(5) == "0 lire toscane, 1s 0d")
-	assert(state.economy.money(-10000) == "−100 lire toscane")
+	assert(state.economy.money(10000) == "100 lire")
+	assert(state.economy.money(5) == "0.05 lire")
+	assert(state.economy.money(-10000) == "−100 lire")
+	assert(state.economy.money(-667) == "−6.67 lire")
 	assert(state.events.eligible_targets(state, state.events.catalog["celebration_04"]).is_empty(), "No photographs in 1800")
 	assert(state.events.eligible_targets(state, state.events.catalog["rural_01"]).is_empty(), "Olive harvest waits for autumn")
 	assert(state.events.is_wartime(1800, 6) and not state.events.is_wartime(1830, 6))
@@ -60,27 +61,30 @@ func _run() -> void:
 	var cash: int = loaded.state.economy.cash_cents
 	assert(loaded.state.events.resolve(loaded.state, loaded.state.events.pending[0]["serial"], 0)["ok"])
 	assert(loaded.state.economy.currency == "tuscan_fiorino" and loaded.state.economy.cash_cents == cash)
-	assert(loaded.state.economy.money(10000) == "60.00 fiorini")
-	assert(loaded.state.economy.money(1000) == "6.00 fiorini")
+	assert(loaded.state.economy.money(10000) == "100 lire")
+	assert(loaded.state.economy.money(1000) == "10 lire")
 	loaded.state.year = 1859
 	loaded.state.month = 11
 	assert(loaded.state.events.trigger(loaded.state, "history_italian_lira"))
 	assert(loaded.state.events.resolve(loaded.state, loaded.state.events.pending[0]["serial"], 0)["ok"])
-	assert(loaded.state.economy.money(10000) == "84.00 lire italiane")
-	assert(loaded.state.economy.money(-10000) == "−84.00 lire italiane")
-	assert(loaded.state.economy.money(1000) == "8.40 lire italiane")
+	assert(loaded.state.economy.money(10000) == "100 lire")
+	assert(loaded.state.economy.money(-10000) == "−100 lire")
+	assert(loaded.state.economy.money(1000) == "10 lire")
 	assert(loaded.state.people["Giovanni"].monthly_income_cents == 20000, "Wage value is preserved with the balance")
 	assert(Save.save_game(loaded, PATH).is_empty())
 	assert(Save.load_game(clock, PATH).is_empty() and clock.state.to_save_data() == loaded.state.to_save_data())
 	# A legacy Italian-lira save keeps its value after rebasing the shared accounting unit.
 	var legacy: Dictionary = {"format": "TheHouse", "version": 1, "state": loaded.state.to_save_data(), "clock": {"speed_level": 3, "month_progress": 0.0}}
 	legacy["state"]["economy"].erase("currency")
+	# Saves before currency tracking also predate the persistent village.
+	legacy["state"].erase("village")
 	legacy["state"]["economy"]["cash_cents"] = 10000
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
 	file.store_var(legacy, false)
 	file.close()
-	assert(Save.load_game(clock, PATH).is_empty())
-	assert(clock.state.economy.money(clock.state.economy.cash_cents) == "100.00 lire italiane")
+	var legacy_error: String = Save.load_game(clock, PATH)
+	assert(legacy_error.is_empty(), legacy_error)
+	assert(clock.state.economy.money(clock.state.economy.cash_cents) == "119.05 lire", "Legacy saves preserve their value in the common accounting basis")
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
 	root.add_child(screen)
 	assert(screen.get_node("TopBar").find_child("Title", true, false).text == "The Landi family")

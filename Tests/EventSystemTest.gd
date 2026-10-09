@@ -23,6 +23,8 @@ func _state():
 	state.economy.cash_cents = 1000000
 	state.year = 1916
 	state.month = 7
+	state.village.development.transfer(state,"workshop","landi")
+	state.village.development.transfer(state,"farm","landi")
 	return state
 
 
@@ -41,7 +43,7 @@ func _advance(state, months: int) -> void:
 
 func _run() -> void:
 	var base = _state()
-	assert(base.events.catalog.size() == 304)
+	assert(base.events.catalog.size() == 306)
 	var categories: Dictionary = {}
 	var ids: Dictionary = {}
 	for event in base.events.catalog.values():
@@ -62,7 +64,7 @@ func _run() -> void:
 			assert(not targets.is_empty(), "The authored event can occur in an appropriate context: " + event["id"])
 			assert(state.events.trigger(state, event["id"], targets[0]))
 			var pending: Dictionary = state.events.pending[0]
-			assert("{person}" not in pending["body"] and "{course}" not in pending["body"], "Story placeholders are bound")
+			assert("{person}" not in pending["body"] and "{course}" not in pending["body"] and "{property}" not in pending["body"], "Story placeholders are bound")
 			assert(state.events.choice_reason(state, pending, choice_index).is_empty())
 			assert(state.events.resolve(state, pending["serial"], choice_index)["ok"])
 			assert(state.events.pending.is_empty())
@@ -211,5 +213,5 @@ func _run() -> void:
 	screen._show_screen("Events")
 	assert(screen.event_popup.visible, "The Events navigation reopens a deferred decision")
 	screen.free()
-	print("PASS: all 304 catalog entries and every choice, eligibility, costs, house damage and expansion, shortages, illness, pregnancy and birth, graduation, payouts, event pauses, deterministic saves, ten-year variety, and event UI")
+	print("PASS: all 306 catalog entries and every choice, eligibility, costs, house damage and expansion, shortages, illness, pregnancy and birth, graduation, payouts, event pauses, deterministic saves, ten-year variety, and event UI")
 	quit()

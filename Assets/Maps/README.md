@@ -1,0 +1,3 @@
+Italy coastline: Natural Earth 1:50m country polygons (public domain), https://www.naturalearthdata.com/about/terms-of-use/. Projection and parchment treatment generated for The House. City markers share the same projection. Village is an original stylized fictional Tuscan settlement.
+
+The evolving village uses village-terrain.svg as its permanent layer and Buildings/*.svg as original interchangeable vector sprites. village.svg retains the earlier static drawing. Simulation/Village/VillageDevelopment.gd owns parcel locations and persistent building identities; renderer positions are derived from those records.

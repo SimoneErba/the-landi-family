@@ -190,12 +190,10 @@ theme_override_colors/font_color = Color(0.71, 0.76, 0.7, 1)
 theme_override_font_sizes/font_size = 15
 text = "You  ·  Family head  ·  Smallholder"
 
-[node name="Observation" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList/Giovanni/Row/Details"]
+[node name="Stats" type="HFlowContainer" parent="PageMargins/Page/RosterScroll/FamilyList/Giovanni/Row/Details"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.67, 0.63, 1)
-theme_override_font_sizes/font_size = 14
-text = "Trying to keep the family business together."
-autowrap_mode = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
 
 [node name="Maria" type="PanelContainer" parent="PageMargins/Page/RosterScroll/FamilyList"]
 custom_minimum_size = Vector2(0, 96)
@@ -236,12 +234,10 @@ theme_override_colors/font_color = Color(0.71, 0.76, 0.7, 1)
 theme_override_font_sizes/font_size = 15
 text = "Wife  ·  Household manager"
 
-[node name="Observation" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList/Maria/Row/Details"]
+[node name="Stats" type="HFlowContainer" parent="PageMargins/Page/RosterScroll/FamilyList/Maria/Row/Details"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.67, 0.63, 1)
-theme_override_font_sizes/font_size = 14
-text = "Has been spending more time talking with Carlo."
-autowrap_mode = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
 
 [node name="Carlo" type="PanelContainer" parent="PageMargins/Page/RosterScroll/FamilyList"]
 custom_minimum_size = Vector2(0, 96)
@@ -282,12 +278,10 @@ theme_override_colors/font_color = Color(0.71, 0.76, 0.7, 1)
 theme_override_font_sizes/font_size = 15
 text = "Son  ·  Works in the family shop"
 
-[node name="Observation" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList/Carlo/Row/Details"]
+[node name="Stats" type="HFlowContainer" parent="PageMargins/Page/RosterScroll/FamilyList/Carlo/Row/Details"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.87, 0.7, 0.45, 1)
-theme_override_font_sizes/font_size = 14
-text = "Often mentions Florence; has stopped staying late at the shop."
-autowrap_mode = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
 
 [node name="Anna" type="PanelContainer" parent="PageMargins/Page/RosterScroll/FamilyList"]
 custom_minimum_size = Vector2(0, 96)
@@ -328,12 +322,10 @@ theme_override_colors/font_color = Color(0.71, 0.76, 0.7, 1)
 theme_override_font_sizes/font_size = 15
 text = "Daughter  ·  Student"
 
-[node name="Observation" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList/Anna/Row/Details"]
+[node name="Stats" type="HFlowContainer" parent="PageMargins/Page/RosterScroll/FamilyList/Anna/Row/Details"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.67, 0.63, 1)
-theme_override_font_sizes/font_size = 14
-text = "Helps her mother, but wants more time for her studies."
-autowrap_mode = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
 
 [node name="OtherBranchHeading" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList"]
 layout_mode = 2
@@ -380,12 +372,10 @@ theme_override_colors/font_color = Color(0.71, 0.76, 0.7, 1)
 theme_override_font_sizes/font_size = 15
 text = "Brother  ·  Carpenter"
 
-[node name="Observation" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList/Pietro/Row/Details"]
+[node name="Stats" type="HFlowContainer" parent="PageMargins/Page/RosterScroll/FamilyList/Pietro/Row/Details"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.67, 0.63, 1)
-theme_override_font_sizes/font_size = 14
-text = "Wants a say in repairs to the shared house."
-autowrap_mode = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
 
 [node name="Lucia" type="PanelContainer" parent="PageMargins/Page/RosterScroll/FamilyList"]
 custom_minimum_size = Vector2(0, 96)
@@ -426,12 +416,10 @@ theme_override_colors/font_color = Color(0.71, 0.76, 0.7, 1)
 theme_override_font_sizes/font_size = 15
 text = "Sister-in-law  ·  Seamstress"
 
-[node name="Observation" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList/Lucia/Row/Details"]
+[node name="Stats" type="HFlowContainer" parent="PageMargins/Page/RosterScroll/FamilyList/Lucia/Row/Details"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.67, 0.63, 1)
-theme_override_font_sizes/font_size = 14
-text = "Keeps to her branch when the families disagree."
-autowrap_mode = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
 
 [node name="Sofia" type="PanelContainer" parent="PageMargins/Page/RosterScroll/FamilyList"]
 custom_minimum_size = Vector2(0, 96)
@@ -472,12 +460,10 @@ theme_override_colors/font_color = Color(0.71, 0.76, 0.7, 1)
 theme_override_font_sizes/font_size = 15
 text = "Niece  ·  Apprentice seamstress"
 
-[node name="Observation" type="Label" parent="PageMargins/Page/RosterScroll/FamilyList/Sofia/Row/Details"]
+[node name="Stats" type="HFlowContainer" parent="PageMargins/Page/RosterScroll/FamilyList/Sofia/Row/Details"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.67, 0.63, 1)
-theme_override_font_sizes/font_size = 14
-text = "Often asks Anna about school."
-autowrap_mode = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 6
 
 [node name="Footer" type="Label" parent="PageMargins/Page"]
 layout_mode = 2

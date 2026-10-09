@@ -86,14 +86,20 @@ func request_label(action: String) -> String:
 
 
 func request_reason(state, person, action: String) -> String:
+	if action.begins_with("train:") and not state.village.business.commitment(person.id).is_empty():
+		return "Release their business responsibility before starting a course."
+	if not state.travel.current(person.id).is_empty():
+		return "They are away on a journey."
 	var key := action.get_slice(":", 1)
+	if state.activities.commitment(person.id) != null:
+		return "Finish or cancel their family activity first."
 	if action.begins_with("train:"):
 		var reason := program_reason(person, key)
 		if not reason.is_empty():
 			return reason
 		if not person.in_household:
 			return "Family-funded training currently requires living in the house."
-		if state.economy.cash_cents < int(programs[key]["monthly_cost_cents"]):
+		if state.economy.cash_cents < state.economy.purchase_cost(int(programs[key]["monthly_cost_cents"])):
 			return "The family cannot afford the first month's fees."
 		return ""
 	if action.begins_with("work:"):
@@ -152,6 +158,7 @@ func advance_month(state, person) -> void:
 	study["status"] = "Studying"
 	# Aptitude speeds learning; discipline can offset slower learning.
 	var rate := 0.45 + weighted_ability(person, program["abilities"]) / 100.0 * 0.65 + float(person.temperament["conscientiousness"]) * 0.5
+	rate *= state.legacy.learning_multiplier()
 	rate *= 1.0 - float(person.current_state.get("stress", 0.0)) * 0.3
 	var remaining := maxf(0.0, float(program["months"]) - float(study["progress"]))
 	var step := minf(rate, remaining)

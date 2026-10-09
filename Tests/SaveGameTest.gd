@@ -13,6 +13,7 @@ func _run() -> void:
 	var clock = Clock.new()
 	clock.state.initialize(JSON.parse_string(FileAccess.get_file_as_string("res://Data/people.json")))
 	clock.state.events.enabled = false
+	assert(clock.state.legacy.choose("wealth", "discount"))
 	clock.state.people["Carlo"].converse("Giovanni", 0, clock.state.date_text())
 	clock.state.request("Carlo", "stay")
 	clock.state.advance_month()

@@ -47,6 +47,8 @@ static func _has_kind(person, kind: String, active_only: bool = true) -> bool:
 
 
 static func advance_month(state, person) -> void:
+	if not state.travel.current(person.id).is_empty():
+		return
 	ensure_goals(person)
 	if not person.alive or person.id == state.head_id:
 		return
@@ -89,12 +91,13 @@ static func advance_month(state, person) -> void:
 static func _choose(state, person, include_funding: bool = true) -> Dictionary:
 	var choices: Array = []
 	var studying: bool = not person.education["study"].is_empty()
+	var committed: bool = state.activities.commitment(person.id) != null or not state.village.business.commitment(person.id).is_empty()
 	var loyalty: float = person.values["family_loyalty"]
 	var security: float = person.values["security"]
 	var achievement: float = person.values["achievement"]
 	var bond: Dictionary = person.relationships.get(state.head_id, {})
 	var resentment: float = maxf(float(person.current_state.get("resentment", 0.0)), float(bond.get("resentment", 0.0)))
-	if person.age >= 18 and not studying:
+	if person.age >= 18 and not studying and not committed:
 		var current_interest := 0.5
 		var current_status := 0.0
 		if state.careers.jobs.has(person.career_id):
@@ -128,7 +131,7 @@ static func _choose(state, person, include_funding: bool = true) -> Dictionary:
 		elif not person.in_household and _has_kind(person, "family_cohesion") and state.economy.cash_cents >= 0:
 			var score: float = loyalty * 0.7 + security * 0.2 + float(bond.get("affection", 0.4)) * 0.2 - float(person.values["independence"]) * 0.5 - resentment * 0.5
 			_offer(choices, "join", "return to the ancestral home", "Being close to family matters more than living apart.", score)
-	if include_funding and person.in_household and person.age >= 6 and not studying and _has_kind(person, "education"):
+	if not committed and include_funding and person.in_household and person.age >= 6 and not studying and _has_kind(person, "education"):
 		for program_id in state.careers.programs:
 			if not state.careers.program_reason(person, program_id).is_empty():
 				continue
@@ -137,7 +140,7 @@ static func _choose(state, person, include_funding: bool = true) -> Dictionary:
 			if person.monthly_income_cents > 0:
 				score -= security * 0.2
 			_offer(choices, "funding:" + program_id, "study " + str(program["name"]), "They want to develop their abilities, but need agreement on the fees.", score)
-	if person.in_household and float(person.current_state.get("stress", 0.0)) < 0.75 and (_has_kind(person, "family_cohesion") or _has_kind(person, "child_security") or _has_kind(person, "shared_ownership")):
+	if not committed and person.in_household and float(person.current_state.get("stress", 0.0)) < 0.75 and (_has_kind(person, "family_cohesion") or _has_kind(person, "child_security") or _has_kind(person, "shared_ownership")):
 		for relative_id in person.relationships:
 			if not state.people.has(relative_id):
 				continue
@@ -147,7 +150,7 @@ static func _choose(state, person, include_funding: bool = true) -> Dictionary:
 				var affection: float = person.relationships[relative_id].get("affection", 0.4)
 				if stress >= 0.3:
 					_offer(choices, "help", "help " + relative.name + " with household responsibilities", "They have noticed a relative struggling.", loyalty * affection * stress, {"target_id": relative_id})
-	if not studying and person.age >= 6 and (_has_kind(person, "education") or _has_kind(person, "independent_career") or _has_kind(person, "career")):
+	if not committed and not studying and person.age >= 6 and (_has_kind(person, "education") or _has_kind(person, "independent_career") or _has_kind(person, "career")):
 		var interest_name := "academic"
 		for key in person.interests:
 			if person.interests[key] > person.interests[interest_name]:
@@ -203,7 +206,7 @@ static func _apply(state, person, choice: Dictionary) -> void:
 			if goal.get("kind") == "seek_marriage" and goal.get("status") == "active":
 				goal["pursuit_started"] = true
 	elif action == "practice":
-		person.skills[choice["skill"]] = minf(50.0, float(person.skills[choice["skill"]]) + 1.5)
+		person.skills[choice["skill"]] = minf(50.0, float(person.skills[choice["skill"]]) + 1.5 * state.legacy.learning_multiplier())
 	person.current_state["happiness"] = minf(1.0, float(person.current_state.get("happiness", 0.6)) + 0.03)
 	person.decision_state["last_action_month"] = state.elapsed_months
 	_record(state, person, "decision", person.name + " chose to " + choice["description"] + ". " + choice["reason"], action not in ["help", "practice"])

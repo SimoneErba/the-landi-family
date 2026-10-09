@@ -14,7 +14,7 @@ func _run() -> void:
 	state.initialize(source)
 	state.events.enabled = false
 	assert(state.careers.jobs.size() == 32)
-	assert(state.careers.programs.size() == 22)
+	assert(state.careers.programs.size() == 23)
 	for job in state.careers.jobs.values():
 		for skill in job["skills"]:
 			assert(skill in State.Person.SKILLS)

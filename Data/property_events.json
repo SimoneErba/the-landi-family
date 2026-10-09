@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "property_repairs_01",
+      "category": "repairs",
+      "title": "Storm damage to a family business",
+      "body": "Wind and rain have damaged {property}. Its condition has fallen and production will suffer until repairs are made.",
+      "weight": 1.0,
+      "cooldown_months": 60,
+      "conditions": {
+        "target": "family_property",
+        "building_types": [
+          "farm",
+          "workshop",
+          "factory",
+          "tavern"
+        ]
+      },
+      "on_trigger": {
+        "property_condition": -12
+      },
+      "choices": [
+        {
+          "label": "Pay for proper repairs",
+          "result": "The damaged property is restored; the payment comes from the shared purse.",
+          "effects": {
+            "cash": -2000,
+            "property_condition": 12
+          }
+        },
+        {
+          "label": "Make a temporary patch",
+          "result": "The family restores part of the damage, but the shared work adds pressure.",
+          "effects": {
+            "property_condition": 5,
+            "household_stress": 0.035
+          }
+        },
+        {
+          "label": "Leave it for now",
+          "result": "No money is spent. The damage continues to reduce the property's output.",
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "id": "property_repairs_02",
+      "category": "repairs",
+      "title": "Flooded farm buildings",
+      "body": "Water has entered {property}, damaging the farm buildings. The farm's condition and future sales are reduced.",
+      "weight": 0.5,
+      "cooldown_months": 72,
+      "conditions": {
+        "target": "family_property",
+        "building_types": [
+          "farm"
+        ],
+        "months": [
+          3,
+          4,
+          10,
+          11
+        ]
+      },
+      "on_trigger": {
+        "property_condition": -18
+      },
+      "choices": [
+        {
+          "label": "Drain and repair the buildings",
+          "result": "The damage is repaired at the family's expense.",
+          "effects": {
+            "cash": -4000,
+            "property_condition": 18
+          }
+        },
+        {
+          "label": "Clear the worst damage together",
+          "result": "The patch helps, while the household shoulders the extra effort.",
+          "effects": {
+            "property_condition": 8,
+            "household_stress": 0.04
+          }
+        },
+        {
+          "label": "Wait for funds",
+          "result": "The damaged farm continues with reduced output.",
+          "effects": {}
+        }
+      ]
+    }
+  ]
+}
