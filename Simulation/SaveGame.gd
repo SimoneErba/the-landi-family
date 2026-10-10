@@ -69,6 +69,10 @@ static func _valid_save(data: Dictionary) -> bool:
 	if not data.get("state") is Dictionary:
 		return false
 	var saved_state: Dictionary = data["state"]
+	if not saved_state.has("notifications"):
+		saved_state["notifications"] = []
+	if not saved_state.has("marriage"):
+		saved_state["marriage"] = template.marriage.to_save_data()
 	if not saved_state.has("travel"):
 		saved_state["travel"] = template.travel.to_save_data()
 	if not saved_state.has("activities"):
@@ -174,6 +178,8 @@ static func _valid_save(data: Dictionary) -> bool:
 		for field in ["temperament", "values", "learned_tendencies", "current_state", "abilities", "skills", "interests"]:
 			if not _matches_fields(person[field], person_template[field]):
 				return false
+		var assignment = preload("res://Simulation/Assignment.gd")
+		if not assignment.valid(person["education"]["study"].get("agreement", {})) or not assignment.valid(person["life_state"].get("job_agreement", {})): return false
 		if person["in_household"] != (person_id in state["household"]["members"]):
 			return false
 	var seen: Dictionary = {}
@@ -181,7 +187,11 @@ static func _valid_save(data: Dictionary) -> bool:
 		if not member is String or not state["people"].has(member) or seen.has(member):
 			return false
 		seen[member] = true
-	return true
+	if state["notifications"].size() > 100: return false
+	for notice in state["notifications"]:
+		if not _matches_fields(notice, {"date":"", "description":"", "person_id":"", "read":false}): return false
+		if not notice["person_id"].is_empty() and not state["people"].has(notice["person_id"]): return false
+	return State.Marriage.valid(state["marriage"], state)
 
 
 static func _valid_travel(state: Dictionary, template) -> bool:
@@ -193,6 +203,7 @@ static func _valid_travel(state: Dictionary, template) -> bool:
 		var journey: Variant = travel["journeys"][journey_id]
 		if journey is Dictionary and journey.has("interruption_reason") and not journey["interruption_reason"] is String:
 			return false
+		if journey is Dictionary and not preload("res://Simulation/Assignment.gd").valid(journey.get("agreement", {})): return false
 		if not journey_id is String or not _matches_fields(journey, {"id": "", "person_id": "", "city_id": "", "purpose_id": "", "status": "", "remaining_months": 1, "progress": 0.0, "started_month": 0, "recalled": false, "outcome": ""}) or journey["id"] != journey_id:
 			return false
 		if not journey_id.begins_with("journey_") or not journey_id.trim_prefix("journey_").is_valid_int() or int(journey_id.trim_prefix("journey_")) < 1 or int(journey_id.trim_prefix("journey_")) >= travel["next_id"]:
@@ -264,8 +275,10 @@ static func _valid_gameplay(state: Dictionary, template) -> bool:
 	var committed: Dictionary = {}
 	for plan_id in activities["plans"]:
 		var plan: Variant = activities["plans"][plan_id]
+		if plan is Dictionary and not plan.has("agreement"): plan["agreement"] = {}
 		if not plan_id is String or not _matches_fields(plan, State.Activities.Plan.new().to_save_data()) or plan["id"] != plan_id:
 			return false
+		if not preload("res://Simulation/Assignment.gd").valid(plan["agreement"]): return false
 		if not State.Activities.CATALOG.has(plan["activity_id"]) or plan["status"] not in State.Activities.Plan.STATUSES:
 			return false
 		if not plan_id.begins_with("activity_") or not plan_id.trim_prefix("activity_").is_valid_int() or int(plan_id.trim_prefix("activity_")) < 1 or int(plan_id.trim_prefix("activity_")) >= activities["next_id"]:

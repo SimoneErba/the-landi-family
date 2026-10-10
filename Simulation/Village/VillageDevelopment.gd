@@ -2,6 +2,7 @@ extends RefCounted
 ## Persistent parcels and structures. The renderer never owns world state.
 const TYPES := ["house", "manor", "church", "tavern", "market", "school", "farm", "workshop", "town_hall", "station", "factory"]
 const COST := 12000
+const PROPERTY_VALUE_MULTIPLIER := 15
 var parcels: Dictionary = {}
 var buildings: Dictionary = {}
 var projects: Dictionary = {}
@@ -146,13 +147,18 @@ func begin_construction(state, parcel_id: String, type: String, owner: String, p
 	return "Construction started. The building will be ready in 12 months."
 
 
+func land_value(parcel: Dictionary) -> int:
+	# Keep recorded parcel data stable, including historical views and old saves.
+	return int(parcel["value_cents"]) * PROPERTY_VALUE_MULTIPLIER
+
+
 func buy_parcel(state, id: String) -> String:
 	if not parcels.has(id) or not parcels[id]["for_sale"] or parcels[id]["owner_id"] != "village" or _occupied_project(id):
 		return "This land is unavailable for purchase."
-	var price: int = state.economy.purchase_cost(parcels[id]["value_cents"])
+	var price: int = state.economy.purchase_cost(land_value(parcels[id]))
 	if state.economy.cash_cents < price:
 		return "The family cannot afford this parcel."
-	state.events._cash(state, -parcels[id]["value_cents"], "Purchase village land")
+	state.events._cash(state, -land_value(parcels[id]), "Purchase village land")
 	parcels[id]["owner_id"] = "landi"
 	parcels[id]["for_sale"] = false
 	_record(state, "The Landi family purchased " + id.replace("_", " ") + ".", [], [id])
@@ -286,7 +292,7 @@ func invest(state, owner: String) -> bool:
 func advance_month(state) -> void:
 	if buildings["home"]["condition"] != float(state.household["condition"]):
 		buildings["home"]["condition"] = float(state.household["condition"])
-		_record(state, "The ancestral house condition changed.", ["home"])
+		_record(state, "Landi House condition changed.", ["home"])
 	# Construction is prepaid, and only completed projects introduce structures.
 	for id in projects.keys():
 		var project: Dictionary = projects[id]
@@ -307,6 +313,7 @@ func advance_month(state) -> void:
 				state.household["capacity"] += 2
 		projects.erase(id)
 		_record(state, "Completed " + project["kind"] + " at " + buildings[id]["address"] + ".", [id], [parcel_id])
+		if project["owner_id"] == "landi": state.notify("Completed " + project["kind"] + " at " + buildings[id]["address"] + ".")
 	if state.elapsed_months % 12 != 0:
 		return
 	for building in buildings.values():

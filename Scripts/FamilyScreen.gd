@@ -1,5 +1,7 @@
 extends Control
 
+const Reaction = preload("res://Scripts/AssignmentReaction.gd")
+const InlinePanel = preload("res://Scripts/InlinePanel.gd")
 const TravelScreen = preload("res://Scripts/TravelScreen.gd")
 const GameplayScreens = preload("res://Scripts/GameplayScreens.gd")
 const Archive = preload("res://Scripts/ArchiveTheme.gd")
@@ -18,7 +20,10 @@ const TEXT_UNKNOWN := Color("#62707a")
 const NAV_TEXT := Color("#f5e4c4")
 
 var people: Dictionary = {}
-var details_popup: PopupPanel
+var details_popup: PanelContainer
+var marriage_popup: PopupPanel
+var marriage_person_id: String = ""
+var marriage_candidate_id: String = ""
 var details_content: VBoxContainer
 var menu_popup: PopupPanel
 var content_overlay: PanelContainer
@@ -32,6 +37,8 @@ var speed_buttons: Array[Button] = []
 var house_description: Label
 var clock_status: Label
 var cash_label: Label
+var cohesion_label: Label
+var reputation_label: Label
 var travel_city_id: String = "florence"
 var travel_person_id: String = "Carlo"
 var travel_purpose_id: String = "study"
@@ -47,12 +54,15 @@ var legacy_status: Label
 var finance_content: VBoxContainer
 var selected_person_id: String = ""
 var conversation_result: String = ""
+var assignment_feedback: Dictionary = {}
+var notification_feed: PanelContainer
+var notification_text: Label
 var profile_expanded := false
 var profile_section := "Activities"
 var influence_popup: PopupMenu
 var influence_person_id: String = ""
 var elsewhere_list: VBoxContainer
-var careers_popup: PopupPanel
+var careers_popup: PanelContainer
 var careers_content: VBoxContainer
 var career_person_id: String = ""
 var event_popup: PopupPanel
@@ -62,11 +72,13 @@ var house_note: Label
 var portraits_ready := false
 var family_frame: Panel
 var month_progress_bar: ProgressBar
-const NAV_WIDTH := 260.0
+const NAV_WIDTH := 192.0
 
 
 func _ready() -> void:
 	theme = Archive.create()
+	Input.set_custom_mouse_cursor(load("res://Assets/UI/hand-cursor.svg"), Input.CURSOR_ARROW, Vector2(9, 3))
+	Input.set_custom_mouse_cursor(load("res://Assets/UI/hand-cursor.svg"), Input.CURSOR_POINTING_HAND, Vector2(9, 3))
 	page = $PageMargins
 	_build_archive_surround()
 	resized.connect(_update_page_bounds)
@@ -79,6 +91,7 @@ func _ready() -> void:
 	_build_details_popup()
 	_build_careers_popup()
 	_build_event_popup()
+	_build_notification_feed()
 	game_clock.month_advanced.connect(_on_month_events)
 	_build_influence_menu()
 	_build_navigation()
@@ -95,6 +108,11 @@ func _ready() -> void:
 	_show_focus()
 
 
+func _exit_tree() -> void:
+	Input.set_custom_mouse_cursor(null, Input.CURSOR_ARROW)
+	Input.set_custom_mouse_cursor(null, Input.CURSOR_POINTING_HAND)
+
+
 func _build_archive_surround() -> void:
 	var plaster := TextureRect.new()
 	plaster.texture = preload("res://Assets/UI/plaster.svg")
@@ -109,7 +127,7 @@ func _build_archive_surround() -> void:
 	add_child(family_frame)
 	move_child(family_frame, 1)
 	$PageMargins/Page/Concern.add_theme_stylebox_override("panel", Archive.card())
-	page.add_theme_constant_override("margin_bottom", 48)
+	page.add_theme_constant_override("margin_bottom", 20)
 	$PageMargins/Page/Concern/ConcernMargins/ConcernText.add_theme_color_override("font_color", Color("#753e30"))
 	$PageMargins/Page/RosterScroll/FamilyList/ImmediateHeading.add_theme_color_override("font_color", TEXT_SUSPECTED)
 	$PageMargins/Page/RosterScroll/FamilyList/OtherBranchHeading.add_theme_color_override("font_color", TEXT_SUSPECTED)
@@ -121,40 +139,49 @@ func _build_time_controls() -> void:
 	top_bar = MarginContainer.new()
 	top_bar.name = "TopBar"
 	top_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	top_bar.offset_top = 22
-	top_bar.offset_bottom = 136
+	top_bar.offset_top = 8
+	top_bar.offset_bottom = 82
 	add_child(top_bar)
 	var frame := PanelContainer.new()
 	frame.name = "Frame"
 	frame.add_theme_stylebox_override("panel", Archive.wood_panel())
 	top_bar.add_child(frame)
 	frame.add_child(header)
-	page.add_theme_constant_override("margin_top", 182)
-	header.add_theme_constant_override("separation", 18)
+	page.add_theme_constant_override("margin_top", 108)
+	header.add_theme_constant_override("separation", 9)
 	var title: Label = header.get_node("Title")
 	title.add_theme_font_override("font", Archive.HEADING)
-	title.add_theme_font_size_override("font_size", 27)
+	title.add_theme_font_size_override("font_size", 22)
 	title.add_theme_color_override("font_color", NAV_TEXT)
 	period_label = header.get_node("Period")
 	header.remove_child(period_label)
 	var clock_module := VBoxContainer.new()
 	clock_module.name = "ClockModule"
-	clock_module.add_theme_constant_override("separation", 7)
+	clock_module.add_theme_constant_override("separation", 4)
 	header.add_child(clock_module)
 	header.move_child(clock_module, header.get_node("MenuButton").get_index())
 	var date_row := HBoxContainer.new()
-	date_row.add_theme_constant_override("separation", 16)
+	date_row.add_theme_constant_override("separation", 8)
 	clock_module.add_child(date_row)
 	date_row.add_child(period_label)
 	period_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	period_label.add_theme_font_override("font", Archive.HEADING)
-	period_label.add_theme_font_size_override("font_size", 19)
+	period_label.add_theme_font_size_override("font_size", 15)
 	period_label.add_theme_color_override("font_color", NAV_TEXT)
-	cash_label = _add_label(date_row, "", 16, Color("#d9c28c"))
+	var summaries := HBoxContainer.new()
+	summaries.name = "FamilySummary"
+	summaries.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	summaries.add_theme_constant_override("separation", 14)
+	header.add_child(summaries)
+	header.move_child(summaries, title.get_index() + 1)
+	header.get_node("HeaderSpacer").hide()
+	cash_label = _add_header_stat(summaries, "FAMILY PURSE")
+	cohesion_label = _add_header_stat(summaries, "COHESION")
+	reputation_label = _add_header_stat(summaries, "REPUTATION")
 	cash_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var controls := HBoxContainer.new()
 	controls.name = "TimeControls"
-	controls.add_theme_constant_override("separation", 3)
+	controls.add_theme_constant_override("separation", 2)
 	clock_module.add_child(controls)
 	play_button = _add_time_button(controls, "▶", _play_game)
 	play_button.tooltip_text = "Play — advance one month at a time"
@@ -166,7 +193,7 @@ func _build_time_controls() -> void:
 		speed_buttons.append(button)
 	var menu_button: Button = header.get_node("MenuButton")
 	header.remove_child(menu_button)
-	menu_button.custom_minimum_size = Vector2(82, 36)
+	menu_button.custom_minimum_size = Vector2(64, 28)
 	controls.add_child(menu_button)
 	month_progress_bar = ProgressBar.new()
 	month_progress_bar.custom_minimum_size = Vector2(0, 3)
@@ -190,7 +217,7 @@ func _build_time_controls() -> void:
 func _add_time_button(parent: Node, caption: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = caption
-	button.custom_minimum_size = Vector2(44, 36)
+	button.custom_minimum_size = Vector2(34, 28)
 	button.toggle_mode = true
 	button.add_theme_color_override("font_color", TEXT_MAIN)
 	_apply_period_button_style(button)
@@ -200,9 +227,11 @@ func _add_time_button(parent: Node, caption: String, action: Callable) -> Button
 
 
 func _refresh_time_controls() -> void:
+	_refresh_notifications()
 	period_label.text = game_clock.state.date_text()
 	cash_label.text = game_clock.state.economy.money(game_clock.state.economy.cash_cents)
-	cash_label.tooltip_text = "Shared family purse, in lire."
+	cash_label.tooltip_text = "Shared family purse, in the current historical currency."
+	_refresh_family_summary()
 	cash_label.add_theme_color_override("font_color", Color("#e09a81") if game_clock.state.economy.cash_cents < 0 else Color("#d9c28c"))
 	if is_instance_valid(finance_content):
 		_refresh_finances()
@@ -216,13 +245,15 @@ func _refresh_time_controls() -> void:
 		if is_instance_valid(house_note):
 			house_note.text = "Rooms: " + ", ".join(game_clock.state.household["rooms"])
 	_refresh_legacy()
-	if current_screen == "Italy":
+	if current_screen in ["Italy", "Family Tree"]:
 		_show_screen(current_screen)
 	elif current_screen == "Village" and is_instance_valid(village_view):
 		village_view.refresh()
 	_refresh_clock_status()
 	_refresh_event_notice()
 	_refresh_people()
+	if is_instance_valid(marriage_popup) and marriage_popup.visible:
+		preload("res://Scripts/PersonMarriage.gd").open_candidates(self, marriage_person_id)
 	if details_popup != null and details_popup.visible and not selected_person_id.is_empty():
 		_show_person(selected_person_id, false)
 	if careers_popup != null and careers_popup.visible and not career_person_id.is_empty():
@@ -284,17 +315,20 @@ func _refresh_clock_status() -> void:
 
 
 func _update_page_bounds() -> void:
-	var available_width := maxf(0.0, size.x - NAV_WIDTH - 80.0)
+	var available_width := maxf(0.0, size.x - NAV_WIDTH - 24.0)
 	var page_width := available_width
-	var left := NAV_WIDTH + 40.0 + (available_width - page_width) / 2.0
+	var left := NAV_WIDTH + 12.0 + (available_width - page_width) / 2.0
 	page.offset_left = left
 	page.offset_right = left + page_width
 	if family_frame != null:
-		family_frame.position = Vector2(left, 150)
-		family_frame.size = Vector2(page_width, maxf(0.0, size.y - 174))
+		family_frame.position = Vector2(left, 92)
+		family_frame.size = Vector2(page_width, maxf(0.0, size.y - 104))
 	if content_overlay != null:
 		content_overlay.offset_left = left
 		content_overlay.offset_right = left + page_width - size.x
+	for panel in [details_popup, careers_popup]:
+		if is_instance_valid(panel) and panel.visible: panel.popup_centered(Vector2i(panel.size))
+	_refresh_notifications()
 	if top_bar != null:
 		top_bar.offset_left = left
 		top_bar.offset_right = left + page_width - size.x
@@ -322,21 +356,22 @@ func _build_navigation() -> void:
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 24)
-	margin.add_theme_constant_override("margin_top", 24)
-	margin.add_theme_constant_override("margin_right", 24)
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_right", 10)
 	rail.add_child(margin)
 	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 10)
+	list.add_theme_constant_override("separation", 5)
 	margin.add_child(list)
 	var masthead := _add_label(list, "THE LANDI\nFAMILY", 24, NAV_TEXT)
 	masthead.add_theme_font_override("font", Archive.HEADING)
 	_add_label(list, "TUSCAN COUNTRYSIDE", 12, Color("#d4b77e"))
 	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 20)
+	spacer.custom_minimum_size = Vector2(0, 8)
 	list.add_child(spacer)
 	_add_navigation_button(list, "People", "People", true)
-	_add_navigation_button(list, "House", "House")
+	_add_navigation_button(list, "Albero genealogico", "Family Tree")
+	_add_navigation_button(list, "Landi House", "House")
 	_add_navigation_button(list, "Village", "Village")
 	_add_navigation_button(list, "Italy", "Italy")
 	_add_navigation_button(list, "Finances", "Finances")
@@ -348,13 +383,13 @@ func _build_navigation() -> void:
 	list.add_child(art_spacer)
 	var engraving := TextureRect.new()
 	engraving.texture = load("res://Assets/ancestral-house-engraving.png")
-	engraving.custom_minimum_size = Vector2(0, 250)
+	engraving.custom_minimum_size = Vector2(0, 150)
 	engraving.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	engraving.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	engraving.modulate = Color("#dac08d")
 	engraving.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	list.add_child(engraving)
-	_add_label(list, "LANDI HOME · TUSCANY", 11, Color("#d4b77e"))
+	_add_label(list, "LANDI HOUSE · TUSCANY", 11, Color("#d4b77e"))
 
 
 func _add_navigation_button(parent: VBoxContainer, caption: String, screen_name: String, selected := false) -> void:
@@ -363,8 +398,8 @@ func _add_navigation_button(parent: VBoxContainer, caption: String, screen_name:
 	button.toggle_mode = true
 	button.button_pressed = selected
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.custom_minimum_size = Vector2(0, 48)
-	button.add_theme_font_size_override("font_size", 16)
+	button.custom_minimum_size = Vector2(0, 32)
+	button.add_theme_font_size_override("font_size", 13)
 	button.add_theme_color_override("font_color", NAV_TEXT)
 	_apply_period_button_style(button, true)
 	if selected:
@@ -377,8 +412,9 @@ func _show_screen(screen_name: String) -> void:
 	current_screen = screen_name
 	family_frame.visible = screen_name in ["People", "Events"]
 	for button in get_node("Navigation").find_children("*", "Button", true, false):
-		button.set_pressed_no_signal(button.text == screen_name)
+		button.set_pressed_no_signal(button.text == screen_name or (screen_name == "Family Tree" and button.text == "Albero genealogico"))
 	details_popup.hide()
+	if is_instance_valid(marriage_popup): marriage_popup.hide()
 	careers_popup.hide()
 	influence_popup.hide()
 	if screen_name == "Events":
@@ -399,10 +435,10 @@ func _show_screen(screen_name: String) -> void:
 		content_overlay.add_theme_stylebox_override("panel", Archive.window_frame())
 		add_child(content_overlay)
 	content_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	content_overlay.offset_left = NAV_WIDTH + 40
-	content_overlay.offset_top = 150
-	content_overlay.offset_right = -40
-	content_overlay.offset_bottom = -24
+	content_overlay.offset_left = NAV_WIDTH + 12
+	content_overlay.offset_top = 92
+	content_overlay.offset_right = -12
+	content_overlay.offset_bottom = -12
 	for child in content_overlay.get_children():
 		content_overlay.remove_child(child)
 		child.queue_free()
@@ -413,6 +449,14 @@ func _show_screen(screen_name: String) -> void:
 		return
 	if screen_name == "Village":
 		GameplayScreens.village(self)
+		content_overlay.show()
+		return
+	if screen_name == "Portraits":
+		preload("res://Scripts/StrangerPortraitPreview.gd").build(self)
+		content_overlay.show()
+		return
+	if screen_name == "Family Tree":
+		preload("res://Scripts/FamilyTree.gd").build(self)
 		content_overlay.show()
 		return
 	if screen_name == "House":
@@ -455,7 +499,7 @@ func _show_focus() -> void:
 	focus_overlay = Control.new()
 	focus_overlay.name = "StartingFocus"
 	focus_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	focus_overlay.z_index = 100
+	focus_overlay.z_index = InlinePanel.OVERLAY_Z_INDEX
 	focus_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(focus_overlay)
 	var shade := ColorRect.new()
@@ -466,51 +510,165 @@ func _show_focus() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	focus_overlay.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(660, 0)
+	panel.custom_minimum_size = Vector2(1080, 0)
 	panel.add_theme_stylebox_override("panel", Archive.card())
 	center.add_child(panel)
 	var margin := MarginContainer.new()
 	for edge in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + edge, 32)
+		margin.add_theme_constant_override("margin_" + edge, 10)
 	panel.add_child(margin)
 	var column := VBoxContainer.new()
-	column.custom_minimum_size.x = 600
-	column.add_theme_constant_override("separation", 18)
+	column.custom_minimum_size.x = 1032
+	column.add_theme_constant_override("separation", 8)
 	margin.add_child(column)
-	_add_label(column, "Choose your family focus", 32, TEXT_MAIN)
 	var legacy = game_clock.state.legacy
-	game_clock.pause()
-	_add_label(column, "Choose one objective and one lasting family bonus before beginning your story.", 17, TEXT_MUTED)
-	var objectives := OptionButton.new()
-	objectives.custom_minimum_size.y = 44
-	column.add_child(objectives)
-	for key in legacy.OBJECTIVES:
-		objectives.add_item(legacy.OBJECTIVES[key]["name"])
-	var objective_description := _add_label(column, legacy.OBJECTIVES["populous"]["description"], 17, TEXT_MAIN)
-	objectives.item_selected.connect(func(index): objective_description.text = legacy.OBJECTIVES[legacy.OBJECTIVES.keys()[index]]["description"])
-	_add_label(column, "Starting bonus", 24, TEXT_SUSPECTED)
-	var bonuses := OptionButton.new()
-	bonuses.custom_minimum_size.y = 44
-	column.add_child(bonuses)
-	for key in legacy.BONUSES:
-		bonuses.add_item(legacy.BONUSES[key]["name"])
-	var bonus_description := _add_label(column, legacy.BONUSES["fertility"]["description"], 17, TEXT_MAIN)
-	bonuses.item_selected.connect(func(index): bonus_description.text = legacy.BONUSES[legacy.BONUSES.keys()[index]]["description"])
-	_add_menu_button(column, "Begin family story", func():
-		_start_family_story(legacy.OBJECTIVES.keys()[objectives.selected], legacy.BONUSES.keys()[bonuses.selected]))
-	_add_menu_button(column, "Load saved family", _load_game)
-	# Keep keyboard navigation within the required choice dialog.
-	var choices: Array[Control] = [objectives, bonuses]
-	for child in column.get_children():
-		if child is Button and child != objectives and child != bonuses:
-			choices.append(child)
+	var selected := {"objective": "", "bonus": ""}
+	var objective_buttons: Array[Button] = []
+	var bonus_buttons: Array[Button] = []
+	_add_label(column, "What will your family be remembered for?", 30, TEXT_MAIN)
+	_add_label(column, "One century. Three ambitions. Choose a legacy, then a lasting family perk.", 16, TEXT_MUTED)
+	var images := ["family", "wealth", "influence"]
+	var flavor := ["A house full of voices. A name carried by generations yet to come.", "From a modest purse to a fortune that outlives its founders.", "A family whose voices reach beyond the village, into the halls of power."]
+	var row := HBoxContainer.new()
+	row.name = "ObjectiveCards"
+	row.add_theme_constant_override("separation", 8)
+	column.add_child(row)
+	for index in legacy.OBJECTIVES.size():
+		var key: String = legacy.OBJECTIVES.keys()[index]
+		var button := _add_focus_card(row, legacy.OBJECTIVES[key], flavor[index], images[index], "Choose this legacy", 164)
+		objective_buttons.append(button)
+	_add_label(column, "A gift for the generations", 23, TEXT_SUSPECTED)
+	var perk_row := HBoxContainer.new()
+	perk_row.name = "PerkCards"
+	perk_row.add_theme_constant_override("separation", 8)
+	column.add_child(perk_row)
+	var perk_flavor := ["Let the next generation fill the house with life.", "Every coin saved is a little more security for tomorrow.", "What one generation learns, the next can build upon."]
+	for index in legacy.BONUSES.size():
+		var key: String = legacy.BONUSES.keys()[index]
+		var button := _add_focus_card(perk_row, legacy.BONUSES[key], perk_flavor[index], images[index], "Choose this perk", 64)
+		bonus_buttons.append(button)
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 8)
+	column.add_child(actions)
+	var begin := Button.new()
+	begin.name = "BeginFamilyStory"
+	begin.text = "Begin family story"
+	begin.custom_minimum_size.y = 28
+	begin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	begin.disabled = true
+	actions.add_child(begin)
+	begin.pressed.connect(func(): _start_family_story(selected["objective"], selected["bonus"]))
+	_add_menu_button(actions, "Load saved family", _load_game)
+	var portrait_test := Button.new()
+	portrait_test.name = "StartStrangerPortraitTest"
+	portrait_test.text = "Start with 100 strangers"
+	portrait_test.pressed.connect(func(): preload("res://Scripts/StrangerPortraitPreview.gd").start(self))
+	actions.add_child(portrait_test)
+	for index in objective_buttons.size():
+		var button := objective_buttons[index]
+		var key: String = legacy.OBJECTIVES.keys()[index]
+		button.pressed.connect(func():
+			selected["objective"] = key
+			for other in objective_buttons:
+				other.set_pressed_no_signal(other == button)
+				other.text = "Legacy selected" if other == button else "Choose this legacy"
+			begin.disabled = selected["bonus"].is_empty())
+	for index in bonus_buttons.size():
+		var button := bonus_buttons[index]
+		var key: String = legacy.BONUSES.keys()[index]
+		button.pressed.connect(func():
+			selected["bonus"] = key
+			for other in bonus_buttons:
+				other.set_pressed_no_signal(other == button)
+				other.text = "Perk selected" if other == button else "Choose this perk"
+			begin.disabled = selected["objective"].is_empty())
+	# Trap tab navigation inside the mandatory modal.
+	var choices: Array[Button] = []
+	choices.append_array(objective_buttons)
+	choices.append_array(bonus_buttons)
+	choices.append(begin)
+	choices.append(actions.get_child(1))
+	choices.append(portrait_test)
 	for index in choices.size():
-		var choice := choices[index]
-		choice.focus_next = choice.get_path_to(choices[(index + 1) % choices.size()])
-		choice.focus_previous = choice.get_path_to(choices[(index - 1 + choices.size()) % choices.size()])
-		for direction in ["left", "right", "top", "bottom"]:
-			choice.set("focus_neighbor_" + direction, choice.get_path_to(choice))
-	objectives.grab_focus()
+		choices[index].focus_next = choices[index].get_path_to(choices[(index + 1) % choices.size()])
+		choices[index].focus_previous = choices[index].get_path_to(choices[(index - 1 + choices.size()) % choices.size()])
+	objective_buttons[0].grab_focus()
+
+
+func _add_focus_card(parent: Node, entry: Dictionary, flavor: String, image_id: String, caption: String, image_height: int) -> Button:
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.add_theme_stylebox_override("panel", Archive.card())
+	parent.add_child(card)
+	var column := VBoxContainer.new()
+	column.custom_minimum_size.x = 320
+	column.add_theme_constant_override("separation", 4)
+	card.add_child(column)
+	var picture := TextureRect.new()
+	picture.texture = load("res://Assets/Legacy/" + image_id + "-1800.png")
+	picture.custom_minimum_size.y = image_height
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(picture)
+	_add_label(column, entry["name"], 22 if image_height > 100 else 19, TEXT_MAIN)
+	_add_label(column, flavor, 15, TEXT_SUSPECTED)
+	var description := _add_label(column, entry["description"], 14, TEXT_MUTED)
+	description.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var button := Button.new()
+	button.text = caption
+	button.toggle_mode = true
+	button.custom_minimum_size.y = 28
+	column.add_child(button)
+	return button
+
+
+func _add_header_stat(parent: Node, caption: String) -> Label:
+	var column := VBoxContainer.new()
+	column.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	column.add_theme_constant_override("separation", 2)
+	parent.add_child(column)
+	var heading := _add_label(column, caption, 11, Color("#d4b77e"))
+	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var value := _add_label(column, "", 18, NAV_TEXT)
+	value.autowrap_mode = TextServer.AUTOWRAP_OFF
+	return value
+
+
+func _refresh_family_summary() -> void:
+	# Summaries reflect existing relationships, without exposing acceptance scores.
+	var state = game_clock.state
+	var connection := 0.0
+	var bonds := 0
+	for person in state.people.values():
+		if not person.alive:
+			continue
+		for relative_id in person.relationships:
+			if not state.people.has(relative_id) or not state.people[relative_id].alive:
+				continue
+			var bond: Dictionary = person.relationships[relative_id]
+			connection += clampf((float(bond.get("affection", 0.5)) + float(bond.get("trust", 0.5))) / 2.0 - float(bond.get("resentment", 0.0)), 0.0, 1.0)
+			bonds += 1
+	var cohesion := connection / bonds if bonds > 0 else 0.5
+	cohesion_label.text = "Close-knit" if cohesion >= 0.65 else ("Steady" if cohesion >= 0.4 else "Strained")
+	cohesion_label.tooltip_text = "Family cohesion · a broad impression of affection, trust and unresolved resentment among living relatives."
+	var standing := 0.0
+	var neighbors := 0
+	for family in state.village.households.values():
+		var bond: Dictionary = family.relationships.get("landi", {})
+		standing += float(bond.get("trust", 0.3)) - float(bond.get("resentment", 0.0))
+		neighbors += 1
+	standing = standing / neighbors if neighbors > 0 else 0.0
+	reputation_label.text = "Respected" if standing >= 0.55 else ("Known" if standing >= 0.25 else "Unproven")
+	reputation_label.tooltip_text = "Village reputation · how neighboring families regard the Landi, based on trust and unresolved grievances."
+
+
+func _add_person_choice(choice: OptionButton, person) -> void:
+	var face := PersonPortrait.new()
+	face.show_person(person)
+	choice.add_icon_item(face.texture, person.name)
+	choice.get_popup().set_item_icon_max_width(choice.item_count - 1, 32)
+	face.free()
 
 
 func _start_family_story(objective_id: String, bonus_id: String) -> bool:
@@ -541,14 +699,14 @@ func _refresh_legacy() -> void:
 func _build_finances_screen() -> void:
 	var margins := MarginContainer.new()
 	for edge in ["left", "right", "top", "bottom"]:
-		margins.add_theme_constant_override("margin_" + edge, 28)
+		margins.add_theme_constant_override("margin_" + edge, 11)
 	content_overlay.add_child(margins)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	margins.add_child(scroll)
 	finance_content = VBoxContainer.new()
 	finance_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	finance_content.add_theme_constant_override("separation", 14)
+	finance_content.add_theme_constant_override("separation", 7)
 	scroll.add_child(finance_content)
 	_refresh_finances()
 
@@ -583,10 +741,10 @@ func _finance_card(parent: Node, icon_name: String, caption: String, amount: int
 	panel.tooltip_text = hint
 	parent.add_child(panel)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 10)
+	column.add_theme_constant_override("separation", 5)
 	panel.add_child(column)
 	var heading := HBoxContainer.new()
-	heading.add_theme_constant_override("separation", 10)
+	heading.add_theme_constant_override("separation", 5)
 	column.add_child(heading)
 	_finance_icon(heading, icon_name, hint)
 	_finance_label(heading, caption, 17, TEXT_MUTED)
@@ -604,10 +762,10 @@ func _finance_section(parent: Node, icon_name: String, caption: String) -> VBoxC
 	panel.add_theme_stylebox_override("panel", Archive.card())
 	parent.add_child(panel)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 12)
+	column.add_theme_constant_override("separation", 6)
 	panel.add_child(column)
 	var heading := HBoxContainer.new()
-	heading.add_theme_constant_override("separation", 10)
+	heading.add_theme_constant_override("separation", 5)
 	column.add_child(heading)
 	_finance_icon(heading, icon_name, caption)
 	_finance_label(heading, caption, 22, TEXT_MAIN)
@@ -630,7 +788,7 @@ func _refresh_finances() -> void:
 	_finance_icon(heading, "info", "L. = lire. All money uses this one gameplay currency throughout the run.\nShared household purse: all resident earnings enter this balance.\nFood prices rise by 0.5% per year (monthly increments); wages stay fixed. Other living costs and separate branch purses are not yet simulated.")
 
 	var summary := HBoxContainer.new()
-	summary.add_theme_constant_override("separation", 12)
+	summary.add_theme_constant_override("separation", 6)
 	finance_content.add_child(summary)
 	_finance_card(summary, "wallet", "Balance", economy.cash_cents, "Available household savings", TEXT_SUSPECTED if economy.cash_cents < 0 else TEXT_MAIN)
 	_finance_card(summary, "income", "Income", budget["income_cents"], "Expected earnings this month", TEXT_KNOWN)
@@ -642,14 +800,23 @@ func _refresh_finances() -> void:
 	if not budget["training_funded"] and int(budget["planned_tuition_cents"]) > 0:
 		_finance_notice(finance_content, "Courses paused", "Food takes priority. The household cannot fund " + economy.money(budget["planned_tuition_cents"]) + " in planned tuition.")
 
+	var dowry_owed := 0
+	for union in state.marriage.unions.values():
+		if union["held_at_home"]: dowry_owed += int(union["capital_cents"])
+	if dowry_owed > 0:
+		_finance_notice(finance_content, "Dowry owed to resident couples · " + economy.money(dowry_owed), "Included in the shared balance. It must follow couples who leave; spending it can create a future cash shortfall.")
+	for family_id in state.marriage.alliances:
+		var obligation: int = state.marriage.alliances[family_id]["obligation_cents"]
+		if obligation > 0:
+			_finance_notice(finance_content, "Favor owed to " + state.village.households[family_id].name, economy.money(obligation) + " · Repay through a person’s Marriage & dote screen.")
 	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 18)
+	columns.add_theme_constant_override("separation", 9)
 	finance_content.add_child(columns)
 	var residents := _finance_section(columns, "people", "Household income")
 	var earnings := GridContainer.new()
 	earnings.columns = 2
-	earnings.add_theme_constant_override("h_separation", 20)
-	earnings.add_theme_constant_override("v_separation", 14)
+	earnings.add_theme_constant_override("h_separation", 10)
+	earnings.add_theme_constant_override("v_separation", 7)
 	residents.add_child(earnings)
 	for contribution in budget["contributions"]:
 		var person := VBoxContainer.new()
@@ -669,8 +836,8 @@ func _refresh_finances() -> void:
 	else:
 		var accounts := GridContainer.new()
 		accounts.columns = 3
-		accounts.add_theme_constant_override("h_separation", 18)
-		accounts.add_theme_constant_override("v_separation", 10)
+		accounts.add_theme_constant_override("h_separation", 9)
+		accounts.add_theme_constant_override("v_separation", 5)
 		history.add_child(accounts)
 		_finance_label(accounts, "Month", 14, TEXT_MUTED)
 		for item in [["net", "Monthly net"], ["wallet", "Closing balance"]]:
@@ -689,7 +856,6 @@ func _refresh_finances() -> void:
 
 	var commitments: Array = []
 	var businesses := _finance_section(finance_content, "income", "Family businesses")
-	_finance_label(businesses, "Property production settles separately from wages, food and tuition. Estimates vary with season, condition, skills, competition and infrastructure.", 14, TEXT_MUTED)
 	for building in state.village.development.buildings.values():
 		if building["owner_id"] == "landi" and building["type"] in state.village.business.CATALOG and building["status"] != "demolished":
 			var estimate: Dictionary = state.village.business.estimate(state, building["id"])
@@ -726,7 +892,7 @@ func _refresh_finances() -> void:
 
 func _finance_notice(parent: Node, caption: String, hint: String) -> void:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
+	row.add_theme_constant_override("separation", 5)
 	parent.add_child(row)
 	_finance_icon(row, "warning", hint)
 	var label := _finance_label(row, caption, 17, TEXT_SUSPECTED)
@@ -736,18 +902,18 @@ func _finance_notice(parent: Node, caption: String, hint: String) -> void:
 func _build_house_screen() -> void:
 	var page_column := VBoxContainer.new()
 	page_column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 28)
-	page_column.add_theme_constant_override("separation", 14)
+	page_column.add_theme_constant_override("separation", 7)
 	content_overlay.add_child(page_column)
-	_add_label(page_column, "The Landi farmhouse", 34, TEXT_MAIN)
+	_add_label(page_column, "Landi House", 34, TEXT_MAIN)
 	house_description = _add_label(page_column, _house_summary(), 16, TEXT_MUTED)
 
 	var rule := HSeparator.new()
-	rule.add_theme_constant_override("separation", 8)
+	rule.add_theme_constant_override("separation", 4)
 	page_column.add_child(rule)
 
 	var rooms := HBoxContainer.new()
 	rooms.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	rooms.add_theme_constant_override("separation", 18)
+	rooms.add_theme_constant_override("separation", 9)
 	page_column.add_child(rooms)
 	_add_house_module(rooms, "Bedroom", "Shared bedroom  ·  Capacity: 2", "res://Assets/House/bedroom-01.png")
 	_add_house_module(rooms, "Kitchen", "Hearth and family table", "res://Assets/House/kitchen-01.png")
@@ -760,11 +926,11 @@ func _build_house_screen() -> void:
 func _add_house_module(parent: HBoxContainer, title: String, subtitle: String, asset_path: String) -> void:
 	var module := VBoxContainer.new()
 	module.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	module.add_theme_constant_override("separation", 8)
+	module.add_theme_constant_override("separation", 4)
 	parent.add_child(module)
 
 	var frame := PanelContainer.new()
-	frame.custom_minimum_size = Vector2(0, 270)
+	frame.custom_minimum_size = Vector2(0, 180)
 	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	frame.add_theme_stylebox_override("panel", Archive.card())
 	module.add_child(frame)
@@ -786,13 +952,13 @@ func _build_menu() -> void:
 	add_child(menu_popup)
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_top", 12)
-	margin.add_theme_constant_override("margin_right", 12)
-	margin.add_theme_constant_override("margin_bottom", 12)
+	margin.add_theme_constant_override("margin_left", 5)
+	margin.add_theme_constant_override("margin_top", 5)
+	margin.add_theme_constant_override("margin_right", 5)
+	margin.add_theme_constant_override("margin_bottom", 5)
 	menu_popup.add_child(margin)
 	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 8)
+	list.add_theme_constant_override("separation", 4)
 	margin.add_child(list)
 	_add_label(list, "GAME MENU", 15, TEXT_SUSPECTED)
 	_add_menu_button(list, "Save", _save_game)
@@ -801,12 +967,12 @@ func _build_menu() -> void:
 	_add_menu_button(list, "Exit", _exit_game)
 
 
-func _add_menu_button(parent: VBoxContainer, caption: String, action: Callable) -> void:
+func _add_menu_button(parent: Container, caption: String, action: Callable) -> void:
 	var button := Button.new()
 	button.text = caption
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.custom_minimum_size = Vector2(220, 38)
-	button.add_theme_font_size_override("font_size", 16)
+	button.custom_minimum_size = Vector2(180, 28)
+	button.add_theme_font_size_override("font_size", 13)
 	button.add_theme_color_override("font_color", TEXT_MAIN)
 	_apply_period_button_style(button)
 	button.pressed.connect(action)
@@ -853,6 +1019,7 @@ func _load_game() -> void:
 		return
 	event_popup.hide()
 	last_event_serial = -1
+	assignment_feedback.clear()
 	people = game_clock.state.people
 	selected_person_id = ""
 	career_person_id = ""
@@ -928,7 +1095,7 @@ func _add_missing_cards(connect_now: bool) -> void:
 func _configure_card(card: PanelContainer) -> void:
 	card.add_theme_stylebox_override("panel", Archive.card())
 	_apply_card_paper_colours(card)
-	_install_portrait(card.get_node("Row/Portrait"), people[str(card.name)], 92)
+	_install_portrait(card.get_node("Row/Portrait"), people[str(card.name)], 56)
 	_ignore_child_mouse(card)
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -961,7 +1128,7 @@ func _install_portrait(frame: PanelContainer, model: RefCounted, width: int) -> 
 		frame.remove_child(initials)
 		initials.queue_free()
 	frame.custom_minimum_size = Vector2(width, width)
-	frame.add_theme_stylebox_override("panel", Archive.box(Archive.PORTRAIT, 14, 7))
+	frame.add_theme_stylebox_override("panel", Archive.box(Archive.PORTRAIT, 14, 4))
 	var portrait := PersonPortrait.new()
 	frame.add_child(portrait)
 	portrait.show_person(model)
@@ -992,16 +1159,17 @@ func _on_card_input(event: InputEvent, person_id: String) -> void:
 
 
 func _build_details_popup() -> void:
-	details_popup = PopupPanel.new()
+	details_popup = InlinePanel.new()
+	details_popup.hide()
 	details_popup.name = "PersonDetails"
 	details_popup.add_theme_stylebox_override("panel", Archive.window_frame())
 	add_child(details_popup)
 
 	var margins := MarginContainer.new()
-	margins.add_theme_constant_override("margin_left", 28)
-	margins.add_theme_constant_override("margin_top", 24)
-	margins.add_theme_constant_override("margin_right", 28)
-	margins.add_theme_constant_override("margin_bottom", 24)
+	margins.add_theme_constant_override("margin_left", 11)
+	margins.add_theme_constant_override("margin_top", 10)
+	margins.add_theme_constant_override("margin_right", 11)
+	margins.add_theme_constant_override("margin_bottom", 10)
 	details_popup.add_child(margins)
 	margins.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
@@ -1013,7 +1181,7 @@ func _build_details_popup() -> void:
 
 	details_content = VBoxContainer.new()
 	details_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	details_content.add_theme_constant_override("separation", 12)
+	details_content.add_theme_constant_override("separation", 6)
 	scroll.add_child(details_content)
 
 
@@ -1032,14 +1200,13 @@ func _show_person(person_id: String, open_popup: bool = true) -> void:
 		child.queue_free()
 	preload("res://Scripts/PersonProfile.gd").build(self, person_id)
 	if open_popup:
-		game_clock.pause()
 		var viewport_size := get_viewport_rect().size
-		details_popup.popup_centered(Vector2i(int(minf(860.0,viewport_size.x-32)),int(minf(690.0 if profile_expanded else 450.0,viewport_size.y-32))))
+		details_popup.popup_centered(Vector2i(int(minf(760.0,viewport_size.x-32)),int(minf(580.0 if profile_expanded else 360.0,viewport_size.y-32))))
 
 	elif details_popup.visible:
-		var height := 690 if profile_expanded else 450
-		var dimensions := Vector2i(int(minf(860,get_viewport_rect().size.x-32)),int(minf(height,get_viewport_rect().size.y-32)))
-		if details_popup.size != dimensions:
+		var height := 580 if profile_expanded else 360
+		var dimensions := Vector2i(int(minf(760,get_viewport_rect().size.x-32)),int(minf(height,get_viewport_rect().size.y-32)))
+		if details_popup.size != Vector2(dimensions):
 			details_popup.popup_centered(dimensions)
 
 
@@ -1067,14 +1234,12 @@ func _build_influence_menu() -> void:
 	influence_popup = PopupMenu.new()
 	influence_popup.theme = theme
 	influence_popup.name = "InfluenceMenu"
-	influence_popup.add_theme_font_size_override("font_size", 17)
+	influence_popup.add_theme_font_size_override("font_size", 14)
 	add_child(influence_popup)
 	influence_popup.id_pressed.connect(_on_influence_selected)
-	$PageMargins/Page/Footer.text = "Left-click to understand a person · Right-click to make a request · Relatives can refuse"
 
 
 func _open_influence_menu(person_id: String) -> void:
-	game_clock.pause()
 	influence_person_id = person_id
 	influence_popup.clear()
 	influence_popup.add_item("About " + people[person_id].name, 0)
@@ -1105,26 +1270,28 @@ func _on_influence_selected(item_id: int) -> void:
 
 
 func _make_request(person_id: String, action: String) -> void:
-	game_clock.pause()
-	careers_popup.hide()
+	if action in ["leave", "join", "marry"]: game_clock.pause()
 	var result: Dictionary = game_clock.state.request(person_id, action)
-	# Select first, because opening another person's details clears the last response.
-	_show_person(person_id)
-	conversation_result = "%s — %s\n%s" % [game_clock.state.Influence.action_label(game_clock.state, action), str(result["outcome"]).capitalize(), result["response"]]
-	_show_person(person_id, false)
+	if action.begins_with("train:") or action.begins_with("work:"):
+		Reaction.remember(self, result, person_id, action)
+		_show_careers(person_id, not careers_popup.visible)
+	else:
+		Reaction.remember(self, result, person_id, "request")
+		if selected_person_id != person_id or not details_popup.visible: _show_person(person_id)
+		_show_person(person_id, false)
 	_refresh_people()
-	if is_instance_valid(finance_content):
-		_refresh_finances()
+	if is_instance_valid(finance_content): _refresh_finances()
 
 
 func _build_careers_popup() -> void:
-	careers_popup = PopupPanel.new()
+	careers_popup = InlinePanel.new()
+	careers_popup.hide()
 	careers_popup.name = "EducationAndCareers"
 	careers_popup.add_theme_stylebox_override("panel", details_popup.get_theme_stylebox("panel").duplicate())
 	add_child(careers_popup)
 	var margins := MarginContainer.new()
 	for edge in ["left", "right", "top", "bottom"]:
-		margins.add_theme_constant_override("margin_" + edge, 24)
+		margins.add_theme_constant_override("margin_" + edge, 10)
 	careers_popup.add_child(margins)
 	margins.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var scroll := ScrollContainer.new()
@@ -1132,13 +1299,12 @@ func _build_careers_popup() -> void:
 	margins.add_child(scroll)
 	careers_content = VBoxContainer.new()
 	careers_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	careers_content.add_theme_constant_override("separation", 14)
+	careers_content.add_theme_constant_override("separation", 7)
 	scroll.add_child(careers_content)
 
 
 func _show_careers(person_id: String, open_popup: bool = true) -> void:
 	if open_popup:
-		game_clock.pause()
 		details_popup.hide()
 	career_person_id = person_id
 	for child in careers_content.get_children():
@@ -1215,7 +1381,7 @@ func _career_tab(tabs: TabContainer, title: String) -> VBoxContainer:
 	tabs.add_child(scroll)
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.add_theme_constant_override("separation", 10)
+	column.add_theme_constant_override("separation", 5)
 	scroll.add_child(column)
 	return column
 
@@ -1230,6 +1396,7 @@ func _career_request_button(parent: VBoxContainer, person_id: String, action: St
 	_apply_period_button_style(button)
 	button.pressed.connect(_make_request.bind(person_id, action))
 	parent.add_child(button)
+	Reaction.build(self, parent, person_id, action)
 	if not reason.is_empty():
 		_add_label(parent, reason, 14, TEXT_MUTED)
 
@@ -1239,7 +1406,7 @@ func _build_elsewhere_list() -> void:
 	var heading := _add_label(family_list, "LIVING ELSEWHERE · Still part of your family", 15, TEXT_MUTED)
 	heading.name = "ElsewhereHeading"
 	elsewhere_list = VBoxContainer.new()
-	elsewhere_list.add_theme_constant_override("separation", 12)
+	elsewhere_list.add_theme_constant_override("separation", 6)
 	family_list.add_child(elsewhere_list)
 	# Duplicate presentation only; connections are bound afresh to each person.
 	for person_id in people:
@@ -1253,14 +1420,14 @@ func _build_elsewhere_list() -> void:
 func _build_chronicle_screen() -> void:
 	var margins := MarginContainer.new()
 	for edge in ["left", "right", "top", "bottom"]:
-		margins.add_theme_constant_override("margin_" + edge, 28)
+		margins.add_theme_constant_override("margin_" + edge, 11)
 	content_overlay.add_child(margins)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	margins.add_child(scroll)
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.add_theme_constant_override("separation", 16)
+	column.add_theme_constant_override("separation", 8)
 	scroll.add_child(column)
 	_add_label(column, "Chronicle", 34, TEXT_MAIN)
 	if game_clock.state.chronicle.is_empty():
@@ -1298,13 +1465,13 @@ func _make_section(parent: Node = null) -> PanelContainer:
 	panel.add_theme_stylebox_override("panel", Archive.card())
 	(parent if parent != null else details_content).add_child(panel)
 	var margins := MarginContainer.new()
-	margins.add_theme_constant_override("margin_left", 16)
-	margins.add_theme_constant_override("margin_top", 12)
-	margins.add_theme_constant_override("margin_right", 16)
-	margins.add_theme_constant_override("margin_bottom", 12)
+	margins.add_theme_constant_override("margin_left", 6)
+	margins.add_theme_constant_override("margin_top", 5)
+	margins.add_theme_constant_override("margin_right", 6)
+	margins.add_theme_constant_override("margin_bottom", 5)
 	panel.add_child(margins)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 6)
+	column.add_theme_constant_override("separation", 3)
 	margins.add_child(column)
 	return panel
 
@@ -1313,7 +1480,7 @@ func _add_label(parent: Node, value: String, font_size: int, color: Color) -> La
 	var label := Label.new()
 	label.text = value
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_font_size_override("font_size", Archive.compact_font_size(font_size))
 	label.add_theme_color_override("font_color", color)
 	parent.add_child(label)
 	return label
@@ -1340,7 +1507,7 @@ func _build_event_popup() -> void:
 	add_child(event_popup)
 	var margins := MarginContainer.new()
 	for edge in ["left", "right", "top", "bottom"]:
-		margins.add_theme_constant_override("margin_" + edge, 24)
+		margins.add_theme_constant_override("margin_" + edge, 10)
 	event_popup.add_child(margins)
 	margins.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var scroll := ScrollContainer.new()
@@ -1348,7 +1515,7 @@ func _build_event_popup() -> void:
 	margins.add_child(scroll)
 	event_content = VBoxContainer.new()
 	event_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	event_content.add_theme_constant_override("separation", 14)
+	event_content.add_theme_constant_override("separation", 7)
 	scroll.add_child(event_content)
 
 
@@ -1362,12 +1529,13 @@ func _refresh_event_notice() -> void:
 		return
 	var events = game_clock.state.events
 	var notice: Label = $PageMargins/Page/Concern/ConcernMargins/ConcernText
+	$PageMargins/Page/Concern.visible = not events.pending.is_empty()
 	if not events.pending.is_empty():
 		notice.text = "%d event%s awaiting your decision · Open Events to respond. Time is paused." % [events.pending.size(), "" if events.pending.size() == 1 else "s"]
 		play_button.disabled = true
 	else:
 		play_button.disabled = false
-		notice.text = "The family has its own plans. Talk, observe, and choose where to intervene."
+		notice.text = ""
 
 
 func _show_pending_event() -> void:
@@ -1384,6 +1552,7 @@ func _show_pending_event() -> void:
 	last_event_serial = int(event["serial"])
 	game_clock.pause()
 	details_popup.hide()
+	if is_instance_valid(marriage_popup): marriage_popup.hide()
 	careers_popup.hide()
 	for child in event_content.get_children():
 		event_content.remove_child(child)
@@ -1400,17 +1569,17 @@ func _show_pending_event() -> void:
 	var viewport_size := get_viewport_rect().size
 	var columns: BoxContainer = HBoxContainer.new() if viewport_size.x >= 820 else VBoxContainer.new()
 	columns.name = "EventColumns"
-	columns.add_theme_constant_override("separation", 24)
+	columns.add_theme_constant_override("separation", 12)
 	event_content.add_child(columns)
 	var story := VBoxContainer.new()
 	story.name = "Story"
 	story.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	story.size_flags_stretch_ratio = 0.9
-	story.add_theme_constant_override("separation", 16)
+	story.add_theme_constant_override("separation", 8)
 	columns.add_child(story)
 	var illustration := PanelContainer.new()
 	illustration.name = "Illustration"
-	illustration.custom_minimum_size = Vector2(0, 230)
+	illustration.custom_minimum_size = Vector2(0, 160)
 	illustration.add_theme_stylebox_override("panel", Archive.card())
 	story.add_child(illustration)
 	# Reserved for event art; intentionally empty during the prototype.
@@ -1426,7 +1595,7 @@ func _show_pending_event() -> void:
 	var actions := VBoxContainer.new()
 	actions.name = "Actions"
 	actions.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	actions.add_theme_constant_override("separation", 12)
+	actions.add_theme_constant_override("separation", 6)
 	columns.add_child(actions)
 	_add_label(actions, "Your response", 20, TEXT_MAIN)
 	_add_label(actions, "Time is paused until you decide. %d event%s awaiting a response." % [state.events.pending.size(), "" if state.events.pending.size() == 1 else "s"], 13, TEXT_MUTED)
@@ -1437,7 +1606,7 @@ func _show_pending_event() -> void:
 		card.add_theme_stylebox_override("panel", Archive.card())
 		actions.add_child(card)
 		var content := VBoxContainer.new()
-		content.add_theme_constant_override("separation", 7)
+		content.add_theme_constant_override("separation", 4)
 		card.add_child(content)
 		var button := Button.new()
 		button.text = str(choice["label"])
@@ -1468,3 +1637,44 @@ func _resolve_event(serial: int, choice: int) -> void:
 	_refresh_time_controls()
 	if not game_clock.state.events.pending.is_empty():
 		call_deferred("_show_pending_event")
+
+
+func _build_notification_feed() -> void:
+	notification_feed = PanelContainer.new()
+	notification_feed.name = "FamilyNotifications"
+	notification_feed.add_theme_stylebox_override("panel", Archive.card())
+	add_child(notification_feed)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 3)
+	notification_feed.add_child(column)
+	notification_text = _add_label(column, "", 15, TEXT_MAIN)
+	var actions := HBoxContainer.new()
+	column.add_child(actions)
+	var journal := Button.new()
+	journal.text = "Open family journal"
+	journal.pressed.connect(_show_screen.bind("Chronicle"))
+	actions.add_child(journal)
+	var dismiss := Button.new()
+	dismiss.text = "Dismiss updates"
+	dismiss.pressed.connect(func():
+		for notice in game_clock.state.notifications: notice["read"] = true
+		_refresh_notifications())
+	actions.add_child(dismiss)
+	_refresh_notifications()
+
+
+func _refresh_notifications() -> void:
+	if not is_instance_valid(notification_feed): return
+	var unread: Array = []
+	for notice in game_clock.state.notifications:
+		if not notice["read"]: unread.append(notice)
+	notification_feed.visible = not unread.is_empty()
+	if unread.is_empty(): return
+	notification_feed.position = Vector2(NAV_WIDTH + 56, maxf(150, size.y - 190))
+	notification_feed.size = Vector2(minf(520, size.x - NAV_WIDTH - 90), 150)
+	var lines: Array[String] = ["Family updates · %d unread" % unread.size()]
+	for notice in unread.slice(maxi(0, unread.size() - 2)):
+		lines.append(str(notice["date"]) + " · " + str(notice["description"]))
+	notification_text.text = "\n".join(lines)
+	notification_text.max_lines_visible = 5
+	notification_text.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS

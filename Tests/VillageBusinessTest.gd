@@ -75,7 +75,7 @@ func _run() -> void:
 	person.current_state["resentment"] = .9
 	state.elapsed_months += 1
 	business.advance_month(state)
-	assert(business.commitment("Carlo").is_empty() and state.major_event, "Unhappy relatives resign")
+	assert(business.commitment("Carlo").is_empty() and not state.notifications.is_empty(), "Unhappy relatives resign")
 	state.economy.cash_cents = 100000
 	opening = state.economy.cash_cents
 	dev.renovate(state,"home")
@@ -101,6 +101,7 @@ func _run() -> void:
 	invalid["state"]["village"]["business"]["reports"].back()["rows"][0]["net_cents"] += 1
 	assert(not SaveGame._valid_save(invalid))
 	var construction = _state()
+	construction.economy.cash_cents = 1000000
 	var plots = construction.village.development
 	var parcel_id: String = plots.best_parcel("house", "landi")
 	plots.buy_parcel(construction, parcel_id)

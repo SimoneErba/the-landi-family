@@ -22,6 +22,7 @@ var upfront_cost_cents: int = 0
 var monthly_cost_cents: int = 0
 var interruption_reason: String = ""
 var outcome: Dictionary = {}
+var agreement: Dictionary = {}
 
 
 func to_save_data() -> Dictionary:
@@ -34,7 +35,7 @@ func to_save_data() -> Dictionary:
 		"started_month": started_month, "duration_months": duration_months,
 		"progress_months": progress_months, "upfront_cost_cents": upfront_cost_cents,
 		"monthly_cost_cents": monthly_cost_cents, "interruption_reason": interruption_reason,
-		"outcome": outcome.duplicate(true),
+		"outcome": outcome.duplicate(true), "agreement": agreement.duplicate(true),
 	}
 
 

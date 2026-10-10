@@ -85,7 +85,8 @@ static func advance_month(state, person) -> void:
 		wording += " They ask the family head to arrange funding through Education & careers."
 	elif person.learned_tendencies["conflict_avoidance"] >= 0.7:
 		wording = person.name + " has been quietly preparing to " + best["description"] + ". " + best["reason"]
-	_record(state, person, "intention", wording, true)
+	_record(state, person, "intention", wording, best["action"] in ["leave", "join"])
+	if best["action"] not in ["leave", "join"]: state.notify(wording, person.id)
 
 
 static func _choose(state, person, include_funding: bool = true) -> Dictionary:
@@ -119,18 +120,18 @@ static func _choose(state, person, include_funding: bool = true) -> Dictionary:
 			if _has_kind(person, "career") or _has_kind(person, "financial_security") or _has_kind(person, "child_security"):
 				score += maxf(0.0, income_gain) * 0.15
 			_offer(choices, "work:" + job_id, "take work as " + str(job["name"]), "The work offers a future closer to what they value.", score)
-	if person.age >= 18 and person.spouse_id.is_empty() and not studying:
+	if person.age >= 18 and (person.spouse_id.is_empty() or state.marriage.unions.has(person.life_state.get("marriage_id", ""))) and not studying:
 		if person.in_household and (_has_kind(person, "independent_life") or _has_kind(person, "independent_career")):
 			var dependents := false
 			for relative in state.people.values():
 				if relative.alive and relative.age < 18 and person.id in relative.parent_ids:
 					dependents = true
-			if not dependents and person.monthly_income_cents >= state.economy.food_per_person_cents() * 2 and state.elapsed_months >= int(person.decision_state.get("stay_until", 0)):
+			if (not dependents or state.marriage.unions.has(person.life_state.get("marriage_id", ""))) and state.marriage.relocation_reason(state, person.id, false).is_empty() and person.monthly_income_cents >= state.economy.food_per_person_cents() * 2 and state.elapsed_months >= int(person.decision_state.get("stay_until", 0)):
 				var score: float = float(person.values["independence"]) * 0.85 + float(person.learned_tendencies["need_for_autonomy"]) * 0.2 + resentment * 0.3 - loyalty * 0.5 - security * 0.2 - float(bond.get("affection", 0.4)) * 0.15 - float(person.values["tradition"]) * 0.1
 				_offer(choices, "leave", "move into a home of their own", "They want independence and have an income to support the move.", score)
-		elif not person.in_household and _has_kind(person, "family_cohesion") and state.economy.cash_cents >= 0:
+		elif not person.in_household and _has_kind(person, "family_cohesion") and state.economy.cash_cents >= 0 and state.marriage.relocation_reason(state, person.id, true).is_empty():
 			var score: float = loyalty * 0.7 + security * 0.2 + float(bond.get("affection", 0.4)) * 0.2 - float(person.values["independence"]) * 0.5 - resentment * 0.5
-			_offer(choices, "join", "return to the ancestral home", "Being close to family matters more than living apart.", score)
+			_offer(choices, "join", "return to Landi House", "Being close to family matters more than living apart.", score)
 	if not committed and include_funding and person.in_household and person.age >= 6 and not studying and _has_kind(person, "education"):
 		for program_id in state.careers.programs:
 			if not state.careers.program_reason(person, program_id).is_empty():
@@ -189,11 +190,13 @@ static func _apply(state, person, choice: Dictionary) -> void:
 	elif action == "leave":
 		state.household["members"].erase(person.id)
 		person.in_household = false
+		state.marriage.relocate(state, person.id, false)
 		_complete(person, "independent_life", state)
 	elif action == "join":
 		if person.id not in state.household["members"]:
 			state.household["members"].append(person.id)
 		person.in_household = true
+		state.marriage.relocate(state, person.id, true)
 	elif action == "help":
 		var relative = state.people[choice["target_id"]]
 		relative.current_state["stress"] = maxf(0.0, float(relative.current_state.get("stress", 0.0)) - 0.08)
@@ -209,7 +212,8 @@ static func _apply(state, person, choice: Dictionary) -> void:
 		person.skills[choice["skill"]] = minf(50.0, float(person.skills[choice["skill"]]) + 1.5 * state.legacy.learning_multiplier())
 	person.current_state["happiness"] = minf(1.0, float(person.current_state.get("happiness", 0.6)) + 0.03)
 	person.decision_state["last_action_month"] = state.elapsed_months
-	_record(state, person, "decision", person.name + " chose to " + choice["description"] + ". " + choice["reason"], action not in ["help", "practice"])
+	_record(state, person, "decision", person.name + " chose to " + choice["description"] + ". " + choice["reason"], action in ["leave", "join"])
+	if action not in ["help", "practice", "leave", "join"]: state.notify(person.name + " chose to " + choice["description"] + ".", person.id)
 
 
 static func _update_goals(state, person) -> void:

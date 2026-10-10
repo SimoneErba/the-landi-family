@@ -1,6 +1,7 @@
 extends RefCounted
 ## Abstract monthly travel; costs and durations are prototype balance values.
 
+const Assignment = preload("res://Simulation/Assignment.gd")
 const CITIES := {
 	"turin": {"name": "Turin", "position": Vector2(0.159959, 0.244450), "months": 2, "fare": 1800, "skill": "technical", "description": "Technical study and commercial opportunities in Piedmont."},
 	"milan": {"name": "Milan", "position": Vector2(0.263029, 0.211954), "months": 2, "fare": 1600, "skill": "commerce", "description": "Commerce, practical training and paid work in Lombardy."},
@@ -73,57 +74,50 @@ func reason(state, person_id: String, city_id: String, purpose_id: String) -> St
 func propose(state, person_id: String, city_id: String, purpose_id: String) -> Dictionary:
 	var unavailable := reason(state, person_id, city_id, purpose_id)
 	if not unavailable.is_empty():
-		return {"ok": false, "response": unavailable}
+		return Assignment.unavailable(unavailable)
 	var person = state.people[person_id]
 	state.last_requests[person_id] = state.elapsed_months
 	var bond: Dictionary = person.relationships.get(state.head_id, {})
 	var score: float = person.interests[PURPOSES[purpose_id]["interest"]] / 100.0 * 0.45 + person.values["independence"] * 0.2 + float(bond.get("trust", 0.4)) * 0.2
 	score -= person.values["security"] * 0.15 + person.current_state["resentment"] * 0.3 + person.current_state["stress"] * 0.15
-	var accepted := score >= 0.12
-	var reluctant := score < 0.3
-	var response: String = person.name + (" reluctantly agreed to visit " if reluctant else " agreed to visit ") + CITIES[city_id]["name"] + "."
-	if not accepted:
-		response = person.name + " refused: I do not want to leave home for this."
-	elif reluctant:
-		person.current_state["resentment"] = minf(1.0, person.current_state["resentment"] + 0.05)
-	_record(state, person, response)
-	if not accepted:
-		return {"ok": false, "response": response}
+	var result: Dictionary = Assignment.resolve(person, score, "visit " + CITIES[city_id]["name"])
+	if result["outcome"] == "reluctant": person.current_state["resentment"] = minf(1.0, person.current_state["resentment"] + 0.05)
+	_record(state, person, result["response"], false)
+	if not result["accepted"]: return result
 	# Reserve the full stay and both journeys so loss of income cannot strand them.
 	state.events._cash(state, -cost(state, city_id, purpose_id), "Journey to " + CITIES[city_id]["name"], false)
 	var id := "journey_%d" % next_id
 	next_id += 1
 	journeys[id] = {"id": id, "person_id": person_id, "city_id": city_id, "purpose_id": purpose_id,
 		"status": "outbound", "remaining_months": int(CITIES[city_id]["months"]),
-		"progress": 0.0, "started_month": state.elapsed_months, "recalled": false, "outcome": ""}
+		"agreement": result["agreement"].duplicate(true), "progress": 0.0, "started_month": state.elapsed_months, "recalled": false, "outcome": ""}
 	state.household["members"].erase(person_id)
 	person.in_household = false
 	person.decision_state["plan"] = {}
-	state.major_event = true
-	return {"ok": true, "response": response}
+	result["activity_id"] = id
+	return result
 
 
 func recall(state, journey_id: String) -> Dictionary:
 	if not journeys.has(journey_id) or journeys[journey_id]["status"] not in ["outbound", "staying"]:
-		return {"ok": false, "response": "This journey cannot be recalled."}
+		return Assignment.unavailable("This journey cannot be recalled.")
 	var journey: Dictionary = journeys[journey_id]
 	var person = state.people[journey["person_id"]]
 	if not person.alive or not state.people[state.head_id].alive:
-		return {"ok": false, "response": "Only living people can discuss a return."}
+		return Assignment.unavailable("Only living people can discuss a return.")
 	if state.last_requests.get(person.id, -1) == state.elapsed_months:
-		return {"ok": false, "response": "You have already made a request this month."}
+		return Assignment.unavailable("You have already made a request this month.")
 	state.last_requests[person.id] = state.elapsed_months
 	var bond: Dictionary = person.relationships.get(state.head_id, {})
 	var score: float = person.values["family_loyalty"] * .6 + float(bond.get("trust", .4)) * .25 - person.values["independence"] * .3 - person.learned_tendencies["need_for_autonomy"] * .2 - person.current_state["resentment"] * .3
-	if score < .12:
-		var response: String = person.name + " refused an early return: I want to finish what I came here to do."
-		_record(state, person, response)
-		return {"ok": false, "response": response}
+	var result: Dictionary = Assignment.resolve(person, score, "return home early", journey_id)
+	_record(state, person, result["response"], false)
+	if not result["accepted"]: return result
 	journey["status"] = "returning"
 	journey["remaining_months"] = int(CITIES[journey["city_id"]]["months"])
 	journey["recalled"] = true
 	_record(state, state.people[journey["person_id"]], "The family requested an early return from " + CITIES[journey["city_id"]]["name"] + ". The placement ends without its reward.")
-	return {"ok": true, "response": person.name + " agreed to return early."}
+	return result
 
 
 func advance_month(state) -> void:
@@ -142,24 +136,28 @@ func advance_month(state) -> void:
 			if not person.life_state.get("illness", {}).is_empty():
 				continue
 			var step: float = state.legacy.learning_multiplier() if journey["purpose_id"] == "study" else 1.0
+			if journey["progress"] >= 1 and Assignment.abandons(person, journey.get("agreement", {})):
+				journey["recalled"] = true
+				journey["status"] = "returning"
+				journey["remaining_months"] = int(city["months"])
+				_record(state, person, person.name + " abandoned the placement in " + city["name"] + " and is returning without its reward.")
+				continue
+			step *= Assignment.progress(person, journey.get("agreement", {}))
 			journey["progress"] = minf(PURPOSES[journey["purpose_id"]]["months"], journey["progress"] + step)
 			if journey["progress"] >= PURPOSES[journey["purpose_id"]]["months"]:
 				journey["status"] = "returning"
 				journey["remaining_months"] = int(city["months"])
 				_record(state, person, person.name + " finished the placement in " + city["name"] + " and is returning home.")
-				state.major_event = true
 			continue
 		var disruption: String = state.events.travel_disruption(state,true)
 		if not disruption.is_empty():
 			if journey.get("interruption_reason","") != disruption:
 				_record(state,person,person.name+" must wait on the journey. "+disruption)
-				state.major_event = true
 			journey["interruption_reason"] = disruption
 			continue
 		if not journey.get("interruption_reason","").is_empty():
 			journey["interruption_reason"] = ""
 			_record(state,person,person.name+" can resume the journey.")
-			state.major_event = true
 		journey["remaining_months"] -= 1
 		if journey["remaining_months"] > 0:
 			continue
@@ -182,7 +180,6 @@ func advance_month(state) -> void:
 					state.events._cash(state, 2000 if journey["purpose_id"] == "trade" else 6000, "Proceeds from " + city["name"])
 			journey["outcome"] = person.name + " returned home from " + city["name"] + (" early." if journey["recalled"] else " after completing the placement.")
 			_record(state, person, journey["outcome"])
-		state.major_event = true
 
 
 func location_text(person_id: String) -> String:
@@ -193,10 +190,11 @@ func location_text(person_id: String) -> String:
 	return {"outbound": "Traveling to " + city, "staying": "Staying in " + city, "returning": "Returning from " + city}[journey["status"]] + (" · " + journey["interruption_reason"] if not journey.get("interruption_reason","").is_empty() else "")
 
 
-func _record(state, person, description: String) -> void:
+func _record(state, person, description: String, notification: bool = true) -> void:
+	if notification: state.notify(description, person.id)
 	state.chronicle.append({"date": state.date_text(), "description": description})
 	person.memories.append({"kind": "travel", "date": state.date_text(), "description": description})
-	person.decision_state["observation"] = description
+	if notification: person.decision_state["observation"] = description
 
 
 func to_save_data() -> Dictionary:

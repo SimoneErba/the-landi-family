@@ -6,7 +6,7 @@ Implemented:
 - One fixed parchment SVG terrain layer; forty handcrafted parcels, eighteen initial buildings.
 - Separate interchangeable SVG building sprites, three appearances per type. Persistent building IDs, addresses, owners, condition, level, construction date and history.
 - Capital-funded autonomous construction and renovation; housing pressure, agricultural expansion, neglected properties and school investment. Public maintenance competes with modernization for money. A reserved southern parcel supports a railway station.
-- Construction, ownership transfer, changes of use and demolition in the simulation. The ancestral house, church and square are protected from demolition. Player UI supports purchasing available land, building on owned parcels and renovating owned buildings. Other households act independently.
+- Construction, ownership transfer, changes of use and demolition in the simulation. Landi House, church and square are protected from demolition. Player UI supports purchasing available land, building on owned parcels and renovating owned buildings. Other households act independently.
 - Technology availability plus public funds and suitable land for railway, paving and electricity. Wealth and railway access can support workshop conversion into factories.
 - Click buildings and parcels to inspect ownership, use, condition, land value, fertility and histories. Existing family activities remain accessible through the inspector.
 - Pan/zoom; ownership, land wealth, relationship influence and development overlays. Wealth/influence are explicitly current-state overlays, hidden during replay.

@@ -30,7 +30,7 @@ static func refresh(host, card: PanelContainer, person) -> void:
 
 static func _add(host, parent: Node, icon_name: String, text: String, hint: String, color: Color) -> void:
 	var chip := HBoxContainer.new()
-	chip.add_theme_constant_override("separation", 5)
+	chip.add_theme_constant_override("separation", 2)
 	chip.tooltip_text = hint
 	parent.add_child(chip)
 	var icon := TextureRect.new()

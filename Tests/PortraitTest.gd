@@ -9,6 +9,19 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	# All generated identities have an illustrated age variant and valid atlas bounds.
+	var portrait_script = load("res://Scripts/PersonPortrait.gd")
+	for base in Identity.BASES:
+		var identity_person = State.Person.new("AtlasCheck_" + base, {"age":28, "portrait":{"appearance":{"base_face":base}}}, 1800, 1, "")
+		var portrait = portrait_script.new()
+		for age in [8,16,28,50,75]:
+			identity_person.age = age
+			portrait.show_person(identity_person)
+			assert(portrait.texture != null)
+			var atlas: AtlasTexture = portrait.texture
+			assert(atlas.region.position.x >= 0 and atlas.region.position.y >= 0)
+			assert(atlas.region.end.x <= atlas.atlas.get_width() + .01 and atlas.region.end.y <= atlas.atlas.get_height() + .01)
+		portrait.free()
 	var source: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://Data/people.json"))
 	var state := State.new()
 	state.initialize(source)

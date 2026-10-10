@@ -11,6 +11,16 @@ const BASES := {
 	"anna": {"presentation": "feminine", "genes": [0.65, 0.45, 0.55, 0.45, 0.5, 0.5]},
 	"lucia": {"presentation": "feminine", "genes": [0.5, 0.65, 0.6, 0.4, 0.55, 0.5]},
 	"sofia": {"presentation": "feminine", "genes": [0.55, 0.7, 0.55, 0.6, 0.55, 0.7]},
+	"blond_sidepart": {"presentation": "masculine", "genes": [0.75, 0.3, 0.6, 0.4, 0.3, 0.3], "hair": 0.7},
+	"black_crop": {"presentation": "masculine", "genes": [0.45, 0.8, 0.4, 0.5, 0.65, 0.25], "hair": 0.25},
+	"auburn_curls": {"presentation": "masculine", "genes": [0.35, 0.6, 0.65, 0.35, 0.3, 0.8], "hair": 0.6},
+	"chestnut_swept": {"presentation": "masculine", "genes": [0.75, 0.65, 0.4, 0.8, 0.55, 0.65], "hair": 0.45},
+	"brown_middlepart": {"presentation": "masculine", "genes": [0.55, 0.7, 0.6, 0.55, 0.55, 0.3], "hair": 0.35},
+	"honey_braidbun": {"presentation": "feminine", "genes": [0.6, 0.35, 0.6, 0.35, 0.3, 0.4], "hair": 0.7},
+	"black_braids": {"presentation": "feminine", "genes": [0.5, 0.8, 0.45, 0.65, 0.65, 0.25], "hair": 0.25},
+	"copper_curls": {"presentation": "feminine", "genes": [0.35, 0.6, 0.7, 0.35, 0.3, 0.8], "hair": 0.6},
+	"ash_twist": {"presentation": "feminine", "genes": [0.8, 0.3, 0.45, 0.6, 0.4, 0.4], "hair": 0.8},
+	"chestnut_bun": {"presentation": "feminine", "genes": [0.5, 0.8, 0.55, 0.55, 0.55, 0.55], "hair": 0.45},
 }
 
 var seed: int
@@ -40,6 +50,7 @@ func _init(person_id: String, source: Dictionary = {}, parents: Array = []) -> v
 	appearance["base_face"] = base_face
 
 
+
 static func stable_seed(person_id: String) -> int:
 	var result := 5381
 	for byte in person_id.to_utf8_buffer():
@@ -59,6 +70,7 @@ func _choose_base() -> String:
 		var score := 0.0
 		for index in range(base["genes"].size()):
 			score += pow(float(genetics[TRAITS[index]]) - float(base["genes"][index]), 2)
+		score += pow(float(genetics["hair_color"]) - float(base.get("hair", 0.4)), 2) * 1.5
 		var weight := exp(-score * 6.0)
 		total += weight
 		candidates.append({"id": base_id, "weight": weight})

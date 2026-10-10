@@ -3,6 +3,7 @@ extends RefCounted
 
 const MONTH_NAMES := ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
+const Marriage = preload("res://Simulation/Marriage.gd")
 const Travel = preload("res://Simulation/Travel.gd")
 const Activities = preload("res://Simulation/Activities/ActivitySystem.gd")
 const Village = preload("res://Simulation/Village/VillageState.gd")
@@ -20,6 +21,7 @@ var elapsed_months: int = 0
 var people: Dictionary = {}
 var economy = Economy.new()
 var legacy = Legacy.new()
+var marriage = Marriage.new()
 var travel = Travel.new()
 var activities = Activities.new()
 var village = Village.new()
@@ -28,12 +30,14 @@ var events = EventSystem.new()
 var major_event: bool = false
 var head_id: String = "Giovanni"
 var chronicle: Array = []
+var notifications: Array = []
 var last_requests: Dictionary = {}
 var household: Dictionary = {"members": [], "rooms": ["Bedroom", "Kitchen", "Outdoor washroom"], "condition": 80, "capacity": 7}
 
 
 func initialize(initial_people: Dictionary) -> void:
 	village.initialize()
+	marriage = Marriage.new()
 	activities = Activities.new()
 	travel = Travel.new()
 	people = {}
@@ -49,6 +53,7 @@ func initialize(initial_people: Dictionary) -> void:
 			household["members"].append(person_id)
 	for person in people.values():
 		DecisionSystem.ensure_goals(person)
+	notifications.clear()
 	chronicle.clear()
 	last_requests.clear()
 
@@ -116,6 +121,7 @@ func advance_month() -> void:
 	travel.advance_month(self)
 	activities.advance_month(self)
 	village.advance_month(self)
+	marriage.advance_month(self)
 	events.advance_month(self)
 	legacy.evaluate(self)
 
@@ -129,6 +135,11 @@ func date_text() -> String:
 	return "%s %d" % [MONTH_NAMES[month - 1], year]
 
 
+func notify(description: String, person_id: String = "") -> void:
+	notifications.append({"date": date_text(), "description": description, "person_id": person_id, "read": false})
+	if notifications.size() > 100: notifications.pop_front()
+
+
 func to_save_data() -> Dictionary:
 	var saved_people: Dictionary = {}
 	for person_id in people:
@@ -136,8 +147,8 @@ func to_save_data() -> Dictionary:
 	return {
 		"year": year, "month": month, "elapsed_months": elapsed_months,
 		"people": saved_people, "head_id": head_id, "household": household.duplicate(true),
-		"chronicle": chronicle.duplicate(true), "last_requests": last_requests.duplicate(true),
-		"travel": travel.to_save_data(), "activities": activities.to_save_data(), "village": village.to_save_data(),
+		"notifications": notifications.duplicate(true), "chronicle": chronicle.duplicate(true), "last_requests": last_requests.duplicate(true),
+		"marriage": marriage.to_save_data(), "travel": travel.to_save_data(), "activities": activities.to_save_data(), "village": village.to_save_data(),
 		"legacy": legacy.to_save_data(), "major_event": major_event, "events": events.to_save_data(),
 		"economy": {"currency": economy.currency, "cash_cents": economy.cash_cents, "price_index": economy.price_index,
 			"event_food_multiplier": economy.event_food_multiplier, "event_income_multiplier": economy.event_income_multiplier,
@@ -147,6 +158,7 @@ func to_save_data() -> Dictionary:
 
 
 func restore_save_data(data: Dictionary) -> void:
+	marriage.restore_save_data(data.get("marriage", {}))
 	travel.restore_save_data(data.get("travel", {}))
 	if data.has("village"):
 		village.restore_save_data(data["village"])
@@ -162,6 +174,7 @@ func restore_save_data(data: Dictionary) -> void:
 	elapsed_months = data["elapsed_months"]
 	head_id = data["head_id"]
 	household = data["household"]
+	notifications = data.get("notifications", []).duplicate(true)
 	chronicle = data["chronicle"]
 	last_requests = data["last_requests"]
 	major_event = data["major_event"]

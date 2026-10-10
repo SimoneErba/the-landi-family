@@ -63,7 +63,7 @@ First playable slice: ask a relative to improve a field over four months while a
 - [x] Add abstract city nodes and travel durations (first WIP slice: eleven cities).
 - [ ] Support distant study, employment, trade contacts, migration, letters, and remittances.
 - [ ] Account for absence, housing, travel costs, family attachment, and return decisions.
-- [ ] Consider whole-household relocation separately; it affects the ancestral-house premise.
+- [ ] Consider whole-household relocation separately; it affects Landi House premise.
 
 ## Decisions before integration
 

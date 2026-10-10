@@ -7,7 +7,7 @@ static func _column(host) -> VBoxContainer:
 	host.content_overlay.add_child(scroll)
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.add_theme_constant_override("separation", 16)
+	column.add_theme_constant_override("separation", 8)
 	scroll.add_child(column)
 	return column
 
@@ -16,7 +16,6 @@ static func village(host) -> void:
 	var column := _column(host)
 	var state = host.game_clock.state
 	host._add_label(column, "The village", 32, host.TEXT_MAIN)
-	host._add_label(column, "One village across generations. Buildings retain their identity as families construct, renovate and change ownership. Use the timeline to revisit its past.", 17, host.TEXT_MUTED)
 	var village_view := preload("res://Scripts/VillageScreen.gd").new()
 	village_view.host = host
 	host.village_view = village_view
@@ -49,9 +48,9 @@ static func _card(host, parent: Node) -> VBoxContainer:
 	parent.add_child(card)
 	var margin := MarginContainer.new()
 	for edge in ["left", "top", "right", "bottom"]:
-		margin.add_theme_constant_override("margin_" + edge, 16)
+		margin.add_theme_constant_override("margin_" + edge, 6)
 	card.add_child(margin)
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 8)
+	content.add_theme_constant_override("separation", 4)
 	margin.add_child(content)
 	return content

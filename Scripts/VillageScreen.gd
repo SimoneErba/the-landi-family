@@ -13,15 +13,16 @@ var message := ""
 var neighbors: VBoxContainer
 
 func _ready() -> void:
-	add_theme_constant_override("separation", 12)
+	add_theme_constant_override("separation", 6)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var toolbar := HBoxContainer.new()
-	toolbar.add_theme_constant_override("separation", 12)
+	toolbar.add_theme_constant_override("separation", 6)
 	add_child(toolbar)
 	var overlays := OptionButton.new()
 	for label in ["Places", "Ownership", "Wealth", "Influence", "Development"]:
 		overlays.add_item(label)
 	toolbar.add_child(overlays)
+	overlays.tooltip_text = "Wealth shows current land value; influence shows current relations with the Landi."
 	var reset := Button.new()
 	reset.text = "Reset view"
 	toolbar.add_child(reset)
@@ -38,29 +39,29 @@ func _ready() -> void:
 	timeline.custom_minimum_size.y = 24
 	add_child(timeline)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 18)
+	row.add_theme_constant_override("separation", 9)
 	add_child(row)
 	map = Map.new()
+	map.tooltip_text = "Wheel to zoom · middle or right drag to pan · select a building or parcel"
 	map.development = host.game_clock.state.village.development
 	map.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(map)
 	var frame := PanelContainer.new()
-	frame.custom_minimum_size.x = 360
+	frame.custom_minimum_size.x = 300
 	frame.add_theme_stylebox_override("panel", host.Archive.card())
 	row.add_child(frame)
 	var margin := MarginContainer.new()
 	for edge in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + edge, 16)
+		margin.add_theme_constant_override("margin_" + edge, 6)
 	frame.add_child(margin)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	margin.add_child(scroll)
 	inspector = VBoxContainer.new()
-	inspector.custom_minimum_size.x = 328
+	inspector.custom_minimum_size.x = 276
 	inspector.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inspector.add_theme_constant_override("separation", 10)
+	inspector.add_theme_constant_override("separation", 5)
 	scroll.add_child(inspector)
-	host._add_label(self, "Wheel to zoom · drag with the middle or right mouse button · click a building or open land to inspect it.", 15, host.TEXT_MUTED)
 	map.building_selected.connect(func(id):
 		selected_kind = "building"
 		selected_id = id
@@ -122,7 +123,7 @@ func _owner_name(id: String) -> String:
 func _button(text: String, action: Callable) -> void:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size.y = 36
+	button.custom_minimum_size.y = 28
 	inspector.add_child(button)
 	button.pressed.connect(action)
 
@@ -141,12 +142,10 @@ func _inspect() -> void:
 	var historical: bool = map.replay_month >= 0
 	if selected_id.is_empty():
 		host._add_label(inspector, "Village memory", 25, host.TEXT_MAIN)
-		host._add_label(inspector, "Select a building to see its owner, use and history. Select open land to inspect a parcel.", 17, host.TEXT_MUTED)
 		host._add_label(inspector, "%d parcels · %d standing buildings" % [map.view["parcels"].size(), _standing_count()], 17, host.TEXT_MAIN)
 		if not historical:
 			host._add_label(inspector, "%d projects in progress" % dev.projects.size(), 17, host.TEXT_MAIN)
 			host._add_label(inspector, "Public investment fund · " + state.economy.money(dev.public_fund_cents), 16, host.TEXT_MUTED)
-			host._add_label(inspector, "Wealth shades land value. Influence shades the household's relationship with the Landi family. These two overlays describe the present day.", 15, host.TEXT_MUTED)
 		return
 	if not message.is_empty():
 		host._add_label(inspector, message, 17, host.TEXT_KNOWN)
@@ -168,9 +167,9 @@ func _inspect() -> void:
 				host._add_label(inspector, "Business · " + estimate["status"], 20, host.TEXT_SUSPECTED)
 				host._add_label(inspector, "Monthly estimate\nSales · %s\nCosts · %s\nNet · %s" % [state.economy.money(estimate["revenue_cents"]), state.economy.money(estimate["cost_cents"]), state.economy.money(estimate["net_cents"])], 16, host.TEXT_MAIN)
 				if building["owner_id"] == "landi":
+					host._add_label(inspector, "Assign an adult resident through their Activities profile. A manager earns monthly income and develops skill, but takes on stress alongside their regular job. Without one, the property only costs upkeep." + (" Farm sales rise during June–September." if building["type"] == "farm" else ""), 16, host.TEXT_MUTED)
 					_button("Manage through a person profile", func():
-						if state.village.business.assignments.has(selected_id):
-							host.gameplay_person_id = state.village.business.assignments[selected_id]["person_id"]
+						host.gameplay_person_id = state.village.business.assignments.get(selected_id, {}).get("person_id", state.head_id)
 						host._open_person_activity())
 			if state.village.households.has(building["owner_id"]):
 				var owner = state.village.households[building["owner_id"]]
@@ -195,11 +194,12 @@ func _inspect() -> void:
 	else:
 		parcel = map.view["parcels"][selected_id]
 		host._add_label(inspector, selected_id.replace("_", " ").capitalize(), 24, host.TEXT_MAIN)
-		host._add_label(inspector, "Owner · %s\nLand value · %s\nFertility · %d%%\nPermitted uses · %s" % [_owner_name(parcel["owner_id"]), state.economy.money(parcel["value_cents"]), parcel["fertility"]*100, ", ".join(parcel["uses"])], 17, host.TEXT_MAIN)
+		host._add_label(inspector, "Owner · %s\nLand value · %s\nFertility · %d%%\nPermitted uses · %s" % [_owner_name(parcel["owner_id"]), state.economy.money(dev.land_value(parcel)), parcel["fertility"]*100, ", ".join(parcel["uses"])], 17, host.TEXT_MAIN)
 		if not historical:
 			if parcel["for_sale"]:
-				_button("Buy land · " + state.economy.money(state.economy.purchase_cost(parcel["value_cents"])), func(): _result(dev.buy_parcel(state, selected_id)))
+				_button("Buy land · " + state.economy.money(state.economy.purchase_cost(dev.land_value(parcel))), func(): _result(dev.buy_parcel(state, selected_id)))
 			if parcel["owner_id"] == "landi" and parcel["building_id"].is_empty():
+				host._add_label(inspector, "Bare land produces no business income. Build a permitted business (12 months), then ask an adult resident to manage it through their Activities profile.", 16, host.TEXT_MUTED)
 				for type in parcel["uses"]:
 					_button("Build " + type + " · " + state.economy.money(state.economy.purchase_cost(dev.COST)), func(): _result(dev.begin_construction(state, selected_id, type, "landi")))
 			for project in dev.projects.values():

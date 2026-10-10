@@ -34,7 +34,7 @@ func _run() -> void:
 	await process_frame
 	var columns = screen.event_content.get_node("EventColumns")
 	assert(columns is HBoxContainer)
-	assert(columns.get_node("Story/Illustration").size.y >= 230)
+	assert(columns.get_node("Story/Illustration").size.y >= 160)
 	assert(columns.get_node("Story").position.x < columns.get_node("Actions").position.x)
 	assert(columns.get_node("Actions/Choice0").get_child(0).get_child(0) is Button)
 	assert(screen.event_popup.visible and not screen.game_clock.is_playing)

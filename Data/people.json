@@ -53,7 +53,7 @@
     },
     "experiences": [
       "Took over the farm after his father's illness.",
-      "Shared the ancestral house with Pietro after their father died."
+      "Shared Landi House with Pietro after their father died."
     ],
     "evidence": [
       "Has covered the farm's shortfalls with personal savings.",
@@ -144,7 +144,7 @@
       },
       {
         "kind": "formative_experience",
-        "description": "Shared the ancestral house with Pietro after their father died.",
+        "description": "Shared Landi House with Pietro after their father died.",
         "date": "Before January 1800",
         "participants": []
       }
@@ -849,7 +849,7 @@
   "Pietro": {
     "name": "Pietro Landi",
     "relationship": "Brother · Carpenter",
-    "summary": "Pietro's branch shares the ancestral house. He wants its upkeep to be a decision between owners, not a favor from Giovanni.",
+    "summary": "Pietro's branch shares Landi House. He wants its upkeep to be a decision between owners, not a favor from Giovanni.",
     "temperament": {
       "known": [
         "Practical and quick to speak",
@@ -1081,7 +1081,7 @@
         "A quieter home of their own"
       ],
       "unknown": [
-        "How attached she is to the ancestral house"
+        "How attached she is to Landi House"
       ]
     },
     "learned_tendencies": {
@@ -1110,7 +1110,7 @@
     },
     "experiences": [
       "Kept her own sewing clients after marrying Pietro.",
-      "Moved into the ancestral house when Sofia was small."
+      "Moved into Landi House when Sofia was small."
     ],
     "evidence": [
       "Has declined Maria's offer to combine household spending.",
@@ -1184,7 +1184,7 @@
       },
       {
         "kind": "formative_experience",
-        "description": "Moved into the ancestral house when Sofia was small.",
+        "description": "Moved into Landi House when Sofia was small.",
         "date": "Before January 1800",
         "participants": []
       }

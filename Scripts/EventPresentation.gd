@@ -79,7 +79,7 @@ static func draw_rows(host, parent: Node, rows: Array) -> void:
 	for entry in rows:
 		var color: Color = GOOD if entry.tone > 0 else (BAD if entry.tone < 0 else NEUTRAL)
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
+		row.add_theme_constant_override("separation", 4)
 		parent.add_child(row)
 		var icon := TextureRect.new()
 		icon.texture = load("res://Assets/UI/Icons/" + str(entry.icon) + ".svg")

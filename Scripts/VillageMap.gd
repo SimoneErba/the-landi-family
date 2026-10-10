@@ -3,8 +3,9 @@ extends Control
 signal place_selected(place_id: String)
 signal building_selected(building_id: String)
 signal parcel_selected(parcel_id: String)
+const MAP_LETTERING = preload("res://Assets/UI/Fonts/ArchiveSerif-Italic.ttf")
 const Development = preload("res://Simulation/Village/VillageDevelopment.gd")
-const LANDMARKS := {"home": "Ancestral house", "church": "Church", "tavern": "Tavern", "market": "Market square", "school": "School", "farm": "Farm", "workshop": "Workshop", "town_hall": "Town hall"}
+const LANDMARKS := {"home": "Landi House", "church": "Church", "tavern": "Tavern", "market": "Market square", "school": "School", "farm": "Farm", "workshop": "Workshop", "town_hall": "Town hall"}
 var development = null
 var influence: Dictionary = {}
 var map_texture: ImageTexture
@@ -29,7 +30,10 @@ func _ready() -> void:
 		development = Development.new()
 		development.initialize()
 	var image := Image.new()
-	image.load_svg_from_string(FileAccess.get_file_as_string("res://Assets/Maps/village-terrain.svg"), 2.0)
+	if FileAccess.file_exists("res://Assets/Maps/village-terrain-1800.png"):
+		image = Image.load_from_file("res://Assets/Maps/village-terrain-1800.png")
+	else:
+		image.load_svg_from_string(FileAccess.get_file_as_string("res://Assets/Maps/village-terrain.svg"), 2.0)
 	map_texture = ImageTexture.create_from_image(image)
 	world = Control.new()
 	world.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -60,10 +64,14 @@ func set_replay(month: int) -> void:
 	refresh(true)
 
 func _sprite(type: String, variant: int) -> ImageTexture:
-	var key := type + "-" + str(variant)
+	var engraving := "res://Assets/Maps/Buildings/" + type + "-engraving.png"
+	var key := type + "-engraving" if FileAccess.file_exists(engraving) else type + "-" + str(variant)
 	if not textures.has(key):
 		var image := Image.new()
-		image.load_svg_from_string(FileAccess.get_file_as_string("res://Assets/Maps/Buildings/" + key + ".svg"), 2.0)
+		if FileAccess.file_exists(engraving):
+			image = Image.load_from_file(engraving)
+		else:
+			image.load_svg_from_string(FileAccess.get_file_as_string("res://Assets/Maps/Buildings/" + key + ".svg"), 2.0)
 		textures[key] = ImageTexture.create_from_image(image)
 	return textures[key]
 
@@ -82,6 +90,7 @@ func refresh(force: bool = false) -> void:
 			button.modulate.a = 0.0
 			button.position = Vector2(parcel["x"] - 40, parcel["y"] - 12)
 			button.size = Vector2(80, 40)
+			button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 			button.mouse_filter = Control.MOUSE_FILTER_PASS
 			button.tooltip_text = "Inspect " + id.replace("_", " ")
 			button.pressed.connect(func(): parcel_selected.emit(id))
@@ -102,6 +111,7 @@ func refresh(force: bool = false) -> void:
 			button.ignore_texture_size = true
 			button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 			button.size = Vector2(110, 105)
+			button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 			button.mouse_filter = Control.MOUSE_FILTER_PASS
 			button.pressed.connect(func():
 				selected_id = id
@@ -117,16 +127,25 @@ func refresh(force: bool = false) -> void:
 				label.size.x = 150
 				label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-				label.add_theme_font_size_override("font_size", 15)
-				label.add_theme_color_override("font_color", Color("#503e2c"))
-				label.add_theme_color_override("font_shadow_color", Color("#eadfc6"))
+				label.add_theme_font_override("font", MAP_LETTERING)
+				label.add_theme_font_size_override("font_size", 13)
+				label.add_theme_color_override("font_color", Color("#fff2cf"))
+				label.add_theme_color_override("font_shadow_color", Color("#241b12"))
+				label.add_theme_color_override("font_outline_color", Color("#241b12"))
+				label.add_theme_constant_override("outline_size", 5)
 				label.add_theme_constant_override("shadow_offset_x", 1)
 				label.add_theme_constant_override("shadow_offset_y", 1)
 				button.add_child(label)
 		else:
 			button = building_nodes[id]
 		button.texture_normal = _sprite(building["type"], building["visual_variant"])
-		button.position = Vector2(parcel["x"] - 55, parcel["y"] - 85)
+		# Building feet stay anchored to the saved parcel, independent of art size.
+		var growth := 1.0 + float(building["visual_variant"]) * .055
+		button.size = Vector2(110, 105) * growth
+		button.position = Vector2(parcel["x"] - button.size.x / 2, parcel["y"] - button.size.y + 20)
+		button.z_index = int(parcel["y"])
+		if button.get_child_count() > 0:
+			button.get_child(0).position = Vector2((button.size.x - 150) / 2, button.size.y - 5)
 		button.modulate = Color("#8a8274") if building["status"] == "abandoned" else Color.WHITE
 		button.tooltip_text = building["address"] + " · " + building["type"].capitalize() + "\nOwner: " + building["owner_id"].capitalize() + " · Built " + str(building["built_year"])
 	_place_world()

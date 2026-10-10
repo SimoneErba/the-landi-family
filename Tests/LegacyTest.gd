@@ -69,6 +69,24 @@ func _run() -> void:
 	assert(not learner.legacy.completed)
 	member.skills["persuasion"] = 50
 	learner.legacy.evaluate(learner)
+	assert(not learner.legacy.completed, "One influential relative is insufficient")
+	for index in range(8):
+		var relative = learner.add_person("Leader%d" % index, {"in_household": false})
+		relative.career_id = "lawyer"
+		relative.skills["leadership"] = 50
+		relative.skills["persuasion"] = 50
+	learner.legacy.evaluate(learner)
+	assert(learner.legacy.progress(learner)["value"] == 9)
+	assert(not learner.legacy.completed, "Nine influential relatives are insufficient")
+	var tenth = learner.add_person("Leader9", {"in_household": false})
+	tenth.career_id = "doctor"
+	tenth.skills["leadership"] = 50
+	tenth.skills["persuasion"] = 50
+	tenth.alive = false
+	learner.legacy.evaluate(learner)
+	assert(not learner.legacy.completed, "Deceased relatives do not count")
+	tenth.alive = true
+	learner.legacy.evaluate(learner)
 	assert(learner.legacy.completed)
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
 	root.add_child(screen)
@@ -84,7 +102,18 @@ func _run() -> void:
 	assert(screen.focus_overlay.visible, "Invalid choices do not dismiss the popup")
 	screen._play_game()
 	assert(not screen.game_clock.is_playing, "Choose an ambition before playing")
-	assert(screen._start_family_story("populous", "fertility"))
+	var objectives = screen.focus_overlay.find_child("ObjectiveCards", true, false)
+	var perks = screen.focus_overlay.find_child("PerkCards", true, false)
+	assert(objectives.get_child_count() == 3 and perks.get_child_count() == 3)
+	var begin = screen.focus_overlay.find_child("BeginFamilyStory", true, false)
+	assert(begin.disabled)
+	objectives.get_child(2).find_children("*", "Button", true, false)[0].pressed.emit()
+	assert(begin.disabled, "Both a goal and a perk must be chosen")
+	perks.get_child(0).find_children("*", "Button", true, false)[0].pressed.emit()
+	assert(not begin.disabled)
+	begin.pressed.emit()
+	assert(screen.game_clock.state.legacy.objective_id == "influence")
+	assert(screen.game_clock.state.legacy.bonus_id == "fertility")
 	assert(not screen.focus_overlay.visible)
 	screen._show_screen("House")
 	screen._show_screen("People")
@@ -117,12 +146,23 @@ func _run() -> void:
 	for candidate in screen.content_overlay.find_children("", "Control", true, false):
 		if candidate.get_script() == load("res://Scripts/ItalyMap.gd"):
 			italy_map = candidate
-	assert(italy_map != null and italy_map.buttons.size() == 11)
+	assert(italy_map != null and italy_map.markers.size() == 11)
 	assert(italy_map.map_texture != null)
 	italy_map.size = Vector2(900, 620)
 	assert(is_equal_approx(italy_map._map_rect().size.x / italy_map._map_rect().size.y, 700.0 / 800.0))
-	italy_map.buttons["rome"].pressed.emit()
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	italy_map.markers["rome"].gui_input.emit(click)
 	assert(screen.travel_city_id == "rome")
+	screen._show_screen("Family Tree")
+	var tree = screen.content_overlay.find_child("FamilyTreeDiagram", true, false)
+	assert(tree.positions.size() == screen.people.size())
+	assert(tree.positions["Carlo"].y > tree.positions["Giovanni"].y)
+	assert(tree.positions["Giovanni"].y == tree.positions["Maria"].y)
+	assert(tree.couples.size() == 2 and tree.descent.size() == 3)
+	tree.get_node("TreePerson_Carlo").pressed.emit()
+	assert(screen.details_popup.visible and screen.selected_person_id == "Carlo")
 	screen.free()
 	print("PASS: objectives, living relatives, currency equivalence, completion, discounts, learning, saves and responsive UI")
 	quit()

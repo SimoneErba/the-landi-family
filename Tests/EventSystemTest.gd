@@ -101,7 +101,7 @@ func _run() -> void:
 	assert(budget["income_cents"] == 30500, "Illness reduces the patient's income without rewriting their wage")
 	sick.events.resolve(sick, sick.events.pending[0]["serial"], 0)
 	sick.advance_month()
-	assert(sick.people["Adult"].health == "Well" and sick.events.pending[0]["id"] == "recovery")
+	assert(sick.people["Adult"].health == "Well" and sick.events.pending.is_empty() and not sick.notifications.is_empty())
 	_resolve_all(sick)
 
 	var pregnancy = _state()
@@ -139,8 +139,8 @@ func _run() -> void:
 	graduation.careers.apply_request(graduation.people["Adult"], "train:architecture")
 	graduation.people["Adult"].education["study"]["progress"] = float(graduation.careers.programs["architecture"]["months"]) - 0.01
 	graduation.advance_month()
-	assert(graduation.events.pending[0]["id"] == "graduation", "Actual graduations generate notices")
-	assert("Architecture" in graduation.events.pending[0]["body"])
+	assert(graduation.events.pending.is_empty() and not graduation.notifications.is_empty(), "Actual graduations generate nonmodal notices")
+	assert("Architecture" in graduation.notifications.back()["description"])
 
 	var trade = _state()
 	var opening: int = trade.economy.cash_cents

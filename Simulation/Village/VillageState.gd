@@ -22,7 +22,7 @@ func initialize() -> void:
 	households = {}
 	locations = {}
 	properties = {}
-	for entry in [["home", "Landi house"], ["church", "Church"], ["tavern", "Tavern"], ["market", "Market"], ["school", "School"], ["farm", "Fields"], ["workshop", "Workshop"], ["town_hall", "Town hall"]]:
+	for entry in [["home", "Landi House"], ["church", "Church"], ["tavern", "Tavern"], ["market", "Market"], ["school", "School"], ["farm", "Fields"], ["workshop", "Workshop"], ["town_hall", "Town hall"]]:
 		locations[entry[0]] = {"id": entry[0], "name": entry[1]}
 	var starters := [
 		["rossi", "Rossi family", "Improve the neighboring fields", 24000, "farm"],

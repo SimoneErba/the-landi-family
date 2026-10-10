@@ -72,11 +72,11 @@ func _run() -> void:
 	click.pressed = true
 	screen.game_clock.play()
 	screen._on_card_input(click, "Carlo")
-	assert(screen.influence_popup.visible and not screen.game_clock.is_playing)
+	assert(screen.influence_popup.visible and screen.game_clock.is_playing)
 	assert(screen.influence_popup.is_item_disabled(screen.influence_popup.get_item_index(3)), "Join is disabled for residents")
 	screen.influence_popup.hide()
 	screen._make_request("Carlo", "leave")
-	assert("Accepted" in screen.conversation_result)
+	assert(screen.assignment_feedback["Carlo:request"]["accepted"])
 	assert(not screen.get_node("PageMargins/Page/RosterScroll/FamilyList/Carlo").visible)
 	assert(screen.elsewhere_list.get_node("Carlo").visible, "Departed relatives remain accessible")
 	screen._show_screen("Chronicle")

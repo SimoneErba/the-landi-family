@@ -34,6 +34,7 @@ func _run() -> void:
 	dev.begin_construction(state, parcel_id, "house", "landi")
 	assert(dev.projects.is_empty() and state.economy.cash_cents == opening, "Construction requires owned land")
 	dev.buy_parcel(state, parcel_id)
+	assert(state.economy.cash_cents == opening - int(dev.parcels[parcel_id]["value_cents"]) * 15, "Land purchases use the increased property price")
 	state.legacy.choose("populous","discount")
 	state.economy.price_multiplier = .9
 	opening = state.economy.cash_cents
@@ -112,7 +113,7 @@ func _run() -> void:
 	view.refresh()
 	assert(view.map.building_nodes["church"] == church_node, "Monthly refresh preserves existing scene nodes")
 	var ui_state = screen.game_clock.state
-	ui_state.economy.cash_cents = 100000
+	ui_state.economy.cash_cents = 1000000
 	var ui_plot: String = ui_state.village.development.best_parcel("house","landi")
 	view.map.parcel_selected.emit(ui_plot)
 	for button in view.inspector.find_children("*","Button",true,false):
@@ -125,6 +126,21 @@ func _run() -> void:
 			button.pressed.emit()
 			break
 	assert(ui_state.village.development.projects.size() == 1, "Inspector commissions an actual construction")
+	var added_id: String = ui_state.village.development.projects.keys()[0]
+	_tick(ui_state, 12)
+	view.refresh()
+	assert(view.map.building_nodes.has(added_id), "Completed construction adds an independent building sprite")
+	var fixed_terrain = view.map.map_texture
+	var standing_month: int = ui_state.elapsed_months
+	_tick(ui_state, 1)
+	assert(ui_state.village.development.demolish(ui_state, added_id))
+	view.refresh()
+	assert(not view.map.building_nodes.has(added_id), "Demolition removes the building sprite")
+	assert(view.map.map_texture == fixed_terrain, "Construction and demolition leave the terrain artwork intact")
+	view.map.set_replay(standing_month)
+	assert(view.map.building_nodes.has(added_id), "Historical replay restores the independently rendered building")
+	view.map.set_replay(-1)
+	assert(not view.map.building_nodes.has(added_id))
 	var wheel := InputEventMouseButton.new()
 	wheel.button_index = MOUSE_BUTTON_WHEEL_UP
 	wheel.pressed = true

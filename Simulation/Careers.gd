@@ -1,4 +1,5 @@
 extends RefCounted
+const Assignment = preload("res://Simulation/Assignment.gd")
 ## Authored prototype career rules. Numeric suitability is simulation-only.
 
 var jobs: Dictionary = {}
@@ -128,6 +129,7 @@ func willingness(person, action: String) -> float:
 
 func apply_request(person, action: String) -> void:
 	var key := action.get_slice(":", 1)
+	person.life_state.erase("job_agreement")
 	if action.begins_with("train:"):
 		person.education["study"] = {"program_id": key, "progress": 0.0, "status": "Studying", "monthly_cost_cents": int(programs[key]["monthly_cost_cents"])}
 		# Full-time training sacrifices earnings, so an education choice has a cost.
@@ -148,6 +150,18 @@ func monthly_cost(person) -> int:
 
 
 func advance_month(state, person) -> void:
+	if person.alive and person.in_household and person.monthly_income_cents > 0:
+		var work_agreement: Dictionary = person.life_state.get("job_agreement", {})
+		if Assignment.abandons(person, work_agreement):
+			var ended: String = person.name + " left work as " + person.job + ". The work no longer fits their plans."
+			person.career_id = ""
+			person.job = "Seeking work"
+			person.monthly_income_cents = 0
+			person.life_state.erase("job_agreement")
+			person.memories.append({"kind":"career", "date":state.date_text(), "description":ended})
+			state.chronicle.append({"date":state.date_text(), "description":ended})
+			state.notify(ended, person.id)
+		else: Assignment.progress(person, work_agreement)
 	var study: Dictionary = person.education["study"]
 	if not person.alive or study.is_empty() or not programs.has(study.get("program_id")):
 		return
@@ -155,10 +169,18 @@ func advance_month(state, person) -> void:
 		study["status"] = "Paused — needs household funding"
 		return
 	var program: Dictionary = programs[study["program_id"]]
+	if float(study["progress"]) >= 1 and Assignment.abandons(person, study.get("agreement", {})):
+		person.education["study"] = {}
+		person.job = "Seeking work"
+		var abandoned: String = person.name + " abandoned " + program["name"] + ". No qualification was awarded."
+		person.memories.append({"kind":"education", "date":state.date_text(), "description":abandoned})
+		state.chronicle.append({"date":state.date_text(), "description":abandoned})
+		state.notify(abandoned, person.id)
+		return
 	study["status"] = "Studying"
 	# Aptitude speeds learning; discipline can offset slower learning.
 	var rate := 0.45 + weighted_ability(person, program["abilities"]) / 100.0 * 0.65 + float(person.temperament["conscientiousness"]) * 0.5
-	rate *= state.legacy.learning_multiplier()
+	rate *= state.legacy.learning_multiplier() * Assignment.progress(person, study.get("agreement", {}))
 	rate *= 1.0 - float(person.current_state.get("stress", 0.0)) * 0.3
 	var remaining := maxf(0.0, float(program["months"]) - float(study["progress"]))
 	var step := minf(rate, remaining)
@@ -179,8 +201,7 @@ func advance_month(state, person) -> void:
 	var description: String = person.name + " completed " + program["name"] + "."
 	person.memories.append({"kind": "education", "date": state.date_text(), "description": description})
 	state.chronicle.append({"date": state.date_text(), "description": description})
-	state.major_event = true
-	state.events.queue_milestone(state, "graduation", person.id, {"course": program["name"]})
+	state.notify(description, person.id)
 	var known: Dictionary = person.career_knowledge.get(state.head_id, {"abilities": [], "skills": [], "interests": []})
 	for skill in program["skills"]:
 		if skill not in known.get("skills", []):

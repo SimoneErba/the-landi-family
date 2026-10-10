@@ -199,7 +199,7 @@ func experience_event(kind: String, description: String, date: String, participa
 
 
 func converse(observer_id: String, month_index: int, date: String) -> String:
-	if not alive or not in_household:
+	if not alive or (not in_household and not life_state.has("marriage_id")):
 		return "They are not here to talk."
 	if int(_last_conversation.get(observer_id, -1)) == month_index:
 		return "You have already had a conversation this month. Give them some time."

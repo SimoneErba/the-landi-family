@@ -244,6 +244,10 @@ func queue_milestone(state, event_id: String, person_id: String, details: Dictio
 	var event := _instance(state, catalog[event_id], person_id)
 	for key in details:
 		event["body"] = event["body"].replace("{" + key + "}", str(details[key]))
+	if event_id in ["recovery", "graduation"]:
+		state.notify(str(event["body"]), person_id)
+		state.chronicle.append({"date":state.date_text(), "description":str(event["body"])})
+		return
 	if event_id == "birth":
 		event["body"] += "\nThe parent has three months of recovery; family activities and business management pause during this leave."
 		if state.household["members"].size() > state.household["capacity"]:
@@ -324,7 +328,7 @@ func _effects(state, event: Dictionary, effects: Dictionary) -> void:
 		state.household["condition"] = clampi(int(state.household.get("condition", 80)) + int(effects["condition"]), 0, 100)
 		var dev = state.village.development
 		dev.buildings["home"]["condition"] = float(state.household["condition"])
-		dev._record(state,event["title"]+" changed the ancestral house condition.",["home"])
+		dev._record(state,event["title"]+" changed Landi House condition.",["home"])
 	if effects.has("property_condition"):
 		var dev = state.village.development
 		var id: String = event.get("building_id","")

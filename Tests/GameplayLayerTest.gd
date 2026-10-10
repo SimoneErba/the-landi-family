@@ -52,7 +52,7 @@ func _run() -> void:
 		state.advance_month()
 		restored.advance_month()
 	assert(state.to_save_data() == restored.to_save_data(), "Saved activities and neighbors continue identically")
-	assert(plan.status == "completed" and state.household["condition"] == 95 and state.major_event)
+	assert(plan.status == "completed" and state.household["condition"] == 95 and not state.notifications.is_empty())
 	opening = state.economy.cash_cents
 	state.activities.advance_month(state)
 	assert(state.economy.cash_cents == opening, "Completed plans do not charge again")

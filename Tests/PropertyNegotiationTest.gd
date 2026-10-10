@@ -8,7 +8,7 @@ func _state():
 	var state = State.new()
 	state.initialize(JSON.parse_string(FileAccess.get_file_as_string("res://Data/people.json")))
 	state.events.enabled = false
-	state.economy.cash_cents = 100000
+	state.economy.cash_cents = 1000000
 	return state
 func _valid(state) -> bool:
 	return SaveGame._valid_save({"state":state.to_save_data(),"clock":{"speed_level":1,"month_progress":0.0}})
@@ -20,6 +20,8 @@ func _run() -> void:
 	var original: Dictionary = dev.view_at(0)
 	assert(not Negotiation.propose(state,home,100000)["ok"], "Households retain a home they need")
 	var value: int = Negotiation.valuation(state,plot)
+	var original_value: int = dev.parcels[plot]["value_cents"] + roundi(dev.COST * .5 * dev.buildings["farm"]["level"] * (.5 + dev.buildings["farm"]["condition"] / 200.0))
+	assert(value == original_value * 15, "Property valuation is fifteen times the former price")
 	var opening: int = state.economy.cash_cents
 	var seller_cash: int = state.village.households["rossi"].cash_cents
 	assert(Negotiation.propose(state,plot,value/2)["outcome"] == "refused")
@@ -68,7 +70,7 @@ func _run() -> void:
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
 	root.add_child(screen)
 	screen._start_family_story("populous","fertility")
-	screen.game_clock.state.economy.cash_cents = 100000
+	screen.game_clock.state.economy.cash_cents = 1000000
 	screen._show_screen("Village")
 	var ui_state = screen.game_clock.state
 	var ui_plot: String = ui_state.village.development.buildings["farm"]["parcel_id"]
@@ -83,6 +85,24 @@ func _run() -> void:
 			button.pressed.emit()
 			break
 	assert(ui_state.village.development.parcels[ui_plot]["owner_id"] == "landi", "Inspector acceptance executes the sale")
+	screen.village_view.map.building_selected.emit("farm")
+	var opened_management := false
+	for button in screen.village_view.inspector.find_children("*","Button",true,false):
+		if button.text == "Manage through a person profile":
+			button.pressed.emit()
+			opened_management = true
+			break
+	assert(opened_management and screen.details_popup.visible and screen.profile_section == "Activities", "An unmanaged purchase opens its management profile")
+	for building_node in screen.village_view.map.building_nodes.values():
+		assert(screen.details_popup.z_index > building_node.z_index, "Person panels render above village icons")
+	var began_management := false
+	for button in screen.details_content.find_children("*","Button",true,false):
+		if button.text == "Begin managing":
+			button.pressed.emit()
+			began_management = true
+			break
+	assert(began_management and ui_state.village.business.assignments["farm"]["person_id"] == ui_state.head_id, "Purchased farms can be put to work from the village")
+	assert(ui_state.village.business.estimate(ui_state,"farm")["revenue_cents"] > 0)
 	assert(_valid(ui_state))
 	screen.free()
 	print("PASS: autonomous refusal, counteroffers, cooldown, affordability, ownership and money conservation, expiry, duplicate payment prevention, replay, saved offers and migration")

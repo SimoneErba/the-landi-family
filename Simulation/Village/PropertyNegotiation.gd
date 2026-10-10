@@ -27,7 +27,7 @@ static func valuation(state, parcel_id: String) -> int:
 	var building: Dictionary = dev.buildings.get(plot["building_id"], {})
 	if not building.is_empty() and building["status"] != "demolished":
 		price += roundi(dev.COST * .5 * building["level"] * (.5 + building["condition"] / 200.0))
-	return price
+	return price * dev.PROPERTY_VALUE_MULTIPLIER
 
 static func _asking_price(state, parcel_id: String) -> int:
 	var plot: Dictionary = state.village.development.parcels[parcel_id]

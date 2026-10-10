@@ -177,7 +177,7 @@ func _business(state) -> bool:
 	for parcel in dev.parcels.values():
 		if not dev.eligible(parcel["id"],type,"landi") or parcel["owner_id"] == "village" and not parcel["for_sale"]:
 			continue
-		var land: int = parcel["value_cents"] if parcel["owner_id"] == "village" else 0
+		var land: int = dev.land_value(parcel) if parcel["owner_id"] == "village" else 0
 		if state.economy.cash_cents <= reserve(state)+state.economy.purchase_cost(dev.COST+land):
 			continue
 		if land > 0:

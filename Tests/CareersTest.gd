@@ -61,7 +61,7 @@ func _run() -> void:
 		months += 1
 	assert(months < 120, "Training must complete")
 	assert(anna.education["level"] == "university" and "architecture_degree" in anna.education["qualifications"])
-	assert(anna.skills["design"] >= 65 and state.major_event)
+	assert(anna.skills["design"] >= 65 and not state.notifications.is_empty())
 	assert(anna.job == "Seeking work" and anna.monthly_income_cents == 0, "Graduation is not automatic employment")
 	assert(anna.career_view_for("Giovanni")["skills"]["design"] == "Competent", "Graduation provides evidence of learned skills")
 	assert(state.careers.job_assessment(anna, "architect")["eligible"])
@@ -136,7 +136,7 @@ func _run() -> void:
 	clock.state.people["Anna"].education["study"]["progress"] = 47.99
 	clock.play()
 	clock.advance_time(clock.seconds_per_month() * 4)
-	assert(not clock.is_playing and clock.state.elapsed_months == 1, "Graduation interrupts time catch-up")
+	assert(clock.is_playing and clock.state.elapsed_months == 4 and not clock.state.notifications.is_empty(), "Graduation notifies without interrupting time")
 	clock.free()
 
 	root.size = Vector2i(1920, 1080)
@@ -147,7 +147,7 @@ func _run() -> void:
 	assert(screen.careers_popup.visible and not screen.game_clock.is_playing)
 	assert(screen.careers_content.get_child(0).get_child(0).text.begins_with("Anna"))
 	screen._make_request("Anna", "train:architecture")
-	assert("Accepted" in screen.conversation_result and not screen.careers_popup.visible)
+	assert(screen.assignment_feedback["Anna:train:architecture"]["accepted"] and screen.careers_popup.visible)
 	screen._show_screen("Finances")
 	assert(screen.game_clock.state.economy.budget(screen.people, screen.game_clock.state.household["members"])["tuition_cents"] == 1800)
 	screen.free()

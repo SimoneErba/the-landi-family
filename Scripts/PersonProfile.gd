@@ -1,14 +1,15 @@
 extends RefCounted
 ## Essential identity first; deeper information is opened deliberately.
 const Activities = preload("res://Scripts/PersonActivities.gd")
-const SECTIONS := ["Activities", "Background", "Personality", "Values & state", "History"]
+const Marriage = preload("res://Scripts/PersonMarriage.gd")
+const SECTIONS := ["Activities", "Marriage", "Background", "Personality", "Values & state", "History"]
 static func build(host, person_id: String) -> void:
 	var state = host.game_clock.state
 	var model = state.people[person_id]
 	var person: Dictionary = model.view_for(state.head_id)
 	var parent: VBoxContainer = host.details_content
 	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 12)
+	header.add_theme_constant_override("separation", 6)
 	parent.add_child(header)
 	var title: Label = host._add_label(header, "%s · %d" % [model.name, model.age], 27, host.TEXT_MAIN)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -17,18 +18,21 @@ static func build(host, person_id: String) -> void:
 	header.add_child(close)
 	close.pressed.connect(host.details_popup.hide)
 	var identity := HBoxContainer.new()
-	identity.add_theme_constant_override("separation", 18)
+	identity.add_theme_constant_override("separation", 9)
 	parent.add_child(identity)
 	var portrait := PanelContainer.new()
+	portrait.name = "Portrait"
 	identity.add_child(portrait)
-	host._install_portrait(portrait, model, 128)
+	host._install_portrait(portrait, model, 88)
 	var essentials := VBoxContainer.new()
 	essentials.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	essentials.add_theme_constant_override("separation", 7)
+	essentials.add_theme_constant_override("separation", 4)
 	identity.add_child(essentials)
 	host._add_label(essentials, str(person["relationship"]).get_slice("·",0).strip_edges(), 16, host.TEXT_SUSPECTED)
 	host._add_label(essentials, model.status_text(), 16, host.TEXT_MAIN)
 	var location: String = state.travel.location_text(person_id)
+	if model.life_state.has("marriage_id") and not model.in_household and location.is_empty():
+		host._add_label(essentials, "Nearby branch household · still part of the family", 16, host.TEXT_KNOWN)
 	if not location.is_empty():
 		host._add_label(essentials, location, 16, host.TEXT_KNOWN)
 	var pregnancy: Dictionary = model.life_state.get("pregnancy", {})
@@ -49,15 +53,17 @@ static func build(host, person_id: String) -> void:
 	var plan: Dictionary = model.decision_state.get("plan", {})
 	if model.in_household and not plan.is_empty():
 		host._add_label(parent,"Current intention · " + str(plan["description"]),16,host.TEXT_SUSPECTED)
+		var timing: String = "Waiting for agreement on education funding." if str(plan.get("action", "")).begins_with("funding:") else "Preparing to act within %d months." % maxi(0, int(plan.get("due_month", state.elapsed_months)) - state.elapsed_months)
+		host._add_label(parent, timing, 16, host.TEXT_SUSPECTED)
 	if not host.conversation_result.is_empty():
 		host._add_flavor(parent, host.conversation_result, false)
 	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 10)
+	actions.add_theme_constant_override("separation", 5)
 	parent.add_child(actions)
 	if person_id != state.head_id:
 		var talk := Button.new()
 		talk.text = "Talk"
-		talk.disabled = not model.alive or not model.in_household
+		talk.disabled = not model.alive or (not model.in_household and not model.life_state.has("marriage_id")) or not state.travel.current(person_id).is_empty()
 		talk.pressed.connect(host._talk_to_person.bind(person_id))
 		actions.add_child(talk)
 		var request := Button.new()
@@ -65,6 +71,14 @@ static func build(host, person_id: String) -> void:
 		request.disabled = not model.alive
 		request.pressed.connect(host._open_influence_menu.bind(person_id))
 		actions.add_child(request)
+	if model.alive and model.age >= 18:
+		var marriage := Button.new()
+		marriage.text = "Marriage & dote"
+		marriage.pressed.connect(func():
+			host.profile_expanded = true
+			host.profile_section = "Marriage"
+			host._show_person(person_id, false))
+		actions.add_child(marriage)
 	var more := Button.new()
 	more.name = "ShowMore"
 	more.text = "Show less" if host.profile_expanded else "Show more"
@@ -74,12 +88,13 @@ static func build(host, person_id: String) -> void:
 	actions.add_child(more)
 	for button in actions.get_children():
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.custom_minimum_size.y = 40
+		button.custom_minimum_size.y = 28
+	host.Reaction.build(host, parent, person_id, "request")
 	if not host.profile_expanded:
 		return
 	var tabs := HBoxContainer.new()
 	tabs.name = "ProfileSections"
-	tabs.add_theme_constant_override("separation", 6)
+	tabs.add_theme_constant_override("separation", 3)
 	parent.add_child(tabs)
 	for section in SECTIONS:
 		var button := Button.new()
@@ -93,11 +108,13 @@ static func build(host, person_id: String) -> void:
 			host._show_person(person_id,false))
 	var content := VBoxContainer.new()
 	content.name = "ProfileSectionContent"
-	content.add_theme_constant_override("separation", 10)
+	content.add_theme_constant_override("separation", 5)
 	parent.add_child(content)
 	match host.profile_section:
 		"Activities":
 			Activities.build(host, content, person_id)
+		"Marriage":
+			Marriage.build(host, content, person_id)
 		"Background":
 			host._add_label(content,"Born %s %d · %s branch" % [state.MONTH_NAMES[model.birth_month-1], model.birth_year,model.branch_id],16,host.TEXT_MAIN)
 			if state.people.has(model.spouse_id):

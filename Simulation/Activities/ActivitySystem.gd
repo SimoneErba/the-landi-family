@@ -1,6 +1,7 @@
 extends RefCounted
 ## First monthly activity slice: consent, one commitment, funding and interruption.
 
+const Assignment = preload("res://Simulation/Assignment.gd")
 const Plan = preload("res://Simulation/Activities/ActivityPlan.gd")
 const CATALOG := {
 	"study": {"name": "Independent study", "months": 6, "cost": 300, "interest": "academic", "location": "school", "description": "Practice literacy for six months. Improves skills without awarding a qualification."},
@@ -50,26 +51,23 @@ func reason(state, person_id: String, activity_id: String, target_id: String = "
 func propose(state, person_id: String, activity_id: String, target_id: String = "") -> Dictionary:
 	var unavailable := reason(state, person_id, activity_id, target_id)
 	if not unavailable.is_empty():
-		return {"ok": false, "response": unavailable}
+		return Assignment.unavailable(unavailable)
 	var person = state.people[person_id]
 	var entry: Dictionary = CATALOG[activity_id]
-	var outcome := "accepted"
+	var score := 1.0
 	if person_id != state.head_id:
 		state.last_requests[person_id] = state.elapsed_months
 		var bond: Dictionary = person.relationships.get(state.head_id, {})
-		var score: float = person.interests[entry["interest"]] / 100.0 * 0.4 + person.values["family_loyalty"] * 0.25 + float(bond.get("trust", 0.4)) * 0.2
+		score = person.interests[entry["interest"]] / 100.0 * 0.4 + person.values["family_loyalty"] * 0.25 + float(bond.get("trust", 0.4)) * 0.2
 		score -= person.current_state["resentment"] * 0.4 + person.current_state["stress"] * 0.15 + person.learned_tendencies["need_for_autonomy"] * 0.15
-		outcome = "accepted" if score >= 0.3 else ("reluctant" if score >= 0.12 else "refused")
-	var response: String = person.name + (" agreed to " if outcome == "accepted" else " reluctantly agreed to ") + entry["name"].to_lower() + "."
-	if outcome == "refused":
-		response = person.name + " refused: I have other priorities."
-	elif outcome == "reluctant":
-		person.current_state["resentment"] = minf(1.0, person.current_state["resentment"] + 0.05)
+	var result: Dictionary = Assignment.resolve(person, score, {"study":"study independently", "repair":"repair Landi House", "visit":"visit the " + state.village.households[target_id].name if state.village.households.has(target_id) else "visit our neighbors"}[activity_id], "", person_id == state.head_id)
+	var response: String = result["response"]
+	if result["outcome"] == "reluctant": person.current_state["resentment"] = minf(1.0, person.current_state["resentment"] + 0.05)
 	person.memories.append({"kind": "activity_request", "date": state.date_text(), "description": response})
-	person.decision_state["observation"] = response
+	if result["accepted"]: person.decision_state["observation"] = entry["name"] + " is now a family commitment."
 	state.chronicle.append({"date": state.date_text(), "description": response})
-	if outcome == "refused":
-		return {"ok": false, "response": response}
+	if not result["accepted"]:
+		return result
 	var plan = Plan.new()
 	plan.id = "activity_%d" % next_id
 	next_id += 1
@@ -84,8 +82,11 @@ func propose(state, person_id: String, activity_id: String, target_id: String = 
 	plan.started_month = state.elapsed_months
 	plan.duration_months = entry["months"]
 	plan.monthly_cost_cents = entry["cost"]
+	plan.agreement = result["agreement"].duplicate(true)
 	plans[plan.id] = plan
-	return {"ok": true, "response": response, "plan_id": plan.id}
+	result["plan_id"] = plan.id
+	result["activity_id"] = plan.id
+	return result
 
 
 func cancel(state, plan_id: String) -> void:
@@ -94,7 +95,10 @@ func cancel(state, plan_id: String) -> void:
 	var plan = plans[plan_id]
 	plan.status = "cancelled"
 	plan.interruption_reason = ""
-	state.chronicle.append({"date": state.date_text(), "description": CATALOG[plan.activity_id]["name"] + " was cancelled. Earlier expenses are not refunded."})
+	var description: String = CATALOG[plan.activity_id]["name"] + " was cancelled. Earlier expenses are not refunded."
+	plan.outcome = {"description":description}
+	state.people[plan.accepted_participant_ids[0]].decision_state["observation"] = description
+	state.chronicle.append({"date":state.date_text(), "description":description})
 
 
 func advance_month(state) -> void:
@@ -123,11 +127,18 @@ func advance_month(state) -> void:
 			plan.status = "interrupted"
 			plan.interruption_reason = interruption
 			continue
+		if plan.progress_months >= 1 and Assignment.abandons(person, plan.agreement):
+			plan.status = "failed"
+			plan.outcome = {"description": person.name + " abandoned " + CATALOG[plan.activity_id]["name"].to_lower() + ": this responsibility has become too much."}
+			person.memories.append({"kind": "activity", "date": state.date_text(), "description": plan.outcome["description"]})
+			person.decision_state["observation"] = plan.outcome["description"]
+			_record(state, plan, plan.outcome["description"])
+			continue
 		plan.status = "active"
 		plan.interruption_reason = ""
 		state.events._cash(state, -plan.monthly_cost_cents, CATALOG[plan.activity_id]["name"])
 		var step: float = state.legacy.learning_multiplier() if plan.activity_id == "study" else 1.0
-		plan.progress_months = minf(plan.duration_months, plan.progress_months + step)
+		plan.progress_months = minf(plan.duration_months, plan.progress_months + step * Assignment.progress(person, plan.agreement))
 		person.current_state["stress"] = minf(1.0, person.current_state["stress"] + 0.015)
 		if plan.progress_months < plan.duration_months:
 			continue
@@ -159,7 +170,7 @@ func advance_month(state) -> void:
 
 func _record(state, plan, description: String) -> void:
 	state.chronicle.append({"date": state.date_text(), "description": CATALOG[plan.activity_id]["name"] + " — " + description})
-	state.major_event = true
+	state.notify(CATALOG[plan.activity_id]["name"] + " — " + description, plan.accepted_participant_ids[0])
 
 
 func to_save_data() -> Dictionary:

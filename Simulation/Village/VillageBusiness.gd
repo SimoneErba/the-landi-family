@@ -1,5 +1,6 @@
 extends RefCounted
 ## Monthly property production, with consent and limited management/labor.
+const Assignment = preload("res://Simulation/Assignment.gd")
 const CATALOG := {
 	"farm": {"revenue": 1100, "materials": 220, "upkeep": 70, "skill": "agriculture", "interest": "practical", "labor": 1},
 	"workshop": {"revenue": 1250, "materials": 400, "upkeep": 100, "skill": "craft", "interest": "practical", "labor": 1},
@@ -44,7 +45,7 @@ func reason(state, person_id: String, building_id: String) -> String:
 func propose(state, person_id: String, building_id: String) -> Dictionary:
 	var unavailable := reason(state,person_id,building_id)
 	if not unavailable.is_empty():
-		return {"ok":false,"response":unavailable}
+		return Assignment.unavailable(unavailable)
 	var person = state.people[person_id]
 	var building: Dictionary = state.village.development.buildings[building_id]
 	var entry: Dictionary = CATALOG[building["type"]]
@@ -53,17 +54,14 @@ func propose(state, person_id: String, building_id: String) -> Dictionary:
 		state.last_requests[person_id] = state.elapsed_months
 		var bond: Dictionary = person.relationships.get(state.head_id,{})
 		score = person.interests[entry["interest"]]/100.0*.4 + person.values["family_loyalty"]*.3 + float(bond.get("trust",.3))*.2 - person.current_state["resentment"]*.4 - person.current_state["stress"]*.2 - person.learned_tendencies["need_for_autonomy"]*.15
-	var accepted := score >= .12
-	var response: String = person.name + (" agreed to manage " if score >= .3 else " reluctantly agreed to manage ") + building["address"] + "."
-	if not accepted:
-		response = person.name + " refused: I cannot take on another family responsibility."
-	elif score < .3:
-		person.current_state["resentment"] = minf(1,person.current_state["resentment"]+.05)
-	if accepted:
-		assignments[building_id] = {"person_id":person_id,"started_month":state.elapsed_months}
+	var result: Dictionary = Assignment.resolve(person, score, "manage " + building["address"], building_id, person_id == state.head_id)
+	var response: String = result["response"]
+	if result["outcome"] == "reluctant": person.current_state["resentment"] = minf(1.0, person.current_state["resentment"] + .05)
+	if result["accepted"]:
+		assignments[building_id] = {"person_id":person_id,"started_month":state.elapsed_months,"agreement":result["agreement"].duplicate(true)}
 	person.memories.append({"kind":"business_request","date":state.date_text(),"description":response,"participants":[state.head_id]})
 	state.chronicle.append({"date":state.date_text(),"description":response})
-	return {"ok":accepted,"response":response}
+	return result
 
 func release(state, building_id: String, explanation: String = "The management responsibility ended.") -> void:
 	if not assignments.has(building_id):
@@ -142,7 +140,7 @@ func advance_month(state) -> void:
 			release(state,building_id,"The business or its manager is no longer available.")
 		elif person.id != state.head_id and (person.current_state["resentment"] >= .8 or (person.current_state["stress"] >= .9 and person.values["independence"] > .6)):
 			release(state,building_id,"They refused to continue under this pressure.")
-			state.major_event = true
+			state.notify(person.name + " stopped managing the business under pressure.", person.id)
 	var labor: Dictionary = {}
 	for owner in state.village.households:
 		labor[owner] = maxi(1,state.village.development.household_sizes[owner]/2)
@@ -171,6 +169,7 @@ func advance_month(state) -> void:
 				# full time leaves room for the ordinary monthly recovery.
 				var pressure := .016 if person.monthly_income_cents > 0 else .008
 				person.current_state["stress"] = minf(1,person.current_state["stress"]+pressure)
+				Assignment.progress(person, assignments[building["id"]].get("agreement", {}))
 				var skill: String = CATALOG[building["type"]]["skill"]
 				person.skills[skill] = minf(100,person.skills[skill]+.4*state.legacy.learning_multiplier())
 			else:
@@ -197,6 +196,7 @@ static func valid(data: Variant, state: Dictionary) -> bool:
 		var assignment: Variant = data["assignments"][id]
 		if not id is String or not buildings.has(id) or not assignment is Dictionary or not assignment.get("person_id") is String or not assignment.get("started_month") is int or not state["people"].has(assignment["person_id"]) or seen.has(assignment["person_id"]) or assignment["started_month"] < 0 or assignment["started_month"] > state["elapsed_months"]:
 			return false
+		if not Assignment.valid(assignment.get("agreement", {})): return false
 		seen[assignment["person_id"]] = true
 	var previous := -1
 	for report in data["reports"]:
