@@ -48,17 +48,18 @@ static func open_candidates(host, person_id: String) -> void:
 		if is_instance_valid(host.marriage_popup): host.marriage_popup.hide()
 		return
 	if not is_instance_valid(host.marriage_popup):
-		host.marriage_popup = PopupPanel.new()
+		host.marriage_popup = host.InlinePanel.new()
+		host.marriage_popup.hide()
 		host.marriage_popup.name = "MarriageCandidates"
-		host.marriage_popup.add_theme_stylebox_override("panel", host.Archive.window_frame())
+		host.marriage_popup.add_theme_stylebox_override("panel", host.Archive.modal_frame())
 		host.add_child(host.marriage_popup)
 	if host.marriage_person_id != person_id:
 		host.marriage_candidate_id = ""
 	host.marriage_person_id = person_id
-	var popup: PopupPanel = host.marriage_popup
+	var popup: PanelContainer = host.marriage_popup
 	var viewport_size: Vector2 = host.get_viewport_rect().size
 	var dimensions := Vector2i(int(minf(860, viewport_size.x - 32)), int(minf(480, viewport_size.y - 32)))
-	popup.size = dimensions
+	popup.size = Vector2(dimensions)
 	for child in popup.get_children():
 		popup.remove_child(child)
 		child.queue_free()
@@ -112,7 +113,7 @@ static func open_candidates(host, person_id: String) -> void:
 		if button.button_pressed: _proposal(host, detail, person_id, proposal)
 	if proposals.is_empty(): host._add_label(detail, "No available candidates.", 16, host.TEXT_MUTED)
 	if popup.visible:
-		popup.size = dimensions
+		popup.size = Vector2(dimensions)
 	else:
 		popup.popup_centered(dimensions)
 	# Shrink after the first layout pass, when wrapped text has its final width.

@@ -135,7 +135,7 @@ layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="FamilyList" type="VBoxContainer" parent="PageMargins/Page/RosterScroll"]
+[node name="FamilyList" type="HFlowContainer" parent="PageMargins/Page/RosterScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 5

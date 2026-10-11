@@ -10,7 +10,6 @@ static func build(host, parent: VBoxContainer, person_id: String) -> void:
 		underway.text = "Activity underway"
 		underway.disabled = true
 		parent.add_child(underway)
-		host.Reaction.build(host, parent, person_id, "activity")
 		host._add_label(parent, state.activities.CATALOG[active.activity_id]["name"], 22, host.TEXT_MAIN)
 		host._add_label(parent, "%s · %.1f / %d months · %s per active month" % [active.status.capitalize(), active.progress_months, active.duration_months, state.economy.money(state.economy.purchase_cost(active.monthly_cost_cents))], 16, host.TEXT_MAIN)
 		if not active.interruption_reason.is_empty():
@@ -53,7 +52,6 @@ static func build(host, parent: VBoxContainer, person_id: String) -> void:
 		request.custom_minimum_size.y = 28
 		request.text = "Begin activity" if person_id == state.head_id else "Ask to take part"
 		parent.add_child(request)
-		host.Reaction.build(host, parent, person_id, "activity")
 		var refresh := func(_index = 0):
 			var id: String = ids[choice.selected]
 			host.gameplay_activity_id = id
@@ -87,7 +85,6 @@ static func _business(host, parent: VBoxContainer, person_id: String) -> void:
 	var business = state.village.business
 	var assigned: String = business.commitment(person_id)
 	if not assigned.is_empty():
-		host.Reaction.build(host, parent, person_id, "business")
 		host._add_label(parent, "Managing " + state.village.development.buildings[assigned]["address"], 22, host.TEXT_MAIN)
 		host._add_label(parent, "A continuing responsibility: earns business income, builds skill and adds pressure alongside their regular job. Courses, activities and travel need a replacement manager.", 16, host.TEXT_MUTED)
 		var release := Button.new()
@@ -113,7 +110,6 @@ static func _business(host, parent: VBoxContainer, person_id: String) -> void:
 	var request := Button.new()
 	request.text = "Begin managing" if person_id == state.head_id else "Ask to manage"
 	parent.add_child(request)
-	host.Reaction.build(host, parent, person_id, "business")
 	var refresh := func(_index = 0):
 		var reason: String = business.reason(state, person_id, ids[choice.selected])
 		explanation.text = reason if not reason.is_empty() else "A long-term responsibility; relatives may refuse or later resign under pressure."

@@ -43,7 +43,8 @@ func _ready() -> void:
 	refresh(true)
 
 func _map_rect() -> Rect2:
-	var dimensions := Vector2(1100, 650) * minf(size.x / 1100.0, size.y / 650.0) * zoom
+	# Fill the viewport; surplus terrain is accessible by panning.
+	var dimensions := Vector2(1100, 650) * maxf(size.x / 1100.0, size.y / 650.0) * zoom
 	return Rect2((size - dimensions) / 2 + pan, dimensions)
 
 func _place_world() -> void:

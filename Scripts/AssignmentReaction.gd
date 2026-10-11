@@ -26,5 +26,7 @@ static func build(host, parent: Node, person_id: String, context: String) -> voi
 	var remaining := maxf(0, 6.0 - (Time.get_ticks_msec() - int(reaction["created_msec"])) / 1000.0)
 	text.text = compact + ("\n“" + str(reaction["dialogue"]) + "”" if remaining > 0 else "")
 	if remaining > 0:
+		var text_ref: WeakRef = weakref(text)
 		host.get_tree().create_timer(remaining).timeout.connect(func():
-			if is_instance_valid(text): text.text = compact)
+			var label = text_ref.get_ref()
+			if label != null: label.text = compact)

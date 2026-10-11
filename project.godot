@@ -18,6 +18,10 @@ config/name="The Landi family"
 run/main_scene="res://Scenes/FamilyScreen.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
+[autoload]
+
+Soundtrack="*res://Scripts/Soundtrack.gd"
+
 [display]
 
 window/size/viewport_width=1920

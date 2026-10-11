@@ -39,6 +39,8 @@ Manage Landi House's space and condition, watch the shared finances, visit neigh
 3. Select a portrait to meet someone. Try **Talk**, **Make a request**, or **Marriage & dote**.
 4. Use the time controls to advance the story, and **Save** to keep your family.
 
+The soundtrack cycles through Satie’s **Gymnopédie No. 1**, Liszt’s **Consolation No. 3**, and Debussy’s **Rêverie**, with 30–60 seconds of birdsong, wind and distant church bells between pieces. Open **Menu → Settings** to mute audio or adjust music and ambience volume. Preferences are saved between sessions; all recordings are bundled for offline playback. See the [audio credits](Assets/Audio/CREDITS.md).
+
 This is a work-in-progress prototype. Marriage, children, education, careers, property and travel are playable; full succession and richer inheritance are still planned.
 
 For setup, controls, simulation details and tests, see the [development guide](Docs/Development-Guide.md). The [marriage model](Docs/Marriage-and-Dowry.md) explains dowry and family favors; the [roadmap](todo/README.md) describes what comes next.

@@ -23,11 +23,15 @@ static func box(texture: Texture2D, edge: float, padding: float) -> StyleBoxText
 
 
 static func window_frame() -> StyleBoxFlat:
+	return paper_panel(12, 0)
+
+
+static func modal_frame() -> StyleBoxFlat:
 	return paper_panel(12, 2)
 
 
 static func card() -> StyleBoxFlat:
-	return paper_panel(6, 1)
+	return paper_panel(8, 0)
 
 
 static func paper_panel(padding: int, border: int) -> StyleBoxFlat:
@@ -45,11 +49,8 @@ static func wood_panel() -> StyleBoxTexture:
 
 
 static func style_button(button: Button) -> void:
-	button.add_theme_stylebox_override("normal", box(NORMAL, 16, 5))
-	button.add_theme_stylebox_override("hover", box(HOVER, 16, 5))
-	button.add_theme_stylebox_override("pressed", box(ACTIVE, 16, 5))
-	button.add_theme_stylebox_override("hover_pressed", box(ACTIVE, 16, 5))
-	button.add_theme_stylebox_override("disabled", box(DISABLED, 16, 5))
+	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
+		button.add_theme_stylebox_override(state, button_surface(state))
 	button.add_theme_color_override("font_color", Color("#f2e0bc"))
 	button.add_theme_color_override("font_hover_color", Color("#fff0d0"))
 	button.add_theme_color_override("font_pressed_color", Color("#fff1cf"))
@@ -60,6 +61,14 @@ static func style_button(button: Button) -> void:
 	focus.border_color = Color("#e0c082")
 	focus.set_border_width_all(2)
 	button.add_theme_stylebox_override("focus", focus)
+
+
+static func button_surface(state: String, _navigation := false) -> StyleBoxTexture:
+	var texture: Texture2D = NORMAL
+	if state == "hover": texture = HOVER
+	if state in ["pressed", "hover_pressed"]: texture = ACTIVE
+	if state == "disabled": texture = DISABLED
+	return box(texture, 16, 5)
 
 
 static func compact_font_size(size: int) -> int:
@@ -82,17 +91,13 @@ static func create() -> Theme:
 	theme.set_color("font_color", "FlavorText", Color("#786b59"))
 	theme.set_color("font_color", "Label", Color("#392b20"))
 	theme.set_stylebox("panel", "PanelContainer", window_frame())
-	theme.set_stylebox("panel", "PopupPanel", window_frame())
-	theme.set_stylebox("panel", "PopupMenu", window_frame())
+	theme.set_stylebox("panel", "PopupPanel", modal_frame())
+	theme.set_stylebox("panel", "PopupMenu", modal_frame())
 	theme.set_color("font_color", "PopupMenu", Color("#392b20"))
 	theme.set_color("font_hover_color", "PopupMenu", Color("#f6e6c5"))
-	theme.set_stylebox("hover", "PopupMenu", box(HOVER, 16, 5))
+	theme.set_stylebox("hover", "PopupMenu", button_surface("hover"))
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-		var texture: Texture2D = NORMAL
-		if state == "hover": texture = HOVER
-		if state in ["pressed", "hover_pressed"]: texture = ACTIVE
-		if state == "disabled": texture = DISABLED
-		theme.set_stylebox(state, "Button", box(texture, 16, 5))
+		theme.set_stylebox(state, "Button", button_surface(state))
 	for state in ["font_color", "font_hover_color", "font_pressed_color"]:
 		theme.set_color(state, "Button", Color("#f2e0bc"))
 	theme.set_color("font_disabled_color", "Button", Color("#a79880"))
@@ -117,9 +122,9 @@ static func create() -> Theme:
 	theme.set_stylebox("panel", "TooltipPanel", card())
 	theme.set_color("font_color", "TooltipLabel", Color("#392b20"))
 	theme.set_stylebox("panel", "TabContainer", card())
-	theme.set_stylebox("tab_selected", "TabContainer", box(ACTIVE, 16, 5))
-	theme.set_stylebox("tab_unselected", "TabContainer", box(NORMAL, 16, 5))
-	theme.set_stylebox("tab_hovered", "TabContainer", box(HOVER, 16, 5))
+	theme.set_stylebox("tab_selected", "TabContainer", button_surface("pressed"))
+	theme.set_stylebox("tab_unselected", "TabContainer", button_surface("normal"))
+	theme.set_stylebox("tab_hovered", "TabContainer", button_surface("hover"))
 	theme.set_color("font_selected_color", "TabContainer", Color("#fff0d0"))
 	theme.set_color("font_unselected_color", "TabContainer", Color("#dec9a1"))
 	return theme

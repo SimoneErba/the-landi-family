@@ -13,16 +13,20 @@ static func _column(host) -> VBoxContainer:
 
 
 static func village(host) -> void:
-	var column := _column(host)
+	var column := VBoxContainer.new()
+	column.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 8)
+	host.content_overlay.add_child(column)
 	var state = host.game_clock.state
 	host._add_label(column, "The village", 32, host.TEXT_MAIN)
 	var village_view := preload("res://Scripts/VillageScreen.gd").new()
 	village_view.host = host
 	host.village_view = village_view
 	column.add_child(village_view)
-	host._add_label(column, "Neighboring families", 24, host.TEXT_SUSPECTED)
+	var neighbors: VBoxContainer = village_view.neighbors
+	host._add_label(neighbors, "Neighboring families", 24, host.TEXT_SUSPECTED)
 	for family in state.village.households.values():
-		var content := _card(host, column)
+		var content := _card(host, neighbors)
 		host._add_label(content, family.name, 22, host.TEXT_MAIN)
 		host._add_label(content, "Ambition · " + family.ambitions[0], 17, host.TEXT_MUTED)
 		var bond: Dictionary = family.relationships["landi"]

@@ -38,6 +38,16 @@ func _run() -> void:
 	assert(columns.get_node("Story").position.x < columns.get_node("Actions").position.x)
 	assert(columns.get_node("Actions/Choice0").get_child(0).get_child(0) is Button)
 	assert(screen.event_popup.visible and not screen.game_clock.is_playing)
+	var roster = screen.get_node("PageMargins/Page/RosterScroll/FamilyList")
+	assert(roster is HFlowContainer)
+	assert(is_equal_approx(roster.get_node("Giovanni").position.y, roster.get_node("Maria").position.y), "Wide rosters display people alongside one another")
+	var card_width: float = roster.get_node("Giovanni").size.x
+	screen._resolve_event(int(state.events.pending[0]["serial"]), 0)
+	await process_frame
+	await process_frame
+	assert(is_equal_approx(roster.get_node("Giovanni").position.y, roster.get_node("Maria").position.y), "Resolving an event retains roster columns")
+	assert(is_equal_approx(roster.get_node("Giovanni").size.x, card_width))
+	assert(state.events.trigger(state, "repairs_01"))
 	screen.event_popup.hide()
 	root.size = Vector2i(720, 900)
 	root.content_scale_size = Vector2i(720, 900)

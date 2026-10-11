@@ -3,15 +3,14 @@ const Map = preload("res://Scripts/ItalyMap.gd")
 
 static func build(host) -> void:
 	var state = host.game_clock.state
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	host.content_overlay.add_child(scroll)
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_theme_constant_override("separation", 8)
-	scroll.add_child(column)
+	host.content_overlay.add_child(column)
 	host._add_label(column, "Italy · cities and journeys", 32, host.TEXT_MAIN)
 	var row := HBoxContainer.new()
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 12)
 	column.add_child(row)
 	var map_scroll := ScrollContainer.new()
@@ -19,6 +18,7 @@ static func build(host) -> void:
 	map_scroll.tooltip_text = "Scroll to explore · drag to pan · select a city"
 	map_scroll.custom_minimum_size = Vector2(560, 520)
 	map_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	map_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	map_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	map_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	row.add_child(map_scroll)
@@ -35,11 +35,15 @@ static func build(host) -> void:
 		if new_scroll != null:
 			new_scroll.set_deferred("scroll_horizontal", int(map_position.x))
 			new_scroll.set_deferred("scroll_vertical", int(map_position.y)))
+	var detail_scroll := ScrollContainer.new()
+	detail_scroll.custom_minimum_size.x = 340
+	detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	row.add_child(detail_scroll)
 	var detail := VBoxContainer.new()
 	detail.custom_minimum_size.x = 320
-	detail.size_flags_horizontal = Control.SIZE_FILL
+	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	detail.add_theme_constant_override("separation", 8)
-	row.add_child(detail)
+	detail_scroll.add_child(detail)
 	var city: Dictionary = state.travel.CITIES[host.travel_city_id]
 	host._add_label(detail, city["name"], 28, host.TEXT_SUSPECTED)
 	var city_engraving := TextureRect.new()
@@ -93,13 +97,13 @@ static func build(host) -> void:
 		host.Reaction.remember(host, result, "", "travel")
 		host._refresh_time_controls())
 	host.Reaction.build(host, detail, "", "travel")
-	host._add_label(column, "Family journeys", 24, host.TEXT_SUSPECTED)
+	host._add_label(detail, "Family journeys", 24, host.TEXT_SUSPECTED)
 	if state.travel.journeys.is_empty():
-		host._add_label(column, "No active journeys.", 17, host.TEXT_MUTED)
+		host._add_label(detail, "No active journeys.", 17, host.TEXT_MUTED)
 	for journey in state.travel.journeys.values():
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 4)
-		column.add_child(box)
+		detail.add_child(box)
 		var person = state.people[journey["person_id"]]
 		host._add_label(box, person.name + " · " + state.travel.CITIES[journey["city_id"]]["name"] + " · " + state.travel.PURPOSES[journey["purpose_id"]]["name"], 21, host.TEXT_MAIN)
 		var status: String = journey["status"].capitalize()

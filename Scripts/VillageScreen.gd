@@ -15,6 +15,7 @@ var neighbors: VBoxContainer
 func _ready() -> void:
 	add_theme_constant_override("separation", 6)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var toolbar := HBoxContainer.new()
 	toolbar.add_theme_constant_override("separation", 6)
 	add_child(toolbar)
@@ -39,12 +40,14 @@ func _ready() -> void:
 	timeline.custom_minimum_size.y = 24
 	add_child(timeline)
 	var row := HBoxContainer.new()
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 9)
 	add_child(row)
 	map = Map.new()
 	map.tooltip_text = "Wheel to zoom · middle or right drag to pan · select a building or parcel"
 	map.development = host.game_clock.state.village.development
 	map.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	map.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(map)
 	var frame := PanelContainer.new()
 	frame.custom_minimum_size.x = 300
@@ -57,11 +60,18 @@ func _ready() -> void:
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	margin.add_child(scroll)
+	var sidebar := VBoxContainer.new()
+	sidebar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sidebar.add_theme_constant_override("separation", 16)
+	scroll.add_child(sidebar)
 	inspector = VBoxContainer.new()
 	inspector.custom_minimum_size.x = 276
 	inspector.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	inspector.add_theme_constant_override("separation", 5)
-	scroll.add_child(inspector)
+	sidebar.add_child(inspector)
+	neighbors = VBoxContainer.new()
+	neighbors.add_theme_constant_override("separation", 6)
+	sidebar.add_child(neighbors)
 	map.building_selected.connect(func(id):
 		selected_kind = "building"
 		selected_id = id

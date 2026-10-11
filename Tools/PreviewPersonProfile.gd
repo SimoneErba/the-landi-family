@@ -2,8 +2,8 @@ extends SceneTree
 func _initialize() -> void:
 	call_deferred("_run")
 func _capture(screen, path: String) -> void:
-	await process_frame
-	await process_frame
+	for frame in range(5):
+		await process_frame
 	await RenderingServer.frame_post_draw
 	assert(screen.details_popup.get_texture().get_image().save_png(path) == OK)
 func _run() -> void:
@@ -15,7 +15,8 @@ func _run() -> void:
 	await _capture(screen,"res://.godot/person-essential-preview.png")
 	screen._open_person_activity("study")
 	await _capture(screen,"res://.godot/person-activities-preview.png")
-	screen.profile_section = "Personality"
-	screen._show_person("Carlo",false)
+	preload("res://Scripts/PersonProfile.gd").jump_to(screen, "Personality")
 	await _capture(screen,"res://.godot/person-personality-preview.png")
+	preload("res://Scripts/PersonProfile.gd").jump_to(screen, "Skills")
+	await _capture(screen,"res://.godot/person-skills-preview.png")
 	quit()
