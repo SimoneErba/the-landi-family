@@ -91,7 +91,7 @@ static func advance_month(state, person) -> void:
 
 static func _choose(state, person, include_funding: bool = true) -> Dictionary:
 	var choices: Array = []
-	var studying: bool = not person.education["study"].is_empty()
+	var studying: bool = not person.education["study"].is_empty() and not person.education["study"].get("suspended", false)
 	var committed: bool = state.activities.commitment(person.id) != null or not state.village.business.commitment(person.id).is_empty()
 	var loyalty: float = person.values["family_loyalty"]
 	var security: float = person.values["security"]

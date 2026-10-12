@@ -9,6 +9,25 @@ func _button(parent: Node, caption: String):
 		if button.text == caption: return button
 	return null
 
+func _assert_expenses_reconcile(parent: Node) -> void:
+	var sum := 0
+	var total := -1
+	var collecting := false
+	var columns = parent.find_child("LedgerColumns", true, false)
+	var expenses = columns.get_child(1)
+	for row in expenses.get_children():
+		if not row is HBoxContainer or row.get_child_count() != 2: continue
+		var caption = row.get_child(0)
+		var value = row.get_child(1)
+		if not caption is Label or not value is Label: continue
+		if caption.text.begins_with("Food ·"): collecting = true
+		if caption.text == "Total household expenses":
+			total = roundi(value.text.replace(" L.", "").to_float() * 100)
+			break
+		if collecting:
+			sum += roundi(value.text.replace(" L.", "").to_float() * 100)
+	assert(total >= 0 and sum == total, "Displayed expense rows must sum to the displayed total")
+
 func _run() -> void:
 	root.size = Vector2i(1920, 1080)
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
@@ -31,6 +50,13 @@ func _run() -> void:
 	var chart = screen.finance_content.find_child("TreasuryHistory", true, false)
 	assert(chart.entries.is_empty(), "Do not fabricate financial history")
 	assert(_button(screen.finance_content, "Explore village businesses →") != null)
+	# Reconcile the actual rendered values across changes to household and milling duties.
+	for year in [1800, 1867, 1869, 1881]:
+		state.year = year
+		screen._refresh_finances()
+		_assert_expenses_reconcile(screen.finance_content)
+	state.year = 1800
+	screen._refresh_finances()
 	# Exact amounts come from the settled ledger, with twelve months retained in the view.
 	for index in range(14):
 		state.economy.settle_month("%s 1800" % state.MONTH_NAMES[index % 12], state.people, state.household["members"])
@@ -43,7 +69,7 @@ func _run() -> void:
 	assert(chart.amount(chart.entries.back()) == state.economy.ledger.back()["closing_cents"])
 	_button(screen.finance_content, "Expenses").pressed.emit()
 	assert(chart.series == "expenses")
-	assert(chart.amount(chart.entries.back()) == state.economy.ledger.back()["food_cents"] + state.economy.ledger.back()["tuition_cents"])
+	assert(chart.amount(chart.entries.back()) == state.economy.ledger.back()["expenses_cents"])
 	screen._refresh_time_controls()
 	chart = screen.finance_content.find_child("TreasuryHistory", true, false)
 	assert(chart.series == "expenses", "Playback refreshes retain the selected series")

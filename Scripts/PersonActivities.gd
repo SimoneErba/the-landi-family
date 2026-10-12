@@ -4,6 +4,7 @@ static func build(host, parent: VBoxContainer, person_id: String) -> void:
 	var state = host.game_clock.state
 	var model = state.people[person_id]
 	_business(host, parent, person_id)
+	preload("res://Scripts/PersonSocialLife.gd").activities(host, parent, person_id)
 	var active = state.activities.commitment(person_id)
 	if active != null:
 		var underway := Button.new()
@@ -14,6 +15,12 @@ static func build(host, parent: VBoxContainer, person_id: String) -> void:
 		host._add_label(parent, "%s · %.1f / %d months · %s per active month" % [active.status.capitalize(), active.progress_months, active.duration_months, state.economy.money(state.economy.purchase_cost(active.monthly_cost_cents))], 16, host.TEXT_MAIN)
 		if not active.interruption_reason.is_empty():
 			host._add_label(parent, active.interruption_reason, 16, host.TEXT_SUSPECTED)
+		var pause := Button.new()
+		pause.text = "Resume activity" if active.status == "paused" else "Pause activity"
+		parent.add_child(pause)
+		pause.pressed.connect(func():
+			state.activities.pause_plan(state, active.id)
+			host._refresh_time_controls())
 		var cancel := Button.new()
 		cancel.text = "Cancel activity"
 		parent.add_child(cancel)
@@ -70,7 +77,7 @@ static func build(host, parent: VBoxContainer, person_id: String) -> void:
 			host._refresh_time_controls())
 	var recent: Array = []
 	for plan in state.activities.plans.values():
-		if person_id in plan.accepted_participant_ids and plan.status not in ["active", "interrupted"]:
+		if person_id in plan.accepted_participant_ids and plan.status in ["completed", "failed", "cancelled"]:
 			recent.append(plan)
 	if not recent.is_empty():
 		host._add_label(parent, "Recent outcomes", 20, host.TEXT_SUSPECTED)

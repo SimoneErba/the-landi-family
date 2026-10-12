@@ -2,6 +2,7 @@ extends RefCounted
 ## Isolated, deterministic century simulations; never reads/writes player saves.
 const State = preload("res://Simulation/GameState.gd")
 const Player = preload("res://Simulation/Testing/SimulatedPlayer.gd")
+const StartingFamily = preload("res://Simulation/StartingFamily.gd")
 const DEFAULTS := {"years":100,"seeds":3,"seed_start":1,"strategies":["passive","frugal","education","enterprise","family"],"bonus":"discount","objective":"wealth"}
 
 static func validate(config: Dictionary) -> String:
@@ -19,6 +20,10 @@ static func validate(config: Dictionary) -> String:
 		seen[strategy] = true
 	if config.get("bonus") not in State.Legacy.BONUSES or config.get("objective") not in State.Legacy.OBJECTIVES:
 		return "Unknown bonus or objective."
+	if config.get("starting_family", "authored") != "authored" and not StartingFamily.OPTIONS.has(config.get("starting_family")):
+		return "Unknown starting family."
+	if config.get("event_policy", "strategy") not in ["strategy", "first_legal"]:
+		return "Unknown event policy."
 	return ""
 
 static func snapshot(state) -> Dictionary:
@@ -61,11 +66,16 @@ static func run_one(config: Dictionary, strategy: String, seed: int) -> Dictiona
 	if not error.is_empty() or strategy not in config["strategies"]:
 		return {"status":"invalid","error":error if not error.is_empty() else "Strategy not configured."}
 	var state = State.new()
-	state.initialize(JSON.parse_string(FileAccess.get_file_as_string("res://Data/people.json")))
+	var starting_family: String = config.get("starting_family", "authored")
+	if starting_family == "authored":
+		state.initialize(JSON.parse_string(FileAccess.get_file_as_string("res://Data/people.json")))
+	else:
+		state.initialize(StartingFamily.create_people(starting_family))
 	state.legacy.choose(config["objective"],config["bonus"])
 	state.events.prepare_economy(state)
 	state.events.rng.seed = seed
-	var player = Player.new(strategy)
+	state.succession.rng.seed = seed + 7301
+	var player = Player.new(strategy, config.get("event_policy", "strategy"))
 	var checkpoints: Array = [snapshot(state)]
 	var peak_living: int = checkpoints[0]["living"]
 	var min_cash: int = state.economy.cash_cents
@@ -73,10 +83,22 @@ static func run_one(config: Dictionary, strategy: String, seed: int) -> Dictiona
 	var first_debt := -1
 	var pauses := 0
 	var total_business_net := 0
+	var total_income := 0
+	var total_food := 0
+	var total_household_taxes := 0
+	var total_tuition := 0
 	var completed_month := -1
 	var status := "completed"
 	var failure := ""
 	for month_index in config["years"]*12:
+		if state.succession.ended:
+			status = "family_ended"
+			break
+		if state.succession.pending:
+			failure = state.succession.continue_as(state, state.succession.default_successor(state))
+			if not failure.is_empty():
+				status = "stalled"
+				break
 		failure = player.resolve_events(state)
 		if not failure.is_empty():
 			status = "stalled"
@@ -88,6 +110,11 @@ static func run_one(config: Dictionary, strategy: String, seed: int) -> Dictiona
 			status = "stalled"
 			failure = "Month did not advance."
 			break
+		var monthly: Dictionary = state.economy.ledger.back()
+		total_income += int(monthly["income_cents"])
+		total_food += int(monthly["food_cents"])
+		total_household_taxes += int(monthly.get("taxes_cents", 0))
+		total_tuition += int(monthly["tuition_cents"])
 		if state.major_event or not state.events.pending.is_empty():
 			pauses += 1
 		failure = player.resolve_events(state)
@@ -112,15 +139,22 @@ static func run_one(config: Dictionary, strategy: String, seed: int) -> Dictiona
 		peak_living = maxi(peak_living,living)
 		if state.elapsed_months % 12 == 0:
 			checkpoints.append(snapshot(state))
+	if state.succession.ended:
+		status = "family_ended"
+	elif state.succession.pending:
+		state.succession.continue_as(state, state.succession.default_successor(state))
 	var final := snapshot(state)
+	final["heads_played"] = state.succession.history.size() + 1
+	final["loan_principal_cents"] = state.loans.principal_cents()
 	if checkpoints.back()["month"] != final["month"]:
 		checkpoints.append(final)
 	var warnings: Array[String] = []
 	if final["living_over_100"] > 0:
-		warnings.append("People over 100 remain alive: mortality and succession are incomplete.")
+		warnings.append("People over 100 remain alive with mortality disabled.")
 	if final["unfulfilled_marriage_goals"] > 0:
 		warnings.append("Accepted marriage requests remain goals; new partners are not generated.")
-	return {"strategy":strategy,"seed":seed,"status":status,"error":failure,"months_simulated":state.elapsed_months,"first_debt_month":first_debt,"debt_months":debt_months,"minimum_cash_cents":min_cash,"peak_living":peak_living,"major_pause_months":pauses,"objective_completed_month":completed_month,"business_net_basis_cents":total_business_net,"decisions":player.counts,"last_100_decisions":player.decisions,"checkpoints":checkpoints,"final":final,"warnings":warnings}
+	var final_budget: Dictionary = state.economy.budget(state.people, state.household["members"], state.household, state.year, state.month, state.tax_property_assessment())
+	return {"strategy":strategy,"seed":seed,"status":status,"error":failure,"months_simulated":state.elapsed_months,"first_debt_month":first_debt,"debt_months":debt_months,"minimum_cash_cents":min_cash,"peak_living":peak_living,"major_pause_months":pauses,"objective_completed_month":completed_month,"business_net_basis_cents":total_business_net,"income_basis_cents":total_income,"food_basis_cents":total_food,"household_tax_basis_cents":total_household_taxes,"tuition_basis_cents":total_tuition,"final_monthly_budget":final_budget,"decisions":player.counts,"last_100_decisions":player.decisions,"checkpoints":checkpoints,"final":final,"warnings":warnings}
 
 static func summarize(runs: Array) -> Dictionary:
 	var groups: Dictionary = {}

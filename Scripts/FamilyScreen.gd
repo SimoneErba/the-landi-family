@@ -21,6 +21,8 @@ const TEXT_UNKNOWN := Color("#62707a")
 const NAV_TEXT := Color("#f5e4c4")
 
 var people: Dictionary = {}
+var starting_people: Dictionary = {}
+var loaded_game := false
 var details_popup: PanelContainer
 var marriage_popup: PanelContainer
 var marriage_person_id: String = ""
@@ -52,6 +54,8 @@ var gameplay_activity_id: String = "study"
 var gameplay_target_id: String = "rossi"
 var village_view: Control
 var focus_overlay: Control
+var succession_overlay: Control
+var displayed_succession_head := ""
 var legacy_status: Label
 var finance_series := "treasury"
 var navigation_standing: Label
@@ -78,6 +82,7 @@ var house_note: Label
 var portraits_ready := false
 var family_frame: Panel
 var month_progress_bar: ProgressBar
+var journal_page: PanelContainer
 const NAV_WIDTH := 192.0
 
 
@@ -92,9 +97,18 @@ func _ready() -> void:
 	_build_archive_surround()
 	resized.connect(_update_page_bounds)
 	_update_page_bounds()
-	_load_people()
-	game_clock.state.initialize(people)
+	if not loaded_game:
+		if starting_people.is_empty():
+			_load_people()
+		else:
+			people = starting_people
+		game_clock.state.initialize(people)
 	people = game_clock.state.people
+	# The scene contains seven authored cards; smaller starts remove absent relatives.
+	for card in $PageMargins/Page/RosterScroll/FamilyList.get_children():
+		if card is PanelContainer and not people.has(str(card.name)):
+			card.get_parent().remove_child(card)
+			card.queue_free()
 	add_child(game_clock)
 	_build_time_controls()
 	_build_details_popup()
@@ -120,6 +134,9 @@ func _ready() -> void:
 	_update_page_bounds()
 	_show_screen("People")
 	_show_focus()
+	_refresh_succession()
+	if loaded_game and not game_clock.state.events.pending.is_empty():
+		call_deferred("_show_pending_event")
 
 
 func _exit_tree() -> void:
@@ -240,6 +257,8 @@ func _add_time_button(parent: Node, caption: String, action: Callable) -> Button
 
 
 func _refresh_time_controls() -> void:
+	if is_instance_valid(journal_page): journal_page.refresh()
+	_refresh_succession()
 	_refresh_notifications()
 	period_label.text = game_clock.state.date_text()
 	if is_instance_valid(navigation_date): navigation_date.text = "TUSCAN COUNTRYSIDE · %d" % game_clock.state.year
@@ -259,7 +278,7 @@ func _refresh_time_controls() -> void:
 		if is_instance_valid(house_note):
 			house_note.text = "Rooms: " + ", ".join(game_clock.state.household["rooms"])
 	_refresh_legacy()
-	if current_screen in ["Italy", "Family Tree"]:
+	if current_screen in ["Italy", "Family Tree", "Laws", "Succession"]:
 		_show_screen(current_screen)
 	elif current_screen == "Village" and is_instance_valid(village_view):
 		village_view.refresh()
@@ -350,9 +369,26 @@ func _update_page_bounds() -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(succession_overlay) and succession_overlay.visible:
+		get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(focus_overlay) and focus_overlay.visible:
 		get_viewport().set_input_as_handled()
 		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_J:
+			_show_screen("Journal")
+			get_viewport().set_input_as_handled()
+			return
+		if event.keycode == KEY_SPACE:
+			if game_clock.is_playing: game_clock.pause()
+			else: _play_game()
+			get_viewport().set_input_as_handled()
+			return
+		if event.keycode >= KEY_1 and event.keycode <= KEY_5:
+			game_clock.set_speed(event.keycode - KEY_1 + 1)
+			get_viewport().set_input_as_handled()
+			return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
 		if details_popup != null and details_popup.visible:
 			details_popup.hide()
@@ -386,11 +422,14 @@ func _build_navigation() -> void:
 	spacer.custom_minimum_size = Vector2(0, 8)
 	list.add_child(spacer)
 	_add_navigation_button(list, "People", "People", true)
+	_add_navigation_button(list, "Family Journal", "Journal")
 	_add_navigation_button(list, "Family Tree", "Family Tree")
+	_add_navigation_button(list, "Succession & will", "Succession")
 	_add_navigation_button(list, "Landi House", "House")
 	_add_navigation_button(list, "Village", "Village")
 	_add_navigation_button(list, "Italy", "Italy")
 	_add_navigation_button(list, "Finances", "Finances")
+	_add_navigation_button(list, "Laws & obligations", "Laws")
 	_add_navigation_button(list, "Family chronicle", "Chronicle")
 	_add_navigation_button(list, "Pending events", "Events")
 	legacy_status = _add_label(list, "", 13, Color("#d4b77e"))
@@ -425,6 +464,7 @@ func _add_navigation_button(parent: VBoxContainer, caption: String, screen_name:
 
 func _show_screen(screen_name: String) -> void:
 	current_screen = screen_name
+	_update_page_bounds()
 	family_frame.visible = screen_name in ["People", "Events"]
 	for button in get_node("Navigation").find_children("*", "Button", true, false):
 		button.set_pressed_no_signal(button.get_meta("screen", "") == screen_name)
@@ -454,12 +494,29 @@ func _show_screen(screen_name: String) -> void:
 	content_overlay.offset_top = 72
 	content_overlay.offset_right = -12
 	content_overlay.offset_bottom = -12
+	_update_page_bounds()
 	for child in content_overlay.get_children():
 		content_overlay.remove_child(child)
 		child.queue_free()
 	finance_content = null
+	journal_page = null
+	if screen_name == "Journal":
+		var journal = preload("res://Scripts/FamilyJournal.gd").new()
+		journal.host = self
+		journal_page = journal
+		content_overlay.add_child(journal)
+		content_overlay.show()
+		return
 	if screen_name == "Italy":
 		TravelScreen.build(self)
+		content_overlay.show()
+		return
+	if screen_name == "Laws":
+		preload("res://Scripts/LawsScreen.gd").build(self)
+		content_overlay.show()
+		return
+	if screen_name == "Succession":
+		preload("res://Scripts/SuccessionScreen.gd").build(self)
 		content_overlay.show()
 		return
 	if screen_name == "Village":
@@ -502,6 +559,88 @@ func _play_game() -> void:
 	game_clock.play()
 
 
+func _refresh_succession() -> void:
+	var state = game_clock.state
+	if not state.succession.pending and not state.succession.ended:
+		if is_instance_valid(succession_overlay): succession_overlay.hide()
+		displayed_succession_head = ""
+		return
+	if is_instance_valid(succession_overlay) and displayed_succession_head == state.head_id:
+		succession_overlay.show()
+		return
+	if is_instance_valid(succession_overlay):
+		remove_child(succession_overlay)
+		succession_overlay.queue_free()
+	displayed_succession_head = state.head_id
+	succession_overlay = Control.new()
+	succession_overlay.name = "SuccessionChoice"
+	succession_overlay.z_index = InlinePanel.OVERLAY_Z_INDEX + 100
+	succession_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(succession_overlay)
+	var shade := ColorRect.new()
+	shade.color = Color(0.12, 0.09, 0.06, 0.85)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	succession_overlay.add_child(shade)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	succession_overlay.add_child(center)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", Archive.paper_panel(24, 2))
+	center.add_child(panel)
+	var column := VBoxContainer.new()
+	column.custom_minimum_size.x = 660
+	column.add_theme_constant_override("separation", 12)
+	panel.add_child(column)
+	_add_label(column, "The family story continues" if not state.succession.ended else "The family story has ended", 30, TEXT_MAIN)
+	_add_label(column, state.people[state.head_id].name + " has died. Time is paused.", 20, TEXT_SUSPECTED)
+	if state.succession.ended:
+		_add_label(column, "There is no surviving relative to become family head.", 18, TEXT_MAIN)
+	else:
+		_add_label(column, "Choose who you will play next. The equal-share will preserves each child's inheritance; loans and inheritance duties are settled before the cash is divided.", 18, TEXT_MAIN)
+		var projected: Dictionary = state.succession.preview(state)
+		for id in projected["shares"]:
+			_add_label(column, state.people[id].name + " · " + state.economy.money(projected["shares"][id]), 18, TEXT_KNOWN)
+		var scroll := ScrollContainer.new()
+		scroll.custom_minimum_size = Vector2(660, 260)
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		column.add_child(scroll)
+		var choices := VBoxContainer.new()
+		choices.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.add_child(choices)
+		for id in state.succession.candidates(state):
+			var button := Button.new()
+			button.text = "Continue as " + state.people[id].name + " · " + str(state.people[id].age) + (" · nominated" if id == state.succession.nominated_id else "")
+			button.custom_minimum_size.y = 40
+			choices.add_child(button)
+			button.pressed.connect(_continue_after_succession.bind(id))
+	var actions := HBoxContainer.new()
+	column.add_child(actions)
+	_add_menu_button(actions, "Save", _save_game)
+	_add_menu_button(actions, "Load", _load_game)
+	_add_menu_button(actions, "Main menu", _return_to_main_menu)
+	var focus_buttons: Array[Button] = []
+	for button in succession_overlay.find_children("*", "Button", true, false): focus_buttons.append(button)
+	for index in focus_buttons.size():
+		focus_buttons[index].focus_next = focus_buttons[index].get_path_to(focus_buttons[(index + 1) % focus_buttons.size()])
+		focus_buttons[index].focus_previous = focus_buttons[index].get_path_to(focus_buttons[(index - 1 + focus_buttons.size()) % focus_buttons.size()])
+	if not focus_buttons.is_empty(): focus_buttons[0].grab_focus()
+
+
+func _continue_after_succession(id: String) -> void:
+	var error: String = game_clock.state.succession.continue_as(game_clock.state, id)
+	if not error.is_empty():
+		_show_menu_message(error)
+		return
+	selected_person_id = ""
+	conversation_result = ""
+	assignment_feedback.clear()
+	gameplay_person_id = id
+	gameplay_result = ""
+	_refresh_succession()
+	_show_screen("People")
+	_refresh_time_controls()
+
+
 func _show_focus() -> void:
 	if not game_clock.state.legacy.objective_id.is_empty():
 		if is_instance_valid(focus_overlay):
@@ -511,103 +650,10 @@ func _show_focus() -> void:
 	if is_instance_valid(focus_overlay):
 		focus_overlay.show()
 		return
-	focus_overlay = Control.new()
-	focus_overlay.name = "StartingFocus"
-	focus_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	focus_overlay.z_index = InlinePanel.OVERLAY_Z_INDEX
-	focus_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	var setup = preload("res://Scripts/StartingFocus.gd").new()
+	setup.host = self
+	focus_overlay = setup
 	add_child(focus_overlay)
-	var shade := ColorRect.new()
-	shade.color = Color(0.12, 0.09, 0.06, 0.8)
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	focus_overlay.add_child(shade)
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	focus_overlay.add_child(center)
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(1080, 0)
-	panel.add_theme_stylebox_override("panel", Archive.modal_frame())
-	center.add_child(panel)
-	var margin := MarginContainer.new()
-	for edge in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + edge, 10)
-	panel.add_child(margin)
-	var column := VBoxContainer.new()
-	column.custom_minimum_size.x = 1032
-	column.add_theme_constant_override("separation", 8)
-	margin.add_child(column)
-	var legacy = game_clock.state.legacy
-	var selected := {"objective": "", "bonus": ""}
-	var objective_buttons: Array[Button] = []
-	var bonus_buttons: Array[Button] = []
-	_add_label(column, "What will your family be remembered for?", 30, TEXT_MAIN)
-	_add_label(column, "One century. Three ambitions. Choose a legacy, then a lasting family perk.", 16, TEXT_MUTED)
-	var images := ["family", "wealth", "influence"]
-	var flavor := ["A house full of voices. A name carried by generations yet to come.", "From a modest purse to a fortune that outlives its founders.", "A family whose voices reach beyond the village, into the halls of power."]
-	var row := HBoxContainer.new()
-	row.name = "ObjectiveCards"
-	row.add_theme_constant_override("separation", 8)
-	column.add_child(row)
-	for index in legacy.OBJECTIVES.size():
-		var key: String = legacy.OBJECTIVES.keys()[index]
-		var button := _add_focus_card(row, legacy.OBJECTIVES[key], flavor[index], images[index], "Choose this legacy", 164)
-		objective_buttons.append(button)
-	_add_label(column, "A gift for the generations", 23, TEXT_SUSPECTED)
-	var perk_row := HBoxContainer.new()
-	perk_row.name = "PerkCards"
-	perk_row.add_theme_constant_override("separation", 8)
-	column.add_child(perk_row)
-	var perk_flavor := ["Let the next generation fill the house with life.", "Every coin saved is a little more security for tomorrow.", "What one generation learns, the next can build upon."]
-	for index in legacy.BONUSES.size():
-		var key: String = legacy.BONUSES.keys()[index]
-		var button := _add_focus_card(perk_row, legacy.BONUSES[key], perk_flavor[index], images[index], "Choose this perk", 64)
-		bonus_buttons.append(button)
-	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 8)
-	column.add_child(actions)
-	var begin := Button.new()
-	begin.name = "BeginFamilyStory"
-	begin.text = "Begin family story"
-	begin.custom_minimum_size.y = 28
-	begin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	begin.disabled = true
-	actions.add_child(begin)
-	begin.pressed.connect(func(): _start_family_story(selected["objective"], selected["bonus"]))
-	_add_menu_button(actions, "Load saved family", _load_game)
-	var portrait_test := Button.new()
-	portrait_test.name = "StartStrangerPortraitTest"
-	portrait_test.text = "Start with 100 strangers"
-	portrait_test.pressed.connect(func(): preload("res://Scripts/StrangerPortraitPreview.gd").start(self))
-	actions.add_child(portrait_test)
-	for index in objective_buttons.size():
-		var button := objective_buttons[index]
-		var key: String = legacy.OBJECTIVES.keys()[index]
-		button.pressed.connect(func():
-			selected["objective"] = key
-			for other in objective_buttons:
-				other.set_pressed_no_signal(other == button)
-				other.text = "Legacy selected" if other == button else "Choose this legacy"
-			begin.disabled = selected["bonus"].is_empty())
-	for index in bonus_buttons.size():
-		var button := bonus_buttons[index]
-		var key: String = legacy.BONUSES.keys()[index]
-		button.pressed.connect(func():
-			selected["bonus"] = key
-			for other in bonus_buttons:
-				other.set_pressed_no_signal(other == button)
-				other.text = "Perk selected" if other == button else "Choose this perk"
-			begin.disabled = selected["objective"].is_empty())
-	# Trap tab navigation inside the mandatory modal.
-	var choices: Array[Button] = []
-	choices.append_array(objective_buttons)
-	choices.append_array(bonus_buttons)
-	choices.append(begin)
-	choices.append(actions.get_child(1))
-	choices.append(portrait_test)
-	for index in choices.size():
-		choices[index].focus_next = choices[index].get_path_to(choices[(index + 1) % choices.size()])
-		choices[index].focus_previous = choices[index].get_path_to(choices[(index - 1 + choices.size()) % choices.size()])
-	objective_buttons[0].grab_focus()
 
 
 func _add_focus_card(parent: Node, entry: Dictionary, flavor: String, image_id: String, caption: String, image_height: int) -> Button:
@@ -847,6 +893,7 @@ func _build_menu() -> void:
 	_add_menu_button(list, "Save", _save_game)
 	_add_menu_button(list, "Load", _load_game)
 	_add_menu_button(list, "Settings", _show_settings)
+	_add_menu_button(list, "Main menu", _return_to_main_menu)
 	list.add_child(HSeparator.new())
 	_add_menu_button(list, "Exit", _exit_game)
 	for button in list.get_children():
@@ -883,7 +930,7 @@ func _style_menu_control(button: Button, dark := false) -> void:
 	button.add_theme_stylebox_override("focus", focus)
 
 
-func _add_menu_button(parent: Container, caption: String, action: Callable) -> void:
+func _add_menu_button(parent: Container, caption: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = caption
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -893,6 +940,7 @@ func _add_menu_button(parent: Container, caption: String, action: Callable) -> v
 	_apply_period_button_style(button)
 	button.pressed.connect(action)
 	parent.add_child(button)
+	return button
 
 
 func _apply_period_button_style(button: Button, _dark := false) -> void:
@@ -905,7 +953,7 @@ func _toggle_menu() -> void:
 	else:
 		var menu_button: Button = top_bar.get_node("Frame/Header/ClockModule/TimeControls/MenuButton")
 		menu_button.set_pressed_no_signal(true)
-		var menu_size := Vector2i(252, 282)
+		var menu_size := Vector2i(252, 326)
 		var position := Vector2i(menu_button.global_position.x + menu_button.size.x - menu_size.x, menu_button.global_position.y + menu_button.size.y + 8)
 		position.x = clampi(position.x, 16, int(get_viewport_rect().size.x) - menu_size.x - 16)
 		position.y = clampi(position.y, 16, int(get_viewport_rect().size.y) - menu_size.y - 16)
@@ -973,6 +1021,19 @@ func _load_game() -> void:
 
 func _exit_game() -> void:
 	get_tree().quit()
+
+
+func _return_to_main_menu() -> void:
+	game_clock.pause()
+	menu_popup.hide()
+	var dialog := ConfirmationDialog.new()
+	dialog.title = "Return to main menu"
+	dialog.dialog_text = "Return to the main menu? Unsaved progress will be lost."
+	dialog.ok_button_text = "Main menu"
+	add_child(dialog)
+	dialog.confirmed.connect(func(): get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn"))
+	dialog.canceled.connect(dialog.queue_free)
+	dialog.popup_centered(Vector2i(420, 180))
 
 
 func _load_people() -> void:
@@ -1112,6 +1173,7 @@ func _build_details_popup() -> void:
 
 
 func _show_person(person_id: String, open_popup: bool = true) -> void:
+	if is_instance_valid(details_popup): details_popup.move_to_front()
 	if not people.has(person_id):
 		return
 	if selected_person_id != person_id:
@@ -1135,6 +1197,23 @@ func _show_person(person_id: String, open_popup: bool = true) -> void:
 		var dimensions := Vector2i(int(minf(940.0, viewport_size.x - 32)), int(minf(760.0, viewport_size.y - 112)))
 		if open_popup or details_popup.size != Vector2(dimensions):
 			details_popup.popup_centered(dimensions)
+		_fit_person_panel.call_deferred(person_id)
+
+
+func _fit_person_panel(person_id: String) -> void:
+	# Wrapped labels initially measure at zero width and can enlarge the panel.
+	# Restore its intended bounds once the dossier containers have laid out.
+	var screen_ref: WeakRef = weakref(self)
+	get_tree().process_frame.connect(func():
+		var screen = screen_ref.get_ref()
+		if screen != null: screen._resize_person_panel.call_deferred(person_id), CONNECT_ONE_SHOT)
+
+
+func _resize_person_panel(person_id: String) -> void:
+	if not is_instance_valid(details_popup) or not details_popup.visible or selected_person_id != person_id:
+		return
+	var viewport_size := get_viewport_rect().size
+	details_popup.popup_centered(Vector2i(int(minf(940.0, viewport_size.x - 32)), int(minf(760.0, viewport_size.y - 112))), false)
 
 
 func _open_person_activity(activity_id: String = "", target_id: String = "") -> void:
@@ -1154,7 +1233,10 @@ func _open_person_activity(activity_id: String = "", target_id: String = "") -> 
 
 func _talk_to_person(person_id: String) -> void:
 	var state = game_clock.state
+	var first_talk: bool = people[person_id]._last_conversation.get(state.head_id, -1) != state.elapsed_months
 	conversation_result = people[person_id].converse(state.head_id, state.elapsed_months, state.date_text())
+	if first_talk and state.social.available(state, person_id):
+		state.social.observe(state, person_id, state.head_id, "conversation", 2.0)
 	_show_person(person_id, false)
 
 
@@ -1255,7 +1337,10 @@ func _show_careers(person_id: String, open_popup: bool = true) -> void:
 	var study: Dictionary = model.education["study"]
 	if not study.is_empty() and state.careers.programs.has(study.get("program_id")):
 		var program: Dictionary = state.careers.programs[study["program_id"]]
-		_add_label(careers_content, "%s · %s · %d%% completed · %s/month" % [program["name"], study["status"], int(float(study["progress"]) / float(program["months"]) * 100.0), game_clock.state.economy.money(game_clock.state.economy.purchase_cost(int(program["monthly_cost_cents"])))], 17, TEXT_KNOWN)
+		_add_label(careers_content, "%s · %s · %d%% completed · fees %s/month" % [program["name"], study["status"], int(float(study["progress"]) / float(program["months"]) * 100.0), game_clock.state.economy.money(game_clock.state.economy.purchase_cost(int(study["monthly_cost_cents"])))], 17, TEXT_KNOWN)
+		_add_label(careers_content, "Current earnings · " + state.economy.money(state.economy.earnings(model)) + "/month", 16, TEXT_KNOWN)
+		if study.get("suspended", false):
+			_add_label(careers_content, "Progress is kept. Paid work is available while the course is on hold; choose the same course below to resume when funding allows.", 15, TEXT_MUTED)
 	_add_label(careers_content, "Your understanding of their abilities and interests", 21, TEXT_MAIN)
 	for layer in ["abilities", "skills", "interests"]:
 		var known: Array = []
@@ -1268,11 +1353,12 @@ func _show_careers(person_id: String, open_popup: bool = true) -> void:
 	tabs.custom_minimum_size = Vector2(0, 450)
 	careers_content.add_child(tabs)
 	var study_list := _career_tab(tabs, "Education")
-	_add_label(study_list, "Full-time study stops earnings and adds monthly tuition. Courses pause when funding is unavailable. Lengths are estimates; learning pace varies.", 15, TEXT_MUTED)
+	_add_label(study_list, "Subsidized lessons, private teaching and paid apprenticeships have different costs and earnings. Full-time college replaces paid work. Amounts and lengths are historical estimates; learning pace varies.", 15, TEXT_MUTED)
 	for program_id in state.careers.programs:
 		var program: Dictionary = state.careers.programs[program_id]
 		var action: String = "train:" + program_id
 		_add_label(study_list, "%s · roughly %d months · %s/month" % [program["name"], program["months"], game_clock.state.economy.money(game_clock.state.economy.purchase_cost(int(program["monthly_cost_cents"])))], 18, TEXT_MAIN)
+		_add_label(study_list, state.careers.program_terms_text(state.economy, program), 15, TEXT_KNOWN)
 		var requirements: String = "Entry education: " + model.EDUCATION_LEVELS[int(program["required_level"])]
 		if not program["entry_skills"].is_empty():
 			requirements += " · Preparation: " + ", ".join(program["entry_skills"].keys())

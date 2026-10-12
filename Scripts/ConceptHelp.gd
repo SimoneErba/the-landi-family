@@ -1,6 +1,7 @@
 extends RefCounted
 ## Short, player-facing lessons shown in the archive's themed hover boxes.
 const LESSONS := {
+	"Laws": "Review current inheritance, tax and old-age obligations. Italian government arrives in 1861, followed by separate tax and civil-law reforms. Laws apply when their dates arrive.",
 	"People": "Observe relatives and talk to them to learn what matters to them. You lead the family, but each person can refuse your requests.",
 	"Family Tree": "Follow parents, children and marriages across generations. Relatives outside your household still belong to the family.",
 	"House": "The ancestral home is a shared asset. Rooms, maintenance and ownership affect everyone living here. Expansion costs money and creates new responsibilities.",
@@ -26,9 +27,9 @@ const LESSONS := {
 	"Known": "Your family head has evidence for this belief. It describes their understanding of the person, rather than perfect knowledge.",
 	"Suspected": "A tentative impression based on limited evidence. Talk and observe before making a major decision around it.",
 	"Unknown": "You have not learned enough about this part of the person yet. Shared experiences and conversation can reveal more.",
-	"Monthly income": "Wages contributed by people in the household. Illness, travel and changes in work can alter the next month's contribution. Business returns are recorded separately.",
-	"Monthly surplus": "Household wages left after food and funded tuition. Projects, business costs and one-off payments can still reduce the shared purse.",
-	"Expenses": "Recurring household costs include food and funded tuition. Compare these with income, and leave funds available for separate obligations and emergencies.",
+	"Monthly income": "Wages contributed by people in the household. Earnings gradually fall after age 60. Illness, travel and changes in work also affect contributions. Business returns are recorded separately.",
+	"Monthly surplus": "Household wages left after food, clothing, care, upkeep and funded tuition. Projects, business costs and one-off payments can still reduce the shared purse.",
+	"Expenses": "Recurring costs include food, household essentials, young-child and elder care, upkeep and tuition. Debt triggers cheaper living with a happiness cost. Leave funds for obligations and emergencies.",
 	"How they seem to feel": "Your impression of this person's current emotional state. Stress and resentment can change over time and affect responses to requests."
 }
 const ALIASES := {

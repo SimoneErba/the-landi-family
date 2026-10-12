@@ -73,6 +73,15 @@ func _init(person_id: String, source: Dictionary, year: int, month: int, observe
 	education["level"] = education.get("level", "none")
 	education["qualifications"] = education.get("qualifications", []).duplicate()
 	education["study"] = education.get("study", {}).duplicate(true)
+	# JSON-authored contracts need integer money just like commands and binary saves.
+	var authored_study: Dictionary = education["study"]
+	if authored_study.has("monthly_cost_cents"): authored_study["monthly_cost_cents"] = int(authored_study["monthly_cost_cents"])
+	if authored_study.has("unfunded_months"): authored_study["unfunded_months"] = int(authored_study["unfunded_months"])
+	if authored_study.has("return_job"):
+		authored_study["return_job"]["income_cents"] = int(authored_study["return_job"].get("income_cents", 0))
+	if authored_study.has("terms"):
+		for field in ["stipend_start_cents", "stipend_end_cents", "monthly_cost_cents", "tuition_cents", "supplies_cents", "duration_months"]:
+			authored_study["terms"][field] = int(authored_study["terms"].get(field, 0))
 	abilities = _scores(source.get("abilities", {}), ABILITIES, 50.0)
 	skills = _scores(source.get("skills", {}), SKILLS, 0.0)
 	interests = _scores(source.get("interests", {}), INTERESTS, 50.0)
@@ -120,6 +129,7 @@ func advance_month(year: int, month: int, financial_pressure: bool) -> void:
 
 func view_for(observer_id: String) -> Dictionary:
 	var view := {"name": name, "age": age, "relationship": _profile.get("relationship", "Relative"), "summary": decision_state.get("observation", _profile.get("summary", "")), "job": job}
+	if id == observer_id: view["relationship"] = "You · Family head"
 	var understanding: Dictionary = knowledge.get(observer_id, {})
 	for layer in LAYERS:
 		view[layer] = understanding.get(layer, {"known": [], "suspected": [], "unknown": ["You have not learned enough about this person."]}).duplicate(true)

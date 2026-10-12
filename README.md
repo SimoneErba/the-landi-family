@@ -35,12 +35,12 @@ Manage Landi House's space and condition, watch the shared finances, visit neigh
 ## Start playing
 
 1. Open `project.godot` in Godot 4.3 or newer and press **F5**.
-2. Choose a family ambition and a starting bonus.
-3. Select a portrait to meet someone. Try **Talk**, **Make a request**, or **Marriage & dote**.
-4. Use the time controls to advance the story, and **Save** to keep your family.
+2. On the main menu, choose **New game**, **Load game**, or **Settings**. New games start alone, with a wife, or with a wife and six-year-old son.
+3. Choose the founder's dream, then a lasting family strength. Use the back arrow to revisit your goal. Begin the story and select a portrait to meet someone. Try **Talk**, **Make a request**, or **Marriage & dote**.
+4. Use the time controls to advance the story, and **Menu → Save** to keep your family. **Menu → Main menu** returns to the title page after a warning about unsaved progress.
 
 The soundtrack cycles through Satie’s **Gymnopédie No. 1**, Liszt’s **Consolation No. 3**, and Debussy’s **Rêverie**, with 30–60 seconds of birdsong, wind and distant church bells between pieces. Open **Menu → Settings** to mute audio or adjust music and ambience volume. Preferences are saved between sessions; all recordings are bundled for offline playback. See the [audio credits](Assets/Audio/CREDITS.md).
 
-This is a work-in-progress prototype. Marriage, children, education, careers, property and travel are playable; full succession and richer inheritance are still planned.
+Deaths and succession now continue the story through a new family head. **Succession & will** shows an equal-share cash will including daughters, with no arbitrary disinheritance. **Finances → Loans** offers borrowing and repayment with 5% annual interest. See [the model and historical scope](Docs/Succession-and-Loans.md). This remains a prototype; full property estates and period-specific intestacy are still planned.
 
-For setup, controls, simulation details and tests, see the [development guide](Docs/Development-Guide.md). The [marriage model](Docs/Marriage-and-Dowry.md) explains dowry and family favors; the [roadmap](todo/README.md) describes what comes next.
+For code ownership, update order and change-specific tests, start with the [code map](Docs/Code-Map.md). For setup, controls and simulation details, see the [development guide](Docs/Development-Guide.md). The [marriage model](Docs/Marriage-and-Dowry.md) explains dowry and family favors; the [roadmap](todo/README.md) describes what comes next.

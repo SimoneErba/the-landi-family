@@ -10,16 +10,16 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var state = State.new()
-	state.initialize({"Resident": {"monthly_income_cents": 0}})
+	state.initialize({"Resident": {"age": 30, "monthly_income_cents": 0}})
 	state.events.enabled = false
 	assert(state.date_text() == "January 1800")
 	assert(state.economy.cash_cents == 10000)
 	state.advance_month()
-	assert(state.economy.cash_cents == 9000)
+	assert(state.economy.cash_cents == 7421, "Food, essentials, upkeep, property assessment and consumption duties are paid; the destitute class is exempt from household macinato")
 	assert(state.economy.ledger[0]["date"] == "January 1800")
 	assert(state.economy.food_per_person_cents() == 1000)
 	state.advance_month()
-	assert(state.economy.cash_cents == 8000, "Small monthly inflation rounds to hundredths")
+	assert(state.economy.cash_cents == 4842, "Small monthly inflation rounds to hundredths")
 	for index in range(10):
 		state.advance_month()
 	assert(state.date_text() == "January 1801")
@@ -27,24 +27,24 @@ func _run() -> void:
 	assert(state.economy.ledger.size() == 12)
 
 	var household = State.new()
-	household.initialize({"Worker": {"monthly_income_cents": 2000}, "Dependent": {}, "Away": {"monthly_income_cents": 7000}})
+	household.initialize({"Worker": {"age": 30, "monthly_income_cents": 4000}, "Dependent": {"age": 30}, "Away": {"age": 30, "monthly_income_cents": 7000}})
 	household.events.enabled = false
 	household.household["members"] = ["Worker", "Dependent"]
 	household.advance_month()
-	assert(household.economy.cash_cents == 10000, "Two residents cost 20 lire; only resident income contributes")
+	assert(household.economy.cash_cents == 9869, "Two adults pay assessed property, two-mouth macinato and consumption duties; only resident income contributes")
 	household.household["members"].erase("Worker")
 	household.advance_month()
-	assert(household.economy.cash_cents == 9000, "Departed worker no longer earns or eats at home")
+	assert(household.economy.cash_cents == 7290, "Departed worker no longer earns, eats or counts as a taxable mouth at home")
 	household.people["Dependent"].monthly_income_cents = 3000
 	household.advance_month()
 	assert(household.economy.ledger[-1]["income_cents"] == 3000, "Job changes affect next settlement")
 
 	var clock = Clock.new()
-	clock.state.initialize({"Resident": {}})
+	clock.state.initialize({"Resident": {"age": 30}})
 	clock.state.events.enabled = false
 	clock.play()
 	clock.advance_time(clock.seconds_per_month() * 20)
-	assert(not clock.is_playing and clock.state.elapsed_months == 10, "First unpaid bill interrupts catch-up")
+	assert(not clock.is_playing and clock.state.elapsed_months == 4, "First unpaid essential bill interrupts catch-up")
 	assert(clock.state.economy.cash_cents < 0)
 	clock.free()
 
@@ -56,15 +56,17 @@ func _run() -> void:
 	assert(screen.cash_label.text == "100 L.")
 	assert(screen.finance_content.find_child("BalanceValue", true, false).text == "100 L.")
 	screen.game_clock.play()
+	var first_balance: int = screen.game_clock.state.economy.cash_cents + screen.game_clock.state.economy.budget(screen.people, screen.game_clock.state.household["members"])["net_cents"]
 	screen.game_clock.advance_time(15)
-	assert(screen.cash_label.text == "315 L.")
-	assert(screen.finance_content.find_child("BalanceValue", true, false).text == "315 L.")
-	assert(screen.game_clock.state.economy.ledger[0]["food_cents"] == 7000)
+	assert(screen.cash_label.text == screen._finance_money(first_balance))
+	assert(screen.finance_content.find_child("BalanceValue", true, false).text == screen._finance_money(first_balance))
+	assert(screen.game_clock.state.economy.ledger[0]["expenses_cents"] > screen.game_clock.state.economy.ledger[0]["food_cents"])
 	screen._show_screen("House")
+	var second_balance: int = screen.game_clock.state.economy.cash_cents + screen.game_clock.state.economy.budget(screen.people, screen.game_clock.state.household["members"])["net_cents"]
 	screen.game_clock.advance_time(15)
-	assert(screen.cash_label.text == "530 L.")
+	assert(screen.cash_label.text == screen._finance_money(second_balance))
 	screen._show_screen("Finances")
-	assert(screen.finance_content.find_child("BalanceValue", true, false).text == "530 L.")
+	assert(screen.finance_content.find_child("BalanceValue", true, false).text == screen._finance_money(second_balance))
 	var card = screen.get_node("PageMargins/Page/RosterScroll/FamilyList/Carlo")
 	assert(not card.has_node("Row/Details/Observation"), "Roster cards show stats instead of flavor text")
 	var stats = card.get_node("Row/Details/Stats")

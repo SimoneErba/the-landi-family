@@ -19,6 +19,7 @@ static func build(host, parent: Node, person_id: String, context: String) -> voi
 	var id: String = reaction["activity_id"]
 	if reaction["accepted"]:
 		if simulation.activities.plans.has(id): status = simulation.activities.plans[id].status.capitalize()
+		elif simulation.social.plans.has(id): status = simulation.social.plans[id]["status"].capitalize()
 		elif simulation.travel.journeys.has(id): status = simulation.travel.journeys[id]["status"].capitalize()
 		elif context.begins_with("train:") and simulation.people[person_id].education["study"].get("program_id") != context.get_slice(":", 1): status = "Assignment ended · see journal"
 		elif context == "business" and simulation.village.business.commitment(person_id) != id: status = "Responsibility ended"

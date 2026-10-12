@@ -47,6 +47,7 @@ func _run() -> void:
 
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
 	root.add_child(screen)
+	screen._start_family_story("populous", "fertility")
 	screen.game_clock.state.events.enabled = false
 	assert(screen.period_label.text == "January 1800")
 	assert(screen.pause_button.button_pressed and screen.speed_buttons[2].button_pressed)

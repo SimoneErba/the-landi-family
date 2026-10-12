@@ -13,7 +13,7 @@ The fixed historical calendar is authored in `Data/historical_events.json`, merg
 - [Treccani: Italy](https://www.treccani.it/enciclopedia/italia/): the broader historical sequence and Italian neutrality in 1914.
 - [Presidency of the Republic: 2 June 1946](https://www.quirinale.it/it/pagine/2-giugno-1946-2-giugno-2016): the 1943 armistice and transition to a republic.
 
-The usual hundred-year scenario covers 1800–1900. The existing prototype does not enforce an end date, so the catalog also provides events through 1948 for longer runs. Mortality and succession remain future systems. Regional reports do not assume fighting happened on the family's doorstep.
+The usual hundred-year scenario covers 1800–1900. The existing prototype does not enforce an end date, so the catalog also provides events through 1948 for longer runs. Mortality and cash succession are implemented. Regional reports do not assume fighting happened on the family's doorstep. The **Laws & obligations** panel follows the 1861 government transition and subsequent tax/civil-law reforms; see [Laws and taxes](Laws-and-Taxes.md) for effects and historical limits.
 
 ## Currency
 

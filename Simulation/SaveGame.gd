@@ -69,6 +69,8 @@ static func _valid_save(data: Dictionary) -> bool:
 	if not data.get("state") is Dictionary:
 		return false
 	var saved_state: Dictionary = data["state"]
+	for field in ["succession", "loans", "social"]:
+		if not saved_state.has(field): saved_state[field] = template.to_save_data()[field]
 	if not saved_state.has("notifications"):
 		saved_state["notifications"] = []
 	if not saved_state.has("marriage"):
@@ -128,6 +130,11 @@ static func _valid_save(data: Dictionary) -> bool:
 	var state: Dictionary = data["state"]
 	if state["month"] < 1 or state["month"] > 12 or state["elapsed_months"] < 0 or not state["people"].has(state["head_id"]):
 		return false
+	if not State.Loans.valid(state["loans"], state["elapsed_months"]): return false
+	if not State.SocialLife.valid(state["social"], state["people"], state["elapsed_months"]): return false
+	for saved_person in state["people"].values():
+		if not saved_person is Dictionary or not State.SocialLife.valid_knowledge(saved_person.get("knowledge", {})): return false
+	# Validate succession after person fields below; malformed people cannot reach its validator.
 	if state["economy"].get("currency") not in ["tuscan_lira", "tuscan_fiorino", "italian_lira"]:
 		return false
 	if not _valid_events(state["events"], template, state["people"],state["village"]):
@@ -175,10 +182,22 @@ static func _valid_save(data: Dictionary) -> bool:
 			return false
 		if person["life_state"].has("recovery_until_month") and (not person["life_state"]["recovery_until_month"] is int or person["life_state"]["recovery_until_month"] < 0):
 			return false
+		if person["life_state"].has("personal_cash_cents") and (not person["life_state"]["personal_cash_cents"] is int or person["life_state"]["personal_cash_cents"] < 0): return false
+		if person["life_state"].has("unsettled_estate_cents") and (not person["life_state"]["unsettled_estate_cents"] is int or person["life_state"]["unsettled_estate_cents"] < 0): return false
 		for field in ["temperament", "values", "learned_tendencies", "current_state", "abilities", "skills", "interests"]:
 			if not _matches_fields(person[field], person_template[field]):
 				return false
 		var assignment = preload("res://Simulation/Assignment.gd")
+		var study: Dictionary = person["education"]["study"]
+		if study.has("terms") and not State.Careers.valid_terms(study["terms"]): return false
+		for field in ["farm_food_share", "food_support_fraction"]:
+			if person["life_state"].has(field):
+				var support: Variant = person["life_state"][field]
+				if not (support is float or support is int) or not is_finite(support) or support < 0 or support > 1: return false
+		if study.has("suspended") and not study["suspended"] is bool: return false
+		if study.has("unfunded_months") and (not study["unfunded_months"] is int or study["unfunded_months"] < 0): return false
+		if study.has("return_job"):
+			if not _matches_fields(study["return_job"], {"career_id": "", "job": "", "income_cents": 0}) or study["return_job"]["income_cents"] < 0: return false
 		if not assignment.valid(person["education"]["study"].get("agreement", {})) or not assignment.valid(person["life_state"].get("job_agreement", {})): return false
 		if person["in_household"] != (person_id in state["household"]["members"]):
 			return false
@@ -191,7 +210,7 @@ static func _valid_save(data: Dictionary) -> bool:
 	for notice in state["notifications"]:
 		if not _matches_fields(notice, {"date":"", "description":"", "person_id":"", "read":false}): return false
 		if not notice["person_id"].is_empty() and not state["people"].has(notice["person_id"]): return false
-	return State.Marriage.valid(state["marriage"], state)
+	return State.Succession.valid(state["succession"], state["people"], state["head_id"]) and State.Marriage.valid(state["marriage"], state)
 
 
 static func _valid_travel(state: Dictionary, template) -> bool:
@@ -276,6 +295,7 @@ static func _valid_gameplay(state: Dictionary, template) -> bool:
 	for plan_id in activities["plans"]:
 		var plan: Variant = activities["plans"][plan_id]
 		if plan is Dictionary and not plan.has("agreement"): plan["agreement"] = {}
+		if plan is Dictionary and not plan.has("queue_order"): plan["queue_order"] = int(str(plan_id).trim_prefix("activity_"))
 		if not plan_id is String or not _matches_fields(plan, State.Activities.Plan.new().to_save_data()) or plan["id"] != plan_id:
 			return false
 		if not preload("res://Simulation/Assignment.gd").valid(plan["agreement"]): return false
@@ -288,14 +308,16 @@ static func _valid_gameplay(state: Dictionary, template) -> bool:
 		var person_id: Variant = plan["participant_ids"][0]
 		if not person_id is String or not state["people"].has(person_id):
 			return false
-		if plan["status"] in ["active", "interrupted"]:
+		if plan["queue_order"] < 0: return false
+		if plan["status"] in ["active", "interrupted"] or (plan["status"] == "paused" and plan["started_month"] >= 0):
 			if committed.has(person_id):
 				return false
 			committed[person_id] = true
 		if plan["duration_months"] < 1 or not is_finite(plan["progress_months"]) or plan["progress_months"] < 0 or plan["progress_months"] > plan["duration_months"] or plan["monthly_cost_cents"] < 0 or plan["upfront_cost_cents"] < 0:
 			return false
-		if plan["proposed_month"] < 0 or plan["proposed_month"] > state["elapsed_months"] or plan["started_month"] < 0 or plan["started_month"] > state["elapsed_months"]:
+		if plan["proposed_month"] < 0 or plan["proposed_month"] > state["elapsed_months"] or plan["started_month"] < -1 or plan["started_month"] > state["elapsed_months"]:
 			return false
+		if plan["status"] in ["active", "interrupted", "completed"] and plan["started_month"] < 0: return false
 		if not village["locations"].has(plan["location_id"]) or (plan["activity_id"] == "visit" and not village["households"].has(plan["target_household_id"])):
 			return false
 		if not plan["outcome"].is_empty() and not _matches_fields(plan["outcome"], {"description": ""}):

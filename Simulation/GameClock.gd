@@ -28,6 +28,9 @@ func _update_real_time() -> void:
 
 
 func advance_time(seconds: float) -> void:
+	if state.succession.pending or state.succession.ended:
+		is_playing = false
+		return
 	if state.events.enabled and not state.events.pending.is_empty():
 		is_playing = false
 		return
@@ -49,6 +52,10 @@ func advance_time(seconds: float) -> void:
 
 
 func play() -> void:
+	if state.succession.pending or state.succession.ended:
+		is_playing = false
+		playback_changed.emit()
+		return
 	if state.events.enabled and not state.events.pending.is_empty():
 		is_playing = false
 		playback_changed.emit()

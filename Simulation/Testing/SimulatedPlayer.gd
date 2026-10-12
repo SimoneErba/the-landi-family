@@ -2,12 +2,14 @@ extends RefCounted
 ## Deterministic policies use public game commands; consent is never bypassed.
 const STRATEGIES := ["passive", "frugal", "education", "enterprise", "family"]
 var strategy := "passive"
+var event_policy := "strategy"
 var cooldowns: Dictionary = {}
 var counts: Dictionary = {}
 var decisions: Array = []
 
-func _init(selected: String = "passive") -> void:
+func _init(selected: String = "passive", selected_event_policy: String = "strategy") -> void:
 	strategy = selected
+	event_policy = selected_event_policy
 
 func _record(state, kind: String, target: String, outcome: String, response: String) -> void:
 	counts[kind] = int(counts.get(kind,0)) + 1
@@ -43,11 +45,12 @@ func resolve_events(state) -> String:
 		var result: Dictionary = state.events.resolve(state,event["serial"],chosen)
 		if not result["ok"]:
 			return result["message"]
+		counts["event:first_option" if chosen == 0 else "event:other_option"] = int(counts.get("event:first_option" if chosen == 0 else "event:other_option", 0)) + 1
 		_record(state,"event",event["id"],"resolved",event["choices"][chosen]["label"])
 	return "Event queue exceeded the safety limit."
 
 func _event_score(effect: Dictionary) -> float:
-	if strategy == "passive":
+	if strategy == "passive" or event_policy == "first_legal":
 		return 0.0 # First legal choice, including consequences and expenses.
 	var score: float = float(effect.get("cash",0))/10000.0 + float(effect.get("delayed_cash",0))/20000.0 - float(effect.get("cash_loss",0))/10000.0
 	score += float(effect.get("shorten_illness",0))*.3 + float(effect.get("condition",0))*.03 + float(effect.get("property_condition",0))*.03
@@ -62,8 +65,8 @@ func _event_score(effect: Dictionary) -> float:
 	return score
 
 func reserve(state) -> int:
-	var budget: Dictionary = state.economy.budget(state.people,state.household["members"])
-	return 6 * (budget["food_cents"] + budget["planned_tuition_cents"])
+	var budget: Dictionary = state.economy.budget(state.people,state.household["members"],state.household,state.year,state.month,state.tax_property_assessment())
+	return 6 * (budget["living_costs_cents"] + budget["planned_tuition_cents"])
 
 func step(state) -> void:
 	if strategy == "passive" or state.elapsed_months % 3 != 0:
@@ -84,12 +87,16 @@ func _request(state, id: String, action: String) -> bool:
 		return false
 	var result: Dictionary = state.request(id,action)
 	_record(state,"request",id+":"+action,result["outcome"],result["response"])
+	var category: String = action.get_slice(":", 0)
+	counts["request:" + category] = int(counts.get("request:" + category, 0)) + 1
+	if result["outcome"] != "refused":
+		counts["accepted:" + category] = int(counts.get("accepted:" + category, 0)) + 1
 	return true
 
 func _employment(state) -> bool:
 	for id in state.household["members"]:
 		var person = state.people[id]
-		if id == state.head_id or not person.education["study"].is_empty():
+		if id == state.head_id or (not person.education["study"].is_empty() and not person.education["study"].get("suspended", false)):
 			continue
 		var best := ""
 		var income: int = person.monthly_income_cents
@@ -113,8 +120,8 @@ func _education(state) -> bool:
 			if not state.Influence.unavailable_reason(state,id,action).is_empty():
 				continue
 			var fees: int = state.economy.purchase_cost(program["monthly_cost_cents"])
-			var budget: Dictionary = state.economy.budget(state.people,state.household["members"])
-			if state.economy.cash_cents < reserve(state)+fees*12 or budget["net_cents"]-person.monthly_income_cents-fees < 0:
+			var budget: Dictionary = state.economy.budget(state.people,state.household["members"],state.household,state.year,state.month,state.tax_property_assessment())
+			if state.economy.cash_cents < reserve(state)+fees*12 or budget["net_cents"]-state.economy.earnings(person)+state.careers.projected_training_income(person, program["id"])-fees < 0:
 				continue
 			# Rank progression first, then cheaper/shorter courses; never retries
 			# the same refused proposal more often than every two years.

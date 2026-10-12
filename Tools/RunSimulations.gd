@@ -21,7 +21,7 @@ func _run() -> void:
 			config[key] = value.to_int()
 		elif key == "strategies":
 			config[key] = Array(value.split(",",false))
-		elif key in ["bonus","objective"]:
+		elif key in ["bonus","objective","starting_family","event_policy"]:
 			config[key] = value
 		else:
 			_fail("Unknown option: "+key)

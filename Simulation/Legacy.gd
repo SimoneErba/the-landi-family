@@ -3,7 +3,7 @@ extends RefCounted
 
 const OBJECTIVES := {
 	"populous": {"name": "Populous family", "description": "Have 100 living family members, including relatives living elsewhere."},
-	"wealth": {"name": "Family fortune", "description": "Reach 1,000,000 Italian lire in the shared purse (equivalent value before currency reforms)."},
+	"wealth": {"name": "Family fortune", "description": "Reach 1,000,000 Italian lire in the shared purse after loan liabilities (equivalent value before currency reforms)."},
 	"influence": {"name": "An influential family", "description": "Have 10 living members in senior careers with competent leadership and persuasion skills. Eligible careers: business manager, entrepreneur, lawyer, doctor, scientist or journalist."},
 }
 const BONUSES := {
@@ -50,7 +50,7 @@ func progress(state) -> Dictionary:
 			influential += 1
 	match objective_id:
 		"populous": return {"value": living, "target": 100.0, "text": "%d / 100 living family members" % living}
-		"wealth": return {"value": state.economy.cash_cents, "target": WEALTH_TARGET, "text": "Shared purse: %s\nTarget in current currency: %s" % [state.economy.money(state.economy.cash_cents), state.economy.money(ceili(WEALTH_TARGET))]}
+		"wealth": return {"value": state.economy.cash_cents - state.loans.principal_cents() - state.loans.accrued_cents(), "target": WEALTH_TARGET, "text": "Shared purse after loan liabilities: %s\nTarget in current currency: %s" % [state.economy.money(state.economy.cash_cents - state.loans.principal_cents() - state.loans.accrued_cents()), state.economy.money(ceili(WEALTH_TARGET))]}
 		"influence": return {"value": influential, "target": 10.0, "text": "%d / 10 highly influential family members" % influential}
 	return {"value": 0, "target": 1.0, "text": "Choose a starting objective."}
 

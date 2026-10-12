@@ -57,8 +57,12 @@ func program_reason(person, program_id: String) -> String:
 	if not programs.has(program_id):
 		return "Unknown training program."
 	if not person.education["study"].is_empty():
-		return "They are already studying."
+		var existing: Dictionary = person.education["study"]
+		if not existing.get("suspended", false) or existing.get("program_id") != program_id:
+			return "They already have a course. Resume it before choosing another."
 	var program: Dictionary = programs[program_id]
+	if person.age < int(program.get("minimum_age", 0)):
+		return "Needs to be at least " + str(program["minimum_age"]) + "."
 	if education_rank(person) < int(program["required_level"]):
 		return "Needs " + person.EDUCATION_LEVELS[int(program["required_level"])] + " education first."
 	if not str(program["qualification"]).is_empty() and program["qualification"] in person.education["qualifications"]:
@@ -100,18 +104,36 @@ func request_reason(state, person, action: String) -> String:
 			return reason
 		if not person.in_household:
 			return "Family-funded training currently requires living in the house."
-		if state.economy.cash_cents < state.economy.purchase_cost(int(programs[key]["monthly_cost_cents"])):
-			return "The family cannot afford the first month's fees."
-		return ""
+		return funding_reason(state, person, key)
 	if action.begins_with("work:"):
 		if person.career_id == key:
 			return "They already do this work."
-		if not person.education["study"].is_empty():
+		if not person.education["study"].is_empty() and not person.education["study"].get("suspended", false):
 			return "Finish the current course before taking full-time work."
 		var assessment := job_assessment(person, key)
 		return "" if assessment["eligible"] else "Needs: " + ", ".join(assessment["missing"])
 	return "Unknown career request."
 
+
+func funding_reason(state, person, program_id: String) -> String:
+	# Price the proposed arrangement, including wages, food provision and taxes.
+	var prospective = state.Person.from_save_data(person.to_save_data())
+	apply_request(prospective, "train:" + program_id)
+	var projected_people: Dictionary = state.people.duplicate()
+	projected_people[person.id] = prospective
+	var budget: Dictionary = state.economy.budget(projected_people, state.household["members"], state.household, state.year, state.month, state.tax_property_assessment())
+	var living: int = budget["living_costs_cents"]
+	for relative in state.people.values():
+		if relative.in_household and not relative.life_state.get("pregnancy", {}).is_empty():
+			living += state.economy.purchase_cost(roundi(1050 * state.economy.price_index))
+	var deficit := maxi(0, living + int(budget["planned_tuition_cents"]) - int(budget["income_cents"]))
+	if int(prospective.education["study"]["monthly_cost_cents"]) == 0 and deficit == 0:
+		return "" # A self-funding paid placement needs no invented tuition reserve.
+	var duration := maxi(1, ceili(float(programs[program_id]["months"]) - float(prospective.education["study"].get("progress", 0))))
+	var required := living * 3 + deficit * duration
+	if state.economy.cash_cents < required:
+		return "Keep three months of household bills plus the training's expected income shortfall in reserve (" + state.economy.money(required) + ")."
+	return ""
 
 func willingness(person, action: String) -> float:
 	var key := action.get_slice(":", 1)
@@ -131,22 +153,81 @@ func apply_request(person, action: String) -> void:
 	var key := action.get_slice(":", 1)
 	person.life_state.erase("job_agreement")
 	if action.begins_with("train:"):
-		person.education["study"] = {"program_id": key, "progress": 0.0, "status": "Studying", "monthly_cost_cents": int(programs[key]["monthly_cost_cents"])}
-		# Full-time training sacrifices earnings, so an education choice has a cost.
-		person.job = "Student — " + programs[key]["name"]
-		person.career_id = ""
-		person.monthly_income_cents = 0
+		var study: Dictionary = person.education["study"]
+		var legacy_contract := not study.is_empty() and not study.has("terms")
+		if study.is_empty():
+			study = {"program_id": key, "progress": 0.0, "monthly_cost_cents": int(programs[key]["monthly_cost_cents"])}
+		study["return_job"] = {"career_id": person.career_id, "job": person.job, "income_cents": person.monthly_income_cents, "food_support_fraction": person.life_state.get("food_support_fraction", 0.0)}
+		if not study.has("terms"):
+			var program: Dictionary = programs[key]
+			study["terms"] = {"mode": program.get("mode", "full_time"), "retained_income_fraction": program.get("retained_income_fraction", 0.0), "stipend_start_cents": int(program.get("stipend_start_cents", 0)), "stipend_end_cents": int(program.get("stipend_end_cents", 0)), "food_support_fraction": program.get("food_support_fraction", 0.0), "monthly_cost_cents": int(program["monthly_cost_cents"]), "tuition_cents": int(program.get("tuition_cents", program["monthly_cost_cents"])), "supplies_cents": int(program.get("supplies_cents", 0)), "duration_months": int(program["months"])}
+			if legacy_contract:
+				study["terms"].merge({"mode": "full_time", "retained_income_fraction": 0.0, "stipend_start_cents": 0, "stipend_end_cents": 0, "food_support_fraction": 0.0, "monthly_cost_cents": int(study["monthly_cost_cents"]), "tuition_cents": int(study["monthly_cost_cents"]), "supplies_cents": 0}, true)
+		study["status"] = "Studying"
+		study["suspended"] = false
+		study["unfunded_months"] = 0
+		person.education["study"] = study
+		person.job = ("Working apprentice — " if study["terms"]["mode"] == "apprenticeship" else "Student — ") + programs[key]["name"]
+		if float(study["terms"]["retained_income_fraction"]) <= 0: person.career_id = ""
+		person.monthly_income_cents = contract_income(study)
 	else:
 		person.career_id = key
 		person.job = jobs[key]["name"]
 		person.monthly_income_cents = int(jobs[key]["monthly_income_cents"])
+		person.life_state["food_support_fraction"] = float(jobs[key].get("food_support_fraction", 0.0))
+
+
+func projected_training_income(person, program_id: String) -> int:
+	var program: Dictionary = programs[program_id]
+	var study: Dictionary = person.education["study"]
+	if study.get("program_id") == program_id and study.has("terms"):
+		var projection := study.duplicate(true)
+		projection["return_job"] = {"income_cents": person.monthly_income_cents, "food_support_fraction": person.life_state.get("food_support_fraction", 0.0)}
+		return contract_income(projection)
+	return roundi(person.monthly_income_cents * float(program.get("retained_income_fraction", 0.0))) + int(int(program.get("stipend_start_cents", 0)))
+
+
+static func contract_income(study: Dictionary) -> int:
+	var terms: Dictionary = study.get("terms", {})
+	var progress := clampf(float(study.get("progress", 0.0)) / maxf(1.0, float(terms.get("duration_months", 1))), 0.0, 1.0)
+	var retained := roundi(int(study.get("return_job", {}).get("income_cents", 0)) * float(terms.get("retained_income_fraction", 0.0)))
+	return retained + roundi(lerpf(float(terms.get("stipend_start_cents", 0)), float(terms.get("stipend_end_cents", 0)), progress))
+
+
+static func restore_work(person, study: Dictionary) -> void:
+	var previous: Dictionary = study.get("return_job", {})
+	person.career_id = previous.get("career_id", "")
+	person.monthly_income_cents = int(previous.get("income_cents", 0))
+	person.job = previous.get("job", "Seeking work") if person.monthly_income_cents > 0 else "Seeking work"
+	person.life_state["food_support_fraction"] = previous.get("food_support_fraction", 0.0)
+
+
+static func valid_terms(value: Variant) -> bool:
+	if not value is Dictionary: return false
+	if value.get("mode") not in ["full_time", "day_lessons", "apprenticeship"]: return false
+	for field in ["retained_income_fraction", "food_support_fraction"]:
+		if not (value.get(field) is float or value.get(field) is int) or not is_finite(value[field]) or value[field] < 0 or value[field] > 1: return false
+	for field in ["stipend_start_cents", "stipend_end_cents", "monthly_cost_cents", "tuition_cents", "supplies_cents", "duration_months"]:
+		if not value.get(field) is int or value[field] < 0: return false
+	return value["duration_months"] > 0 and value["stipend_end_cents"] >= value["stipend_start_cents"] and value["tuition_cents"] + value["supplies_cents"] == value["monthly_cost_cents"]
+
+
+static func program_terms_text(economy, program: Dictionary) -> String:
+	var description: String = "Tuition / board " + economy.money(economy.purchase_cost(int(int(program.get("tuition_cents", program["monthly_cost_cents"]))))) + " · supplies " + economy.money(economy.purchase_cost(int(int(program.get("supplies_cents", 0))))) + " per month. "
+	if program.get("mode") == "apprenticeship":
+		description += "Paid placement · " + economy.money(int(program["stipend_start_cents"])) + " rising to " + economy.money(int(program["stipend_end_cents"])) + "/month with progress."
+	elif float(program.get("retained_income_fraction", 0.0)) > 0:
+		description += "Lessons retain %d%% of previous paid work." % roundi(float(program["retained_income_fraction"]) * 100)
+	else: description += "Full-time study replaces paid work."
+	if float(program.get("food_support_fraction", 0.0)) > 0: description += " Meals included while board is paid."
+	return description
 
 
 func monthly_cost(person) -> int:
 	var study: Dictionary = person.education["study"]
 	if not person.alive or not person.in_household or study.is_empty():
 		return 0
-	return int(programs.get(study.get("program_id"), {}).get("monthly_cost_cents", 0))
+	return int(study.get("monthly_cost_cents", 0))
 
 
 func advance_month(state, person) -> void:
@@ -157,6 +238,7 @@ func advance_month(state, person) -> void:
 			person.career_id = ""
 			person.job = "Seeking work"
 			person.monthly_income_cents = 0
+			person.life_state["food_support_fraction"] = 0.0
 			person.life_state.erase("job_agreement")
 			person.memories.append({"kind":"career", "date":state.date_text(), "description":ended})
 			state.chronicle.append({"date":state.date_text(), "description":ended})
@@ -165,19 +247,31 @@ func advance_month(state, person) -> void:
 	var study: Dictionary = person.education["study"]
 	if not person.alive or study.is_empty() or not programs.has(study.get("program_id")):
 		return
-	if not person.in_household or not bool(state.economy.ledger[-1].get("training_funded", false)):
-		study["status"] = "Paused — needs household funding"
+	if study.get("suspended", false):
+		study["status"] = "On hold — working or seeking work"
 		return
+	if not person.in_household or (int(study.get("monthly_cost_cents", 0)) > 0 and not bool(state.economy.ledger[-1].get("training_funded", false))):
+		study["status"] = "Paused — needs household funding"
+		if person.in_household:
+			study["unfunded_months"] = int(study.get("unfunded_months", 0)) + 1
+			if study["unfunded_months"] >= 3 and person.age >= 18:
+				study["suspended"] = true
+				restore_work(person, study)
+				var description: String = person.name + " put studies on hold after three unfunded months. Course progress is kept; paid work can resume."
+				state.notify(description, person.id)
+				state.chronicle.append({"date": state.date_text(), "description": description})
+		return
+	study["unfunded_months"] = 0
 	var program: Dictionary = programs[study["program_id"]]
 	if float(study["progress"]) >= 1 and Assignment.abandons(person, study.get("agreement", {})):
+		restore_work(person, study)
 		person.education["study"] = {}
-		person.job = "Seeking work"
 		var abandoned: String = person.name + " abandoned " + program["name"] + ". No qualification was awarded."
 		person.memories.append({"kind":"education", "date":state.date_text(), "description":abandoned})
 		state.chronicle.append({"date":state.date_text(), "description":abandoned})
 		state.notify(abandoned, person.id)
 		return
-	study["status"] = "Studying"
+	study["status"] = "Working apprentice" if study.get("terms", {}).get("mode") == "apprenticeship" else "Studying"
 	# Aptitude speeds learning; discipline can offset slower learning.
 	var rate := 0.45 + weighted_ability(person, program["abilities"]) / 100.0 * 0.65 + float(person.temperament["conscientiousness"]) * 0.5
 	rate *= state.legacy.learning_multiplier() * Assignment.progress(person, study.get("agreement", {}))
@@ -189,6 +283,7 @@ func advance_month(state, person) -> void:
 		var gap := maxf(0.0, float(program["skills"][skill]) - float(person.skills[skill]))
 		person.skills[skill] = clampf(float(person.skills[skill]) + gap * step / maxf(remaining, 0.01), 0.0, 100.0)
 	study["progress"] = minf(float(program["months"]), float(study["progress"]) + step)
+	if study.has("terms"): person.monthly_income_cents = contract_income(study)
 	if float(study["progress"]) < float(program["months"]):
 		return
 	var rank: int = person.EDUCATION_LEVELS.find(program["education_level"])
@@ -198,6 +293,10 @@ func advance_month(state, person) -> void:
 		person.education["qualifications"].append(program["qualification"])
 	person.education["study"] = {}
 	person.job = "Seeking work"
+	person.career_id = ""
+	person.monthly_income_cents = 0
+	if float(study.get("terms", {}).get("retained_income_fraction", 0.0)) > 0:
+		restore_work(person, study)
 	var description: String = person.name + " completed " + program["name"] + "."
 	person.memories.append({"kind": "education", "date": state.date_text(), "description": description})
 	state.chronicle.append({"date": state.date_text(), "description": description})

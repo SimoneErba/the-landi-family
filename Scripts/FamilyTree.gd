@@ -98,7 +98,7 @@ func _populate(host) -> void:
 		column.add_child(face)
 		var label: Label = host._add_label(column, person.name, 16, host.TEXT_MAIN)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		var status: String = "Family head" if id == host.game_clock.state.head_id else ("Deceased" if not person.alive else ("At home" if person.in_household else "Elsewhere"))
+		var status: String = "Deceased" if not person.alive else ("Family head" if id == host.game_clock.state.head_id else ("At home" if person.in_household else "Elsewhere"))
 		label = host._add_label(column, "%d · %s" % [person.age, status], 13, host.TEXT_MUTED)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		host._ignore_child_mouse(column)

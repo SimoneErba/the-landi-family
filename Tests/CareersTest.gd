@@ -14,7 +14,7 @@ func _run() -> void:
 	state.initialize(source)
 	state.events.enabled = false
 	assert(state.careers.jobs.size() == 32)
-	assert(state.careers.programs.size() == 23)
+	assert(state.careers.programs.size() == 25)
 	for job in state.careers.jobs.values():
 		for skill in job["skills"]:
 			assert(skill in State.Person.SKILLS)
@@ -52,8 +52,8 @@ func _run() -> void:
 	assert(state.request("Anna", "work:factory_worker")["outcome"] == "unavailable")
 	var opening: int = state.economy.cash_cents
 	state.advance_month()
-	assert(state.economy.ledger[-1]["tuition_cents"] == 1800)
-	assert(state.economy.cash_cents == opening + 28500 - 7000 - 1800)
+	assert(state.economy.ledger[-1]["tuition_cents"] == 800)
+	assert(state.economy.cash_cents == opening + state.economy.ledger[-1]["income_cents"] - state.economy.ledger[-1]["expenses_cents"])
 	assert(anna.skills["design"] > 30 and anna.skills["medicine"] == 0)
 	var months := 1
 	while not anna.education["study"].is_empty() and months < 120:
@@ -70,7 +70,7 @@ func _run() -> void:
 	anna.abilities["reasoning"] = 25
 	assert(state.careers.job_assessment(anna, "architect")["eligible"], "Cognitive ability is not a fixed exclusion")
 	assert(state.request("Anna", "work:architect")["outcome"] == "accepted")
-	assert(anna.job == "Architect" and anna.monthly_income_cents == 14000)
+	assert(anna.job == "Architect" and anna.monthly_income_cents == 7000)
 	var expected_income: int = state.economy.budget(state.people, state.household["members"])["income_cents"]
 	state.advance_month()
 	assert(state.economy.ledger[-1]["tuition_cents"] == 0 and state.economy.ledger[-1]["income_cents"] == expected_income)
@@ -79,12 +79,13 @@ func _run() -> void:
 	var hesitant = State.new()
 	hesitant.initialize(source)
 	hesitant.events.enabled = false
+	hesitant.economy.cash_cents = 1000000
 	hesitant.people["Carlo"].interests["technical"] = 0
 	hesitant.people["Carlo"].values["achievement"] = 0
 	hesitant.people["Carlo"].current_state["resentment"] = 1
 	assert(hesitant.request("Carlo", "train:engineering")["outcome"] == "refused")
 	assert(hesitant.people["Carlo"].education["study"].is_empty())
-	assert(hesitant.people["Carlo"].monthly_income_cents == 7000)
+	assert(hesitant.people["Carlo"].monthly_income_cents == 2500)
 
 	var paused = State.new()
 	paused.initialize(source)
@@ -111,6 +112,7 @@ func _run() -> void:
 
 	var children = State.new()
 	children.initialize({"Giovanni": {"age": 50}, "Child": {"age": 12, "parent_ids": ["Giovanni"]}, "Niece": {"age": 12, "parent_ids": ["Pietro"]}})
+	children.economy.cash_cents = 1000000
 	children.events.enabled = false
 	assert(children.Influence.unavailable_reason(children, "Child", "train:primary").is_empty())
 	assert("parent" in children.Influence.unavailable_reason(children, "Niece", "train:primary"))
@@ -143,13 +145,14 @@ func _run() -> void:
 	var screen = load("res://Scenes/FamilyScreen.tscn").instantiate()
 	root.add_child(screen)
 	screen.game_clock.state.events.enabled = false
+	screen.game_clock.state.economy.cash_cents = 1000000
 	screen._show_careers("Anna")
 	assert(screen.careers_popup.visible and not screen.game_clock.is_playing)
 	assert(screen.careers_content.get_child(0).get_child(0).text.begins_with("Anna"))
 	screen._make_request("Anna", "train:architecture")
 	assert(screen.assignment_feedback["Anna:train:architecture"]["accepted"] and screen.careers_popup.visible)
 	screen._show_screen("Finances")
-	assert(screen.game_clock.state.economy.budget(screen.people, screen.game_clock.state.household["members"])["tuition_cents"] == 1800)
+	assert(screen.game_clock.state.economy.budget(screen.people, screen.game_clock.state.household["members"])["tuition_cents"] == 800)
 	screen.free()
 	print("PASS: career catalog, private abilities, qualifications, consent, funded study, progress, graduation, employment, guardian authority, and career UI")
 	quit()

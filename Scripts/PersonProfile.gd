@@ -22,6 +22,8 @@ static func build(host, person_id: String) -> void:
 	identity.add_child(facts)
 	_essentials(host, facts, model)
 	var location: String = state.travel.location_text(person_id)
+	var personal: int = model.life_state.get("personal_cash_cents", 0)
+	if personal > 0: host._add_label(identity, "Personal inheritance · " + state.economy.money(personal), 16, host.TEXT_KNOWN)
 	if not location.is_empty():
 		host._add_label(identity, location, 15, host.TEXT_KNOWN)
 	var close := Button.new()
@@ -127,6 +129,7 @@ static func build(host, person_id: String) -> void:
 	var careers := _button(background, "Education & careers", "education")
 	careers.pressed.connect(host._show_careers.bind(person_id, true))
 	var requests := _category(host, content, "Requests & influence", "bond", "Requests")
+	preload("res://Scripts/PersonSocialLife.gd").reports(host, requests, person_id)
 	host._add_label(requests, "Their wishes and relationship with you shape their answer.", 15, host.TEXT_MUTED)
 	for action in state.Influence.ACTIONS:
 		var reason: String = state.Influence.unavailable_reason(state, person_id, action)
@@ -177,7 +180,7 @@ static func _button(parent: Node, text: String, icon_name: String) -> Button:
 
 static func _essentials(host, parent: Node, model) -> void:
 	var state = host.game_clock.state
-	var income: int = roundi(model.monthly_income_cents * state.economy.event_income_multiplier * (0.5 if not model.life_state.get("illness", {}).is_empty() else 1.0))
+	var income: int = state.economy.earnings(model)
 	if not model.alive or not model.in_household or not state.travel.current(model.id).is_empty(): income = 0
 	for entry in [["health", model.health if model.alive else "Deceased", "Health"], ["house", "At home" if model.in_household else ("Nearby branch" if model.life_state.has("marriage_id") else "Elsewhere"), "Residence"], ["coins", state.economy.money(income) + "/month", "Contribution to the family purse"]]:
 		var row := HBoxContainer.new()
@@ -287,15 +290,20 @@ static func _response(host, parent: VBoxContainer, person_id: String) -> void:
 static func _current_tasks(host, parent: VBoxContainer, person_id: String) -> void:
 	var state = host.game_clock.state
 	var active = state.activities.commitment(person_id)
+	var shared: Dictionary = state.social.commitment(person_id)
 	var study: Dictionary = state.people[person_id].education["study"]
 	var journey: Dictionary = state.travel.current(person_id)
-	if active == null and study.is_empty() and journey.is_empty():
+	if active == null and shared.is_empty() and study.is_empty() and journey.is_empty():
 		return
 	var section := VBoxContainer.new()
 	section.name = "CurrentTasks"
 	section.add_theme_constant_override("separation", 5)
 	parent.add_child(section)
 	host._add_label(section, "Current tasks", 20, host.TEXT_MAIN)
+	if not shared.is_empty():
+		var pair: Array = shared["participants"]
+		var partner: String = pair[1] if pair[0] == person_id else pair[0]
+		_task_progress(host, section, state.social.KINDS[shared["kind"]] + " with " + state.people[partner].name, shared["status"].capitalize(), shared["months"], 3.0, shared["reason"])
 	if active != null:
 		_task_progress(host, section, state.activities.CATALOG[active.activity_id]["name"], active.status.capitalize(), active.progress_months, active.duration_months, active.interruption_reason)
 	if not study.is_empty() and state.careers.programs.has(study["program_id"]):

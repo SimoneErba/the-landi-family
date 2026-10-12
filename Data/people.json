@@ -60,7 +60,7 @@
       "Has asked Carlo to stay late at work three times this month."
     ],
     "job": "Smallholder (farm and market earnings)",
-    "monthly_income_cents": 8000,
+    "monthly_income_cents": 4500,
     "birth": {
       "year": 1747,
       "month": 4
@@ -211,6 +211,9 @@
         "presentation": "masculine",
         "base_face": "giovanni"
       }
+    },
+    "life_state": {
+      "farm_food_share": 0.35
     }
   },
   "Maria": {
@@ -482,8 +485,8 @@
       "Left before closing on three recent evenings.",
       "Maria has been speaking with him privately."
     ],
-    "job": "Farm worker",
-    "monthly_income_cents": 7000,
+    "job": "Farm laborer (paid work)",
+    "monthly_income_cents": 2500,
     "birth": {
       "year": 1776,
       "month": 6
@@ -693,7 +696,7 @@
       "Studies after the others have gone to bed.",
       "Maria has given some of Anna's chores to other family members."
     ],
-    "job": "Studying with a private tutor",
+    "job": "Preparing for further study",
     "monthly_income_cents": 0,
     "birth": {
       "year": 1780,
@@ -907,7 +910,7 @@
       "Offered to repair the roof himself if materials are paid for."
     ],
     "job": "Carpenter",
-    "monthly_income_cents": 8500,
+    "monthly_income_cents": 4000,
     "birth": {
       "year": 1752,
       "month": 2
@@ -1117,7 +1120,7 @@
       "Asked Pietro about the repair estimate after dinner."
     ],
     "job": "Seamstress",
-    "monthly_income_cents": 3500,
+    "monthly_income_cents": 2000,
     "birth": {
       "year": 1754,
       "month": 8
@@ -1322,7 +1325,7 @@
       "Asked how Anna qualified for her examinations."
     ],
     "job": "Apprentice seamstress",
-    "monthly_income_cents": 1500,
+    "monthly_income_cents": 300,
     "birth": {
       "year": 1782,
       "month": 12
@@ -1409,7 +1412,30 @@
     "education": {
       "level": "primary",
       "qualifications": [],
-      "study": {}
+      "study": {
+        "program_id": "sewing",
+        "progress": 0.0,
+        "monthly_cost_cents": 0,
+        "status": "Working apprentice",
+        "suspended": false,
+        "unfunded_months": 0,
+        "return_job": {
+          "career_id": "",
+          "job": "Seeking work",
+          "income_cents": 0
+        },
+        "terms": {
+          "mode": "apprenticeship",
+          "retained_income_fraction": 0.0,
+          "stipend_start_cents": 300,
+          "stipend_end_cents": 650,
+          "food_support_fraction": 0.0,
+          "monthly_cost_cents": 0,
+          "tuition_cents": 0,
+          "supplies_cents": 0,
+          "duration_months": 24
+        }
+      }
     },
     "abilities": {
       "reasoning": 70,

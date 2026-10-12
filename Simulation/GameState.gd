@@ -14,6 +14,10 @@ const Influence = preload("res://Simulation/Influence.gd")
 const Careers = preload("res://Simulation/Careers.gd")
 const EventSystem = preload("res://Simulation/EventSystem.gd")
 const DecisionSystem = preload("res://Simulation/DecisionSystem.gd")
+const Succession = preload("res://Simulation/Succession.gd")
+const Loans = preload("res://Simulation/Loans.gd")
+const Laws = preload("res://Simulation/Laws.gd")
+const SocialLife = preload("res://Simulation/SocialLife.gd")
 
 var year: int = 1800
 var month: int = 1
@@ -27,6 +31,9 @@ var activities = Activities.new()
 var village = Village.new()
 var careers = Careers.new()
 var events = EventSystem.new()
+var succession = Succession.new()
+var loans = Loans.new()
+var social = SocialLife.new()
 var major_event: bool = false
 var head_id: String = "Giovanni"
 var chronicle: Array = []
@@ -36,6 +43,9 @@ var household: Dictionary = {"members": [], "rooms": ["Bedroom", "Kitchen", "Out
 
 
 func initialize(initial_people: Dictionary) -> void:
+	succession = Succession.new()
+	loans = Loans.new()
+	social = SocialLife.new()
 	village.initialize()
 	marriage = Marriage.new()
 	activities = Activities.new()
@@ -98,6 +108,7 @@ func add_person(person_id: String, source: Dictionary) -> RefCounted:
 
 
 func advance_month() -> void:
+	if succession.pending or succession.ended: return
 	if events.enabled and not events.pending.is_empty():
 		return
 	major_event = false
@@ -108,27 +119,46 @@ func advance_month() -> void:
 		month = 1
 		year += 1
 	elapsed_months += 1
+	Laws.advance_month(self)
+	loans.advance_month(self)
 	for person in people.values():
 		person.in_household = person.id in household["members"]
 		person.advance_month(year, month, economy.cash_cents < 0)
+		if person.in_household and person.alive and economy.ledger.back().get("economizing", false):
+			person.current_state["happiness"] = maxf(0.0, float(person.current_state.get("happiness", 0.6)) - 0.01)
 		careers.advance_month(self, person)
 		if economy.crisis_started and person.in_household and person.alive:
-			person.experience_event("financial_crisis", "The household could not cover its monthly food bill.", date_text(), [head_id], 0.5)
+			person.experience_event("financial_crisis", "The household could not cover its essential monthly bills.", date_text(), [head_id], 0.5)
 
-	# Evaluate after all birthdays, learning, and financial pressure are applied.
+	succession.advance_month(self)
+	# Evaluate after all birthdays, learning, financial pressure and deaths.
 	for person in people.values():
 		DecisionSystem.advance_month(self, person)
 	travel.advance_month(self)
 	activities.advance_month(self)
 	village.advance_month(self)
 	marriage.advance_month(self)
+	social.advance_month(self)
 	events.advance_month(self)
 	legacy.evaluate(self)
 
 
+func tax_property_assessment() -> int:
+	# Stable authored capital is a proxy for assessed rental capacity. Do not use
+	# speculative sale prices or tax the same parcel again as a business expense.
+	var assessed := 0
+	for parcel in village.development.parcels.values():
+		if parcel["owner_id"] == "landi": assessed += int(parcel["value_cents"])
+	for building in village.development.buildings.values():
+		if building["owner_id"] != "landi" or building["status"] == "demolished": continue
+		assessed += village.development.COST * village.development.PROPERTY_VALUE_MULTIPLIER * int(building["level"])
+		if building["id"] == "home": assessed += maxi(0, household["rooms"].size() - 3) * 20000
+	return assessed
+
+
 func _update_monthly() -> void:
 	events.prepare_economy(self)
-	economy.settle_month(date_text(), people, household["members"])
+	economy.settle_month(date_text(), people, household["members"], household, year, month, tax_property_assessment())
 
 
 func date_text() -> String:
@@ -150,6 +180,8 @@ func to_save_data() -> Dictionary:
 		"notifications": notifications.duplicate(true), "chronicle": chronicle.duplicate(true), "last_requests": last_requests.duplicate(true),
 		"marriage": marriage.to_save_data(), "travel": travel.to_save_data(), "activities": activities.to_save_data(), "village": village.to_save_data(),
 		"legacy": legacy.to_save_data(), "major_event": major_event, "events": events.to_save_data(),
+		"succession": succession.to_save_data(), "loans": loans.to_save_data(),
+		"social": social.to_save_data(),
 		"economy": {"currency": economy.currency, "cash_cents": economy.cash_cents, "price_index": economy.price_index,
 			"event_food_multiplier": economy.event_food_multiplier, "event_income_multiplier": economy.event_income_multiplier,
 			"ledger": economy.ledger.duplicate(true), "crisis_started": economy.crisis_started},
@@ -158,6 +190,9 @@ func to_save_data() -> Dictionary:
 
 
 func restore_save_data(data: Dictionary) -> void:
+	social.restore_save_data(data.get("social", {}))
+	succession.restore_save_data(data.get("succession", {}))
+	loans.restore_save_data(data.get("loans", {}))
 	marriage.restore_save_data(data.get("marriage", {}))
 	travel.restore_save_data(data.get("travel", {}))
 	if data.has("village"):
@@ -188,6 +223,11 @@ func restore_save_data(data: Dictionary) -> void:
 	economy.crisis_started = data["economy"]["crisis_started"]
 	careers.jobs = data["careers"]["jobs"]
 	careers.programs = data["careers"]["programs"]
+	# New offers use the current catalogue; ongoing pay and stored course contracts
+	# stay with the person. Preserve additional save-authored/custom entries.
+	var current_catalog = Careers.new()
+	careers.jobs.merge(current_catalog.jobs, true)
+	careers.programs.merge(current_catalog.programs, true)
 
 	events.restore_save_data(data.get("events", {}))
 	events.prepare_economy(self)

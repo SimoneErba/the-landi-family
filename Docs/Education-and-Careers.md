@@ -1,6 +1,6 @@
 # Education and careers
 
-The model separates eligibility, aptitude, and willingness. A relative may qualify for a career and refuse it; another may want it and need years of preparation.
+The current 1800 wage and training calibration, paid apprenticeships, day lessons, board and saved contracts are documented in [Historical income calibration](Historical-Income-Calibration.md). The sections below describe the broader career system; the calibration supersedes the earlier assumption that every course stops all pay. The model separates eligibility, aptitude, and willingness. A relative may qualify for a career and refuse it; another may want it and need years of preparation.
 
 ## Person data
 
@@ -26,9 +26,9 @@ Each occupation specifies an education level, optional qualification, minimum le
 
 ## Training catalog and monthly flow
 
-The 22 programs include schooling, four trade apprenticeships, technical and commercial training, accounting, teaching, nursing, engineering, architecture, medicine, law, surveying, research, art, music, agriculture, household work, and writing. They grant an education level and/or qualification and teach specified skills. Some have prior schooling or entry-skill requirements.
+The 25 programs include schooling, four trade apprenticeships, technical and commercial training, accounting, teaching, nursing, engineering, architecture, medicine, law, surveying, research, art, music, agriculture, household work, and writing. They grant an education level and/or qualification and teach specified skills. Some have prior schooling or entry-skill requirements.
 
-An accepted education request starts full-time study and removes earnings. An occupation request requires completion of current study. Courses already mastered or qualifications already held cannot be repeated. Training does not lower existing skills or education.
+An accepted education request saves its fees and earnings as a contract. Full-time study stops wages; day lessons retain part of the existing wage, and apprenticeships pay a gradually increasing stipend. An occupation request requires completion of current study. Courses already mastered or qualifications already held cannot be repeated. Training does not lower existing skills or education.
 
 The month settles income, food, and tuition before advancing study. If available cash plus resident earnings minus food cannot cover all tuition, courses pause together without charging fees. Learning also pauses outside the household or after death. Tuition is fixed; food follows the existing inflation model.
 

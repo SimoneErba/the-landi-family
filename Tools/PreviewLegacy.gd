@@ -17,6 +17,8 @@ func _run() -> void:
 	await _capture("res://.godot/legacy-start-preview.png")
 	var goals = screen.focus_overlay.find_child("ObjectiveCards", true, false)
 	goals.get_child(2).find_children("*", "Button", true, false)[0].pressed.emit()
+	screen.focus_overlay.find_child("NextFocusStep", true, false).pressed.emit()
+	await _capture("res://.godot/legacy-bonus-preview.png")
 	var perks = screen.focus_overlay.find_child("PerkCards", true, false)
 	perks.get_child(1).find_children("*", "Button", true, false)[0].pressed.emit()
 	await _capture("res://.godot/legacy-selected-preview.png")

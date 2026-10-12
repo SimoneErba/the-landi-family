@@ -18,7 +18,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 3500
+      "monthly_income_cents": 2500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "farmer",
@@ -42,7 +44,9 @@
         "land",
         "equipment"
       ],
-      "monthly_income_cents": 5500
+      "monthly_income_cents": 4500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "farm_manager",
@@ -64,7 +68,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 8500
+      "monthly_income_cents": 5000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "domestic_worker",
@@ -83,7 +89,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 3000
+      "monthly_income_cents": 1200,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.6
     },
     {
       "id": "factory_worker",
@@ -102,7 +110,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 4500
+      "monthly_income_cents": 2800,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "machine_operator",
@@ -123,7 +133,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 6500
+      "monthly_income_cents": 3500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "carpenter",
@@ -144,7 +156,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 8500
+      "monthly_income_cents": 4000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "builder",
@@ -164,7 +178,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 6500
+      "monthly_income_cents": 3800,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "mechanic",
@@ -186,7 +202,9 @@
         "openness": 0.5
       },
       "access": [],
-      "monthly_income_cents": 7500
+      "monthly_income_cents": 4200,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "tailor",
@@ -207,7 +225,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 5500
+      "monthly_income_cents": 2400,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "cook",
@@ -228,7 +248,9 @@
         "emotional_stability": 0.5
       },
       "access": [],
-      "monthly_income_cents": 5000
+      "monthly_income_cents": 2200,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.4
     },
     {
       "id": "shop_assistant",
@@ -251,7 +273,9 @@
         "extraversion": 0.5
       },
       "access": [],
-      "monthly_income_cents": 7000
+      "monthly_income_cents": 2600,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "merchant",
@@ -277,7 +301,9 @@
         "capital",
         "suppliers"
       ],
-      "monthly_income_cents": 9000
+      "monthly_income_cents": 6000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "shopkeeper",
@@ -301,7 +327,9 @@
         "premises",
         "capital"
       ],
-      "monthly_income_cents": 8000
+      "monthly_income_cents": 4200,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "salesperson",
@@ -322,7 +350,9 @@
         "emotional_stability": 0.5
       },
       "access": [],
-      "monthly_income_cents": 6000
+      "monthly_income_cents": 3000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "bookkeeper",
@@ -344,7 +374,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 6500
+      "monthly_income_cents": 3800,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "accountant",
@@ -365,7 +397,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 10000
+      "monthly_income_cents": 5500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "clerk",
@@ -386,7 +420,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 5500
+      "monthly_income_cents": 3500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "teacher",
@@ -409,7 +445,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 8500
+      "monthly_income_cents": 5600,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "nurse",
@@ -432,7 +470,9 @@
         "emotional_stability": 1
       },
       "access": [],
-      "monthly_income_cents": 7000
+      "monthly_income_cents": 2400,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "doctor",
@@ -455,7 +495,9 @@
         "emotional_stability": 0.5
       },
       "access": [],
-      "monthly_income_cents": 16000
+      "monthly_income_cents": 9000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "lawyer",
@@ -477,7 +519,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 14000
+      "monthly_income_cents": 8000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "engineer",
@@ -500,7 +544,9 @@
         "openness": 0.5
       },
       "access": [],
-      "monthly_income_cents": 14000
+      "monthly_income_cents": 7500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "architect",
@@ -523,7 +569,9 @@
         "conscientiousness": 1
       },
       "access": [],
-      "monthly_income_cents": 14000
+      "monthly_income_cents": 7000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "surveyor",
@@ -546,7 +594,9 @@
       "access": [
         "instruments"
       ],
-      "monthly_income_cents": 9500
+      "monthly_income_cents": 5000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "researcher",
@@ -571,7 +621,9 @@
       "access": [
         "institution"
       ],
-      "monthly_income_cents": 13000
+      "monthly_income_cents": 5500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "journalist",
@@ -593,7 +645,9 @@
         "extraversion": 0.5
       },
       "access": [],
-      "monthly_income_cents": 8000
+      "monthly_income_cents": 4000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "writer",
@@ -616,7 +670,9 @@
       "access": [
         "publisher"
       ],
-      "monthly_income_cents": 6000
+      "monthly_income_cents": 2500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "artist",
@@ -638,7 +694,9 @@
       "access": [
         "materials"
       ],
-      "monthly_income_cents": 6000
+      "monthly_income_cents": 2800,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "musician",
@@ -661,7 +719,9 @@
       "access": [
         "instrument"
       ],
-      "monthly_income_cents": 6000
+      "monthly_income_cents": 3000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "manager",
@@ -684,7 +744,9 @@
         "extraversion": 0.5
       },
       "access": [],
-      "monthly_income_cents": 11000
+      "monthly_income_cents": 6000,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     },
     {
       "id": "entrepreneur",
@@ -708,13 +770,15 @@
         "capital",
         "opportunity"
       ],
-      "monthly_income_cents": 8000
+      "monthly_income_cents": 4500,
+      "income_basis": "Estimated monthly equivalent; paid days, demand and period vary.",
+      "food_support_fraction": 0.0
     }
   ],
   "programs": [
     {
       "id": "primary",
-      "name": "Basic schooling",
+      "name": "Subsidized basic lessons",
       "education_level": "primary",
       "qualification": "",
       "required_level": 0,
@@ -723,12 +787,21 @@
         "mathematics": 30
       },
       "months": 24,
-      "monthly_cost_cents": 200,
+      "monthly_cost_cents": 50,
       "interest": "academic",
       "abilities": {
         "learning_speed": 1
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 0,
+      "supplies_cents": 50,
+      "mode": "day_lessons",
+      "retained_income_fraction": 0.5,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 6,
+      "cost_basis": "Subsidized tuition; 0.5 lire/month supplies assumed. A local teaching place is assumed available."
     },
     {
       "id": "secondary",
@@ -742,13 +815,22 @@
         "science": 40
       },
       "months": 36,
-      "monthly_cost_cents": 800,
+      "monthly_cost_cents": 350,
       "interest": "academic",
       "abilities": {
         "reasoning": 0.5,
         "learning_speed": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 300,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "carpentry",
@@ -761,13 +843,22 @@
         "mathematics": 30
       },
       "months": 24,
-      "monthly_cost_cents": 300,
+      "monthly_cost_cents": 0,
       "interest": "practical",
       "abilities": {
         "spatial": 0.5,
         "learning_speed": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 0,
+      "supplies_cents": 0,
+      "mode": "apprenticeship",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 600,
+      "stipend_end_cents": 1200,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Assumed local paid placement; employer provides work materials. Cash pay rises with training progress."
     },
     {
       "id": "construction",
@@ -780,13 +871,22 @@
         "technical": 35
       },
       "months": 24,
-      "monthly_cost_cents": 300,
+      "monthly_cost_cents": 0,
       "interest": "practical",
       "abilities": {
         "spatial": 0.5,
         "learning_speed": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 0,
+      "supplies_cents": 0,
+      "mode": "apprenticeship",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 450,
+      "stipend_end_cents": 950,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Assumed local paid placement; employer provides work materials. Cash pay rises with training progress."
     },
     {
       "id": "mechanical",
@@ -799,13 +899,22 @@
         "craft": 40
       },
       "months": 24,
-      "monthly_cost_cents": 300,
+      "monthly_cost_cents": 0,
       "interest": "technical",
       "abilities": {
         "spatial": 0.5,
         "learning_speed": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 0,
+      "supplies_cents": 0,
+      "mode": "apprenticeship",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 600,
+      "stipend_end_cents": 1250,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Assumed local paid placement; employer provides work materials. Cash pay rises with training progress."
     },
     {
       "id": "sewing",
@@ -818,13 +927,22 @@
         "art": 25
       },
       "months": 24,
-      "monthly_cost_cents": 300,
+      "monthly_cost_cents": 0,
       "interest": "practical",
       "abilities": {
         "spatial": 0.5,
         "learning_speed": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 0,
+      "supplies_cents": 0,
+      "mode": "apprenticeship",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 300,
+      "stipend_end_cents": 650,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Assumed local paid placement; employer provides work materials. Cash pay rises with training progress."
     },
     {
       "id": "technical",
@@ -837,13 +955,22 @@
         "mathematics": 35
       },
       "months": 24,
-      "monthly_cost_cents": 700,
+      "monthly_cost_cents": 350,
       "interest": "technical",
       "abilities": {
         "reasoning": 0.5,
         "spatial": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 300,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "commercial",
@@ -858,13 +985,22 @@
         "mathematics": 40
       },
       "months": 18,
-      "monthly_cost_cents": 600,
+      "monthly_cost_cents": 250,
       "interest": "commercial",
       "abilities": {
         "verbal": 0.5,
         "reasoning": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 200,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "accounting",
@@ -877,13 +1013,22 @@
         "mathematics": 55
       },
       "months": 24,
-      "monthly_cost_cents": 1000,
+      "monthly_cost_cents": 400,
       "interest": "commercial",
       "abilities": {
         "reasoning": 0.7,
         "learning_speed": 0.3
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 350,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "teaching",
@@ -897,13 +1042,22 @@
         "empathy": 45
       },
       "months": 24,
-      "monthly_cost_cents": 1000,
+      "monthly_cost_cents": 300,
       "interest": "academic",
       "abilities": {
         "verbal": 0.7,
         "learning_speed": 0.3
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 250,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "nursing",
@@ -917,13 +1071,22 @@
         "empathy": 40
       },
       "months": 24,
-      "monthly_cost_cents": 800,
+      "monthly_cost_cents": 100,
       "interest": "social",
       "abilities": {
         "memory": 0.6,
         "learning_speed": 0.4
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 50,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "engineering",
@@ -937,7 +1100,7 @@
         "science": 50
       },
       "months": 48,
-      "monthly_cost_cents": 1800,
+      "monthly_cost_cents": 800,
       "interest": "technical",
       "abilities": {
         "reasoning": 0.65,
@@ -945,7 +1108,16 @@
       },
       "entry_skills": {
         "mathematics": 45
-      }
+      },
+      "tuition_cents": 750,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "architecture",
@@ -959,7 +1131,7 @@
         "technical": 50
       },
       "months": 48,
-      "monthly_cost_cents": 1800,
+      "monthly_cost_cents": 800,
       "interest": "artistic",
       "abilities": {
         "spatial": 0.75,
@@ -967,7 +1139,16 @@
       },
       "entry_skills": {
         "mathematics": 40
-      }
+      },
+      "tuition_cents": 750,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "medicine",
@@ -981,7 +1162,7 @@
         "care": 45
       },
       "months": 72,
-      "monthly_cost_cents": 2200,
+      "monthly_cost_cents": 1000,
       "interest": "academic",
       "abilities": {
         "reasoning": 0.5,
@@ -989,7 +1170,16 @@
       },
       "entry_skills": {
         "science": 35
-      }
+      },
+      "tuition_cents": 950,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "law",
@@ -1003,7 +1193,7 @@
         "persuasion": 45
       },
       "months": 48,
-      "monthly_cost_cents": 1800,
+      "monthly_cost_cents": 800,
       "interest": "academic",
       "abilities": {
         "verbal": 0.7,
@@ -1011,7 +1201,16 @@
       },
       "entry_skills": {
         "literacy": 50
-      }
+      },
+      "tuition_cents": 750,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "surveying",
@@ -1024,13 +1223,22 @@
         "technical": 50
       },
       "months": 24,
-      "monthly_cost_cents": 1000,
+      "monthly_cost_cents": 350,
       "interest": "technical",
       "abilities": {
         "spatial": 0.7,
         "reasoning": 0.3
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 300,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "research",
@@ -1044,13 +1252,22 @@
         "literacy": 65
       },
       "months": 36,
-      "monthly_cost_cents": 2000,
+      "monthly_cost_cents": 700,
       "interest": "academic",
       "abilities": {
         "reasoning": 0.7,
         "memory": 0.3
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 650,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "art",
@@ -1063,13 +1280,22 @@
         "design": 65
       },
       "months": 30,
-      "monthly_cost_cents": 800,
+      "monthly_cost_cents": 300,
       "interest": "artistic",
       "abilities": {
         "spatial": 0.7,
         "learning_speed": 0.3
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 250,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "music",
@@ -1081,13 +1307,22 @@
         "music": 70
       },
       "months": 36,
-      "monthly_cost_cents": 800,
+      "monthly_cost_cents": 350,
       "interest": "artistic",
       "abilities": {
         "memory": 0.7,
         "learning_speed": 0.3
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 300,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "agriculture",
@@ -1100,13 +1335,22 @@
         "commerce": 40
       },
       "months": 18,
-      "monthly_cost_cents": 500,
+      "monthly_cost_cents": 50,
       "interest": "practical",
       "abilities": {
         "reasoning": 0.5,
         "learning_speed": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 0,
+      "supplies_cents": 50,
+      "mode": "day_lessons",
+      "retained_income_fraction": 0.75,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "household",
@@ -1119,13 +1363,22 @@
         "cooking": 50
       },
       "months": 12,
-      "monthly_cost_cents": 300,
+      "monthly_cost_cents": 50,
       "interest": "practical",
       "abilities": {
         "memory": 0.5,
         "learning_speed": 0.5
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 0,
+      "supplies_cents": 50,
+      "mode": "day_lessons",
+      "retained_income_fraction": 0.75,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "writing",
@@ -1139,13 +1392,22 @@
         "art": 40
       },
       "months": 24,
-      "monthly_cost_cents": 600,
+      "monthly_cost_cents": 250,
       "interest": "artistic",
       "abilities": {
         "verbal": 0.7,
         "learning_speed": 0.3
       },
-      "entry_skills": {}
+      "entry_skills": {},
+      "tuition_cents": 200,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
     },
     {
       "id": "leadership",
@@ -1158,7 +1420,7 @@
         "persuasion": 65
       },
       "months": 24,
-      "monthly_cost_cents": 1200,
+      "monthly_cost_cents": 400,
       "interest": "social",
       "abilities": {
         "verbal": 0.6,
@@ -1166,7 +1428,72 @@
       },
       "entry_skills": {
         "literacy": 40
-      }
+      },
+      "tuition_cents": 350,
+      "supplies_cents": 50,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 12,
+      "cost_basis": "Historical-relative estimate; tuition and supplies, excluding relocation."
+    },
+    {
+      "id": "private_primary",
+      "name": "Private basic lessons",
+      "education_level": "primary",
+      "qualification": "",
+      "required_level": 0,
+      "skills": {
+        "literacy": 35,
+        "mathematics": 30
+      },
+      "months": 24,
+      "monthly_cost_cents": 350,
+      "interest": "academic",
+      "abilities": {
+        "learning_speed": 1
+      },
+      "entry_skills": {},
+      "tuition_cents": 300,
+      "supplies_cents": 50,
+      "mode": "day_lessons",
+      "retained_income_fraction": 0.5,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 0.0,
+      "minimum_age": 6,
+      "cost_basis": "Assumed small-group/private lessons: 3 lire tuition + 0.5 supplies per month, relative to teacher pay."
+    },
+    {
+      "id": "boarding_secondary",
+      "name": "Boarding grammar school",
+      "education_level": "secondary",
+      "qualification": "",
+      "required_level": 1,
+      "skills": {
+        "literacy": 60,
+        "mathematics": 55,
+        "science": 40
+      },
+      "months": 36,
+      "monthly_cost_cents": 1850,
+      "interest": "academic",
+      "abilities": {
+        "reasoning": 0.5,
+        "learning_speed": 0.5
+      },
+      "entry_skills": {},
+      "tuition_cents": 1750,
+      "supplies_cents": 100,
+      "mode": "full_time",
+      "retained_income_fraction": 0.0,
+      "stipend_start_cents": 0,
+      "stipend_end_cents": 0,
+      "food_support_fraction": 1.0,
+      "minimum_age": 12,
+      "cost_basis": "Santa Chiara pre-1800 boarding benchmark: 30 scudi/year = 17.5 Tuscan lire/month; 1 lira supplies assumed. Local admission assumed; physical relocation is summarized."
     }
   ]
 }

@@ -64,7 +64,11 @@ static func build(host) -> void:
 		if person.alive and person.age >= 18 and person.id != state.head_id and person.id in state.household["members"]:
 			host._add_person_choice(people, person)
 			ids.append(person.id)
-	people.select(maxi(0, ids.find(host.travel_person_id)))
+	if not ids.is_empty():
+		people.select(maxi(0, ids.find(host.travel_person_id)))
+	else:
+		people.disabled = true
+		host._add_label(detail, "Journeys need an adult relative at home. The family head stays to lead the household.", 16, host.TEXT_MUTED)
 	people.custom_minimum_size.y = 28
 	detail.add_child(people)
 	var purposes := OptionButton.new()

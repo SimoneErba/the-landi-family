@@ -8,6 +8,19 @@ func _run() -> void:
 	config["years"] = 2
 	config["seeds"] = 1
 	assert(Runner.validate(config).is_empty())
+	var first_option_config: Dictionary = config.duplicate(true)
+	first_option_config["starting_family"] = "child"
+	first_option_config["event_policy"] = "first_legal"
+	var small: Dictionary = Runner.run_one(first_option_config, "education", 7)
+	assert(small["status"] == "completed" and small["checkpoints"][0]["living"] == 3)
+	assert(small["income_basis_cents"] > 0 and small["food_basis_cents"] > 0)
+	var first_option_player = Runner.Player.new("education", "first_legal")
+	assert(first_option_player._event_score({"cash": -10000}) == first_option_player._event_score({"cash": 10000}))
+	first_option_config["event_policy"] = "invalid"
+	assert(not Runner.validate(first_option_config).is_empty())
+	first_option_config["event_policy"] = "first_legal"
+	first_option_config["starting_family"] = "invalid"
+	assert(not Runner.validate(first_option_config).is_empty())
 	var invalid: Dictionary = config.duplicate(true)
 	invalid["years"] = 0
 	assert(not Runner.validate(invalid).is_empty())
@@ -21,7 +34,10 @@ func _run() -> void:
 	assert(first["status"] == "completed" and first["months_simulated"] == 24)
 	assert(first["checkpoints"].size() == 3 and first["checkpoints"][0]["month"] == 0 and first["checkpoints"][2]["month"] == 24)
 	assert(first["decisions"].get("construction",0) > 0 and first["decisions"].get("land",0) > 0, "Enterprise policy actually buys land and pays for construction")
-	assert(first["final"]["family_businesses"] > 0 and first["decisions"].get("manager",0) > 0, "Managers are requested after the construction completes")
+	var enterprise_config: Dictionary = config.duplicate(true)
+	enterprise_config["years"] = 5
+	var developed: Dictionary = Runner.run_one(enterprise_config, "enterprise", 7)
+	assert(developed["final"]["family_businesses"] > 0 and developed["decisions"].get("manager",0) > 0, "Managers are requested after saving and construction at the calibrated wage scale")
 	assert(first["last_100_decisions"].size() <= 100)
 	var passive: Dictionary = Runner.run_one(config,"passive",7)
 	assert(passive["decisions"].get("request",0) == 0 and passive["decisions"].get("construction",0) == 0)

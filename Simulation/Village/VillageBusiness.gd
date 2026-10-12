@@ -127,6 +127,17 @@ func estimate(state, building_id: String, available_labor: int = 99, completed_m
 	if building["owner_id"] == "landi":
 		row["cost_cents"] = state.economy.purchase_cost(row["cost_cents"])
 	row["net_cents"] = row["revenue_cents"]-row["cost_cents"]
+	# Income duties apply to positive non-farm profits, never gross sales or losses.
+	var tax_year: int = state.year
+	var tax_month: int = state.month
+	if completed_month:
+		tax_month -= 1
+		if tax_month < 1:
+			tax_month = 12
+			tax_year -= 1
+	var rate: float = state.Laws.rules(tax_year, tax_month)["income_rate"]
+	row["tax_cents"] = roundi(maxi(0, row["net_cents"]) * rate) if building["type"] != "farm" else 0
+	row["net_cents"] -= row["tax_cents"]
 	return row
 
 func advance_month(state) -> void:
@@ -155,11 +166,14 @@ func advance_month(state) -> void:
 			row["revenue_cents"] = 0
 			row["cost_cents"] = 0
 			row["net_cents"] = 0
+			row["tax_cents"] = 0
 			row["status"] = "Needs operating funds"
 		elif owner == "landi":
 			state.events._cash(state,-row["cost_cents"],"Business costs · " + building["address"],false)
 			if row["revenue_cents"] > 0:
 				state.events._cash(state,row["revenue_cents"],"Business sales · " + building["address"],false)
+			if row.get("tax_cents", 0) > 0:
+				state.events._cash(state, -row["tax_cents"], "Business income duty · " + building["address"], false)
 		else:
 			state.village.households[owner].cash_cents += row["net_cents"]
 		if row["status"] == "Operating":
@@ -209,6 +223,8 @@ static func valid(data: Variant, state: Dictionary) -> bool:
 			for field in ["revenue_cents","cost_cents","net_cents"]:
 				if not row.get(field) is int:
 					return false
-			if row["revenue_cents"] < 0 or row["cost_cents"] < 0 or row["net_cents"] != row["revenue_cents"]-row["cost_cents"]:
+			var duty: Variant = row.get("tax_cents", 0)
+			if not duty is int or duty < 0 or duty > maxi(0, row["revenue_cents"] - row["cost_cents"]): return false
+			if row["revenue_cents"] < 0 or row["cost_cents"] < 0 or row["net_cents"] != row["revenue_cents"]-row["cost_cents"]-duty:
 				return false
 	return true

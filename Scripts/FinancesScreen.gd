@@ -1,6 +1,7 @@
 extends RefCounted
 ## A family ledger: plain rows, settled history, and links to real opportunities.
 const Chart = preload("res://Scripts/LedgerChart.gd")
+const Economy = preload("res://Simulation/Economy.gd")
 
 static func _label(host, parent: Node, text: String, size: int = 16, color: Color = Color("#392b20")) -> Label:
 	var label: Label = host._add_label(parent, text, size, color)
@@ -59,7 +60,32 @@ static func build(host) -> void:
 	parent.add_theme_constant_override("separation", 24)
 	var state = host.game_clock.state
 	var economy = state.economy
-	var budget: Dictionary = economy.budget(state.people, state.household["members"])
+	var budget: Dictionary = economy.budget(state.people, state.household["members"], state.household, state.year, state.month, state.tax_property_assessment())
+	_heading(host, parent, budget)
+	_obligations(host, parent, budget)
+	_loans(host, parent)
+	var main: BoxContainer = HBoxContainer.new() if host.get_viewport_rect().size.x >= 1200 else VBoxContainer.new()
+	main.add_theme_constant_override("separation", 48)
+	parent.add_child(main)
+	var columns := VBoxContainer.new()
+	columns.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.size_flags_stretch_ratio = 0.8
+	columns.name = "LedgerColumns"
+	columns.add_theme_constant_override("separation", 48)
+	main.add_child(columns)
+	_income(host, columns, budget)
+	_expenses(host, columns, budget)
+	_history(host, main, economy)
+	var bottom: BoxContainer = HBoxContainer.new() if host.get_viewport_rect().size.x >= 1050 else VBoxContainer.new()
+	bottom.add_theme_constant_override("separation", 48)
+	parent.add_child(bottom)
+	_businesses(host, bottom)
+	_opportunities(host, bottom)
+	_commitments(host, parent)
+
+static func _heading(host, parent: Node, budget: Dictionary) -> void:
+	var state = host.game_clock.state
+	var economy = state.economy
 	var heading := VBoxContainer.new()
 	heading.add_theme_constant_override("separation", 6)
 	parent.add_child(heading)
@@ -74,18 +100,10 @@ static func build(host) -> void:
 	parent.add_child(summary)
 	_stat(host, summary, "Family treasury", economy.cash_cents, "Available shared funds", "BalanceValue")
 	_stat(host, summary, "Monthly income", budget["income_cents"], "From household wages", "IncomeValue")
-	_stat(host, summary, "Monthly surplus", budget["net_cents"], "After food and funded tuition", "MonthlynetValue", true)
-	_label(host, parent, "Household accounts cover wages, food and tuition. Business returns, projects and one-off payments are recorded separately below.", 14, host.TEXT_MUTED)
-	_obligations(host, parent, budget)
-	var main: BoxContainer = HBoxContainer.new() if host.get_viewport_rect().size.x >= 1200 else VBoxContainer.new()
-	main.add_theme_constant_override("separation", 48)
-	parent.add_child(main)
-	var columns := VBoxContainer.new()
-	columns.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	columns.size_flags_stretch_ratio = 0.8
-	columns.name = "LedgerColumns"
-	columns.add_theme_constant_override("separation", 48)
-	main.add_child(columns)
+	_stat(host, summary, "Monthly surplus", budget["net_cents"], "After living costs, taxes and funded tuition", "MonthlynetValue", true)
+	_label(host, parent, "Household accounts cover food, clothing, care, upkeep, taxes and tuition. Older relatives gradually earn less after 60. Business returns and one-off payments appear separately below.", 14, host.TEXT_MUTED)
+
+static func _income(host, columns: Node, budget: Dictionary) -> void:
 	var income := _section(host, columns, "Household income")
 	for contribution in budget["contributions"]:
 		var row := HBoxContainer.new()
@@ -95,31 +113,42 @@ static func build(host) -> void:
 		row.add_child(identity)
 		_label(host, identity, contribution["name"], 18)
 		_label(host, identity, contribution["job"], 14, host.TEXT_MUTED)
+		if contribution["work_capacity"] < 1.0:
+			_label(host, identity, "Reduced work with age · %d%% of usual earnings" % roundi(contribution["work_capacity"] * 100), 13, host.TEXT_MUTED)
 		var value := _label(host, row, host._finance_money(contribution["income_cents"]), 18, host.TEXT_KNOWN if int(contribution["income_cents"]) > 0 else host.TEXT_MUTED)
 		value.autowrap_mode = TextServer.AUTOWRAP_OFF
 		value.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+static func _expenses(host, columns: Node, budget: Dictionary) -> void:
+	var state = host.game_clock.state
 	var expenses := _section(host, columns, "Expenses")
 	_expense_bar(host, expenses, budget)
 	_row(host, expenses, "Food · %d residents" % budget["residents"], budget["food_cents"])
-	_row(host, expenses, "Funded tuition", budget["tuition_cents"])
-	_row(host, expenses, "Total household expenses", int(budget["food_cents"]) + int(budget["tuition_cents"]), true)
+	if budget.get("food_support_cents", 0) > 0:
+		_label(host, expenses, "Farm produce or supplied meals reduce food purchases by " + host._finance_money(budget["food_support_cents"]) + "/month; this is food provision, not cash income.", 14, host.TEXT_MUTED)
+	_row(host, expenses, "Clothing and household essentials", budget["essentials_cents"])
+	_row(host, expenses, "Young-child and elder care", budget["care_cents"])
+	_row(host, expenses, "House upkeep", budget["upkeep_cents"])
+	_row(host, expenses, "Property / community assessment", budget["property_tax_cents"])
+	if state.Laws.rules(state.year, state.month)["household_macinato"]:
+		_row(host, expenses, "Tuscan macinato · %d mouths · class %d" % [budget["taxable_mouths"], budget["household_tax_class"]], budget["household_tax_cents"])
+	_row(host, expenses, "Salt / consumption duties in food prices", budget["salt_duty_cents"])
+	if state.Laws.rules(state.year, state.month)["milling_duty"]:
+		_row(host, expenses, "Italian milling duty in food prices", budget["milling_tax_cents"])
+	_row(host, expenses, "Income duty", budget["income_tax_cents"])
+	_action(host, expenses, "Read current laws →", host._show_screen.bind("Laws"))
+	_row(host, expenses, "Education fees, board and supplies", budget["tuition_cents"])
+	_row(host, expenses, "Total household expenses", budget["expenses_cents"], true)
 	_row(host, expenses, "Net monthly savings", budget["net_cents"], true)
-	_history(host, main, economy)
-	var bottom: BoxContainer = HBoxContainer.new() if host.get_viewport_rect().size.x >= 1050 else VBoxContainer.new()
-	bottom.add_theme_constant_override("separation", 48)
-	parent.add_child(bottom)
-	_businesses(host, bottom)
-	_opportunities(host, bottom)
-	_commitments(host, parent)
 
 static func _expense_bar(host, parent: Node, budget: Dictionary) -> void:
-	var total: int = int(budget["food_cents"]) + int(budget["tuition_cents"])
+	var total: int = budget["expenses_cents"]
 	var bar := HBoxContainer.new()
 	bar.name = "ExpenseBreakdown"
 	bar.custom_minimum_size.y = 14
 	bar.add_theme_constant_override("separation", 2)
 	parent.add_child(bar)
-	for entry in [["Food", int(budget["food_cents"]), Color("#9a6533")], ["Tuition", int(budget["tuition_cents"]), host.TEXT_KNOWN]]:
+	for entry in [["Food", int(budget["food_cents"]), Color("#9a6533")], ["Essentials", int(budget["essentials_cents"]), Color("#8a795c")], ["Care", int(budget["care_cents"]), Color("#866859")], ["Upkeep", int(budget["upkeep_cents"]), Color("#62707a")], ["Tuition", int(budget["tuition_cents"]), host.TEXT_KNOWN], ["Taxes", int(budget["taxes_cents"]), Color("#753e30")]]:
 		if entry[1] <= 0: continue
 		var segment := ColorRect.new()
 		segment.color = entry[2]
@@ -127,7 +156,54 @@ static func _expense_bar(host, parent: Node, budget: Dictionary) -> void:
 		segment.size_flags_stretch_ratio = float(entry[1]) / maxf(1, total)
 		segment.tooltip_text = entry[0] + " · " + host._finance_money(entry[1])
 		bar.add_child(segment)
-	_label(host, parent, "Food · ochre     Tuition · sage", 13, host.TEXT_MUTED)
+	_label(host, parent, "Hover over each segment for its expense category and amount.", 13, host.TEXT_MUTED)
+
+static func _loans(host, parent: Node) -> void:
+	var state = host.game_clock.state
+	var section := _section(host, parent, "Loans · 5% annual interest")
+	_label(host, section, "Interest is paid once every twelve months after borrowing. Principal stays owed until repaid; early repayment includes interest accrued so far. Loans follow the estate through succession.", 15, host.TEXT_MUTED)
+	_row(host, section, "Outstanding principal", state.loans.principal_cents())
+	_row(host, section, "Accrued interest", state.loans.accrued_cents())
+	var borrow_row := HBoxContainer.new()
+	section.add_child(borrow_row)
+	var amount := SpinBox.new()
+	amount.name = "LoanAmount"
+	amount.min_value = 1
+	amount.max_value = maxf(1, float(state.loans.CREDIT_LIMIT_CENTS - state.loans.principal_cents()) / 100.0)
+	amount.value = minf(100, amount.max_value)
+	amount.suffix = "lire"
+	amount.custom_minimum_size.x = 160
+	borrow_row.add_child(amount)
+	var borrow := _action(host, borrow_row, "Borrow", func():
+		var error: String = state.loans.borrow(state, roundi(amount.value * 100))
+		host.gameplay_result = error if not error.is_empty() else "Loan received. Interest is due in twelve months."
+		host._refresh_time_controls())
+	borrow.disabled = state.loans.principal_cents() >= state.loans.CREDIT_LIMIT_CENTS or state.succession.pending or state.succession.ended
+	for id in state.loans.loans:
+		var loan: Dictionary = state.loans.loans[id]
+		var row := HBoxContainer.new()
+		section.add_child(row)
+		_label(host, row, id + " · " + state.economy.money(loan["principal_cents"]) + " · annual bill in %d months" % (loan["next_interest_month"] - state.elapsed_months), 16)
+		var repayment := SpinBox.new()
+		repayment.min_value = 0.01
+		repayment.max_value = float(loan["principal_cents"]) / 100.0
+		repayment.step = 0.01
+		repayment.value = minf(100, repayment.max_value)
+		repayment.suffix = "lire"
+		row.add_child(repayment)
+		var repay := _action(host, row, "Repay", func():
+			var error: String = state.loans.repay(state, id, roundi(repayment.value * 100))
+			host.gameplay_result = error if not error.is_empty() else "Loan repayment recorded."
+			host._refresh_time_controls())
+		repay.disabled = state.succession.pending or state.succession.ended
+		var cost := _label(host, section, "", 14, host.TEXT_MUTED)
+		var update := func(_value: float = 0):
+			var total: int = state.loans.repayment_cost(id, roundi(repayment.value * 100))
+			cost.text = "Repayment including accrued interest · " + state.economy.money(total)
+			repay.disabled = total < 0 or state.economy.cash_cents < total or state.succession.pending or state.succession.ended
+		update.call()
+		repayment.value_changed.connect(update)
+	if not host.gameplay_result.is_empty(): _label(host, section, host.gameplay_result, 16, host.TEXT_KNOWN)
 
 static func _history(host, parent: Node, economy) -> void:
 	var section := _section(host, parent, "Household financial history")
@@ -153,15 +229,15 @@ static func _history(host, parent: Node, economy) -> void:
 	_label(host, section, "Last 12 settled months · L. = lire · Hover over a month for its exact value. Treasury shows the balance at household settlement; later payments appear in Payments and sales.", 13, host.TEXT_MUTED)
 	if not economy.ledger.is_empty():
 		var entry: Dictionary = economy.ledger.back()
-		_label(host, section, "%s · Income %s · Expenses %s · Net savings %s · Closing treasury %s" % [entry["date"], host._finance_money(entry["income_cents"]), host._finance_money(int(entry["food_cents"]) + int(entry["tuition_cents"])), host._finance_money(entry["net_cents"]), host._finance_money(entry["closing_cents"])], 15)
+		_label(host, section, "%s · Income %s · Expenses %s · Net savings %s · Closing treasury %s" % [entry["date"], host._finance_money(entry["income_cents"]), host._finance_money(Economy.total_expenses(entry)), host._finance_money(entry["net_cents"]), host._finance_money(entry["closing_cents"])], 15)
 
 static func _obligations(host, parent: Node, budget: Dictionary) -> void:
 	var state = host.game_clock.state
 	var economy = state.economy
 	if economy.cash_cents < 0:
-		host._finance_notice(parent, "Unpaid bills", "The balance is below zero. Time paused when the household first entered debt.")
+		host._finance_notice(parent, "Unpaid bills · economizing", "The family buys simpler food and cuts clothing and upkeep expenses while in debt. Happiness suffers. Funded study takes priority only after essential bills; adults suspend unfunded courses after three months to return to paid work.")
 	if not budget["training_funded"] and int(budget["planned_tuition_cents"]) > 0:
-		host._finance_notice(parent, "Courses paused", "Food takes priority. The household cannot fund " + economy.money(budget["planned_tuition_cents"]) + " in planned tuition.")
+		host._finance_notice(parent, "Courses paused", "Living costs take priority. The household cannot fund " + economy.money(budget["planned_tuition_cents"]) + " in planned tuition.")
 	var dowry_owed := 0
 	for union in state.marriage.unions.values():
 		if union["held_at_home"]: dowry_owed += int(union["capital_cents"])
@@ -196,7 +272,7 @@ static func _businesses(host, parent: Node) -> void:
 			var report: Dictionary = state.village.business.reports.back()
 			for entry in report["rows"]:
 				if entry["owner_id"] == "landi":
-					_label(host, section, "%s · %s · sales %s · costs %s · net %s" % [report["date"], state.village.development.buildings[entry["building_id"]]["address"], host._finance_money(entry["revenue_cents"]), host._finance_money(entry["cost_cents"]), host._finance_money(entry["net_cents"])], 14, host.TEXT_MUTED)
+					_label(host, section, "%s · %s · sales %s · costs %s · duties %s · net %s" % [report["date"], state.village.development.buildings[entry["building_id"]]["address"], host._finance_money(entry["revenue_cents"]), host._finance_money(entry["cost_cents"]), host._finance_money(entry.get("tax_cents", 0)), host._finance_money(entry["net_cents"])], 14, host.TEXT_MUTED)
 
 static func _opportunities(host, parent: Node) -> void:
 	var state = host.game_clock.state

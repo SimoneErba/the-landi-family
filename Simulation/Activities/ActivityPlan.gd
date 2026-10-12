@@ -2,7 +2,7 @@ extends RefCounted
 ## Persistent activity data, coordinated by ActivitySystem.
 ## See todo/second-gameplay-layer/README.md before integrating.
 
-const STATUSES := ["proposed", "active", "interrupted", "completed", "cancelled", "failed"]
+const STATUSES := ["proposed", "queued", "paused", "active", "interrupted", "completed", "cancelled", "failed"]
 
 var id: String = ""
 var activity_id: String = ""
@@ -23,6 +23,7 @@ var monthly_cost_cents: int = 0
 var interruption_reason: String = ""
 var outcome: Dictionary = {}
 var agreement: Dictionary = {}
+var queue_order: int = 0
 
 
 func to_save_data() -> Dictionary:
@@ -35,7 +36,7 @@ func to_save_data() -> Dictionary:
 		"started_month": started_month, "duration_months": duration_months,
 		"progress_months": progress_months, "upfront_cost_cents": upfront_cost_cents,
 		"monthly_cost_cents": monthly_cost_cents, "interruption_reason": interruption_reason,
-		"outcome": outcome.duplicate(true), "agreement": agreement.duplicate(true),
+		"outcome": outcome.duplicate(true), "agreement": agreement.duplicate(true), "queue_order": queue_order,
 	}
 
 

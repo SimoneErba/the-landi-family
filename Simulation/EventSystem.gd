@@ -40,7 +40,7 @@ func advance_month(state) -> void:
 	if not enabled:
 		return
 	prepare_economy(state)
-	var residents: int = state.economy.budget(state.people, state.household["members"])["residents"]
+	var residents: int = state.economy.budget(state.people, state.household["members"], state.household, state.year, state.month, state.tax_property_assessment())["residents"]
 	var pressure := maxf(0.0, (50.0 - float(state.household.get("condition", 80))) / 1000.0)
 	pressure += maxf(0.0, float(residents - int(state.household.get("capacity", 7)))) * 0.01
 	for resident in state.people.values():
@@ -97,6 +97,14 @@ func advance_month(state) -> void:
 
 func eligible_targets(state, entry: Dictionary) -> Array:
 	var rules: Dictionary = entry["conditions"]
+	if entry["category"] == "expansion":
+		var expected_residents := 0
+		for person in state.people.values():
+			if person.alive and person.id in state.household["members"]:
+				expected_residents += 1
+				if not person.life_state.get("pregnancy", {}).is_empty(): expected_residents += 1
+		if int(state.household["capacity"]) >= expected_residents + 2:
+			return []
 	if rules.get("automatic_only", false) or state.year < int(rules.get("min_year", 0)):
 		return []
 	if rules.has("historical_date"):
@@ -277,11 +285,11 @@ func choice_reason(state, event: Dictionary, index: int) -> String:
 		var reason: String = state.careers.request_reason(state, person, "train:" + str(event.get("program_id", "")))
 		if not reason.is_empty():
 			return reason
-		# Reserve the first month's food and all tuition; commitments affect future wages.
-		var budget: Dictionary = state.economy.budget(state.people, state.household["members"])
+		# Career affordability already reserves the whole projected income shortfall.
+		var budget: Dictionary = state.economy.budget(state.people, state.household["members"], state.household, state.year, state.month, state.tax_property_assessment())
 		var tuition: int = state.economy.purchase_cost(int(state.careers.programs[event["program_id"]]["monthly_cost_cents"]))
-		if state.economy.cash_cents + int(budget["income_cents"]) - person.monthly_income_cents - int(budget["food_cents"]) < int(budget["planned_tuition_cents"]) + tuition:
-			return "There is not enough funding after the household's food and existing courses."
+		if state.economy.cash_cents + int(budget["income_cents"]) - state.economy.earnings(person) - int(budget["living_costs_cents"]) < int(budget["planned_tuition_cents"]) + tuition:
+			return "There is not enough funding after household living costs and existing courses."
 	return ""
 
 

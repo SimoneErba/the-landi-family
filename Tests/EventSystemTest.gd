@@ -20,6 +20,7 @@ func _state():
 		values[value] = 1.0
 	state.initialize({"Giovanni": {"age": 60, "monthly_income_cents": 20000}, "Adult": {"name": "Test Relative", "age": 30, "spouse_id": "Partner", "monthly_income_cents": 7000, "life_state": {"can_be_pregnant": true}, "psychology": {"values": values, "current_state": {"stress": 0.5, "happiness": 0.5, "resentment": 0.1}}, "education": {"level": "secondary"}, "skills": skills}, "Partner": {"age": 30, "spouse_id": "Adult", "monthly_income_cents": 7000}})
 	state.events.monthly_chance = 0.0
+	state.succession.enabled = false # This fixture jumps to 1916 without changing births.
 	state.economy.cash_cents = 1000000
 	state.year = 1916
 	state.month = 7
@@ -55,6 +56,7 @@ func _run() -> void:
 			continue
 		for choice_index in range(event["choices"].size()):
 			var state = _state()
+			if event["category"] == "expansion": state.household["capacity"] = 3
 			if event["conditions"].has("historical_date"):
 				state.year = int(event["conditions"]["historical_date"]["year"])
 				state.month = int(event["conditions"]["historical_date"]["month"])
@@ -82,9 +84,11 @@ func _run() -> void:
 	assert(poor.household["condition"] == 77)
 
 	var expansion = _state()
+	expansion.household["capacity"] = 3
 	expansion.events.trigger(expansion, "expansion_04")
 	assert(expansion.events.resolve(expansion, expansion.events.pending[0]["serial"], 0)["ok"])
-	assert(expansion.household["capacity"] == 9 and "Second bedroom" in expansion.household["rooms"])
+	assert(expansion.household["capacity"] == 5 and "Second bedroom" in expansion.household["rooms"])
+	assert(expansion.events.eligible_targets(expansion, expansion.events.catalog["expansion_05"]).is_empty(), "Expansion stories stop when the household has spare capacity")
 
 	var drought = _state()
 	drought.events.trigger(drought, "drought_01")

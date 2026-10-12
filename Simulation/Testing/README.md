@@ -12,7 +12,11 @@ On a Windows Mono install, use its console executable instead of `godot`. Argume
 
 For a quick smoke run, use `--years=2 --seeds=1`. To compare bonuses fairly, keep the seed list, strategies and objective fixed and run each bonus into its own directory. Same inputs, sources and seed reproduce each run's decisions and checkpoints. Policies can cause random streams to diverge as they change which events are eligible.
 
+Optional `--starting-family=alone|wife|child|authored` selects a main-menu household (default: the original seven-person authored family). `--event-policy=first_legal` makes every strategy choose the first available event option, falling back only when earlier options are unavailable. The default `strategy` retains each policy's preferences. For routine work and study with first-option events, use `--strategies=education --event-policy=first_legal`. Reports count first/other event options, work/study proposals and accepted requests, total wages/food/tuition, and the final monthly household budget. Accounting-basis cents divided by 100 match the stable lire displayed in-game; Italian-lira equivalents multiply that amount by 0.84.
+
 ## Components
+
+The `child` starting-family key now means Giovanni, his wife Maria, and their six-year-old son Carlo. Reports generated before this change used a two-person single-father start and should not be compared as the same household.
 
 - `SimulationRunner.gd`: configuration validation, isolated run execution, yearly checkpoints, stalled-run detection and median/min/max aggregation. `run_one(config, strategy, seed)` returns a report dictionary for use by tests or other tools.
 - `SimulatedPlayer.gd`: event-choice preferences and quarterly proactive decisions. Repeat proposals have a two-year cooldown. Refusals, reluctance, tuition, unavailable workers, construction time and operating costs retain their normal consequences. Policies never set relationships, skills, spouses or wealth directly.
@@ -45,6 +49,6 @@ Stalled events return an explicit error instead of being silently discarded. An 
 
 ## Current game limits
 
-No deaths, spouses, heirs or money are fabricated to make the run reach 100 years. The current incomplete mortality/succession and marriage systems can leave very old people alive and marriage goals unfulfilled. These are reported as development gaps. The harness can compare implemented systems now and measure new systems as they are added; it cannot certify a complete generational victory balance yet.
+The normal age-related mortality and equal-share cash-will systems run in the harness. On succession it chooses the nominee, otherwise the first adult relative, otherwise a surviving minor. No surviving relative means `family_ended`, and the report records how many months were actually reached. No deaths, spouses, heirs or money are fabricated to force 100 years. Existing bots request marriage intentions but do not arrange proposals or borrow automatically. Full historical intestacy, property estates and spousal usufruct remain outside this cash-only prototype. Reports include `heads_played` and final loan principal.
 
 Verification: `Tests/SimulationRunnerTest.gd` checks determinism, isolation through fresh-state construction, actual paid property development, manager proposals, real refusals, request cooldowns, impossible event handling, annual records, aggregation and exports.

@@ -14,7 +14,7 @@ var next_id: int = 1
 
 func commitment(person_id: String):
 	for plan in plans.values():
-		if person_id in plan.accepted_participant_ids and plan.status in ["active", "interrupted"]:
+		if person_id in plan.accepted_participant_ids and (plan.status in ["active", "interrupted"] or (plan.status == "paused" and plan.started_month >= 0)):
 			return plan
 	return null
 
@@ -29,6 +29,8 @@ func reason(state, person_id: String, activity_id: String, target_id: String = "
 		return "A living resident must take part."
 	if person.age < 18:
 		return "These activities need an adult representative."
+	if not state.travel.current(person_id).is_empty():
+		return "They are away on a journey."
 	if commitment(person_id) != null:
 		return "They already have a family activity."
 	if not state.village.business.commitment(person_id).is_empty():
@@ -65,7 +67,7 @@ func propose(state, person_id: String, activity_id: String, target_id: String = 
 	if result["outcome"] == "reluctant": person.current_state["resentment"] = minf(1.0, person.current_state["resentment"] + 0.05)
 	person.memories.append({"kind": "activity_request", "date": state.date_text(), "description": response})
 	if result["accepted"]: person.decision_state["observation"] = entry["name"] + " is now a family commitment."
-	state.chronicle.append({"date": state.date_text(), "description": response})
+	state.chronicle.append({"date": state.date_text(), "description": response, "category": "project", "person_id": person_id})
 	if not result["accepted"]:
 		return result
 	var plan = Plan.new()
@@ -90,7 +92,7 @@ func propose(state, person_id: String, activity_id: String, target_id: String = 
 
 
 func cancel(state, plan_id: String) -> void:
-	if not plans.has(plan_id) or plans[plan_id].status not in ["active", "interrupted"]:
+	if not plans.has(plan_id) or plans[plan_id].status not in ["active", "interrupted", "queued", "paused"]:
 		return
 	var plan = plans[plan_id]
 	plan.status = "cancelled"
@@ -98,11 +100,18 @@ func cancel(state, plan_id: String) -> void:
 	var description: String = CATALOG[plan.activity_id]["name"] + " was cancelled. Earlier expenses are not refunded."
 	plan.outcome = {"description":description}
 	state.people[plan.accepted_participant_ids[0]].decision_state["observation"] = description
-	state.chronicle.append({"date":state.date_text(), "description":description})
+	state.chronicle.append({"date":state.date_text(), "description":state.people[plan.participant_ids[0]].name + " · " + description, "category": "project", "person_id": plan.participant_ids[0]})
 
 
 func advance_month(state) -> void:
+	_start_queues(state)
 	for plan in plans.values():
+		if plan.status in ["queued", "paused"]:
+			var participant = state.people[plan.participant_ids[0]]
+			if not participant.alive or participant.id not in state.household["members"]:
+				plan.status = "failed"
+				plan.outcome = {"description": participant.name + " is no longer available."}
+				_record(state, plan, plan.outcome["description"])
 		if plan.status not in ["active", "interrupted"]:
 			continue
 		var person = state.people[plan.accepted_participant_ids[0]]
@@ -134,6 +143,7 @@ func advance_month(state) -> void:
 			person.decision_state["observation"] = plan.outcome["description"]
 			_record(state, plan, plan.outcome["description"])
 			continue
+		if plan.status == "interrupted": _record(state, plan, person.name + ": resumed after interruption.")
 		plan.status = "active"
 		plan.interruption_reason = ""
 		state.events._cash(state, -plan.monthly_cost_cents, CATALOG[plan.activity_id]["name"])
@@ -168,9 +178,9 @@ func advance_month(state) -> void:
 		_record(state, plan, description)
 
 
-func _record(state, plan, description: String) -> void:
-	state.chronicle.append({"date": state.date_text(), "description": CATALOG[plan.activity_id]["name"] + " — " + description})
-	state.notify(CATALOG[plan.activity_id]["name"] + " — " + description, plan.accepted_participant_ids[0])
+func _record(state, plan, description: String, notify_user := true) -> void:
+	state.chronicle.append({"date": state.date_text(), "description": state.people[plan.participant_ids[0]].name + " · " + CATALOG[plan.activity_id]["name"] + " — " + description, "category": "project", "person_id": plan.participant_ids[0]})
+	if notify_user: state.notify(CATALOG[plan.activity_id]["name"] + " — " + description, plan.accepted_participant_ids[0])
 
 
 func to_save_data() -> Dictionary:
@@ -187,3 +197,88 @@ func restore_save_data(data: Dictionary) -> void:
 		var plan = Plan.new()
 		plan.restore_save_data(data["plans"][plan_id])
 		plans[plan_id] = plan
+
+
+func enqueue(state, person_id: String, activity_id: String, target_id: String = "") -> String:
+	if not CATALOG.has(activity_id) or not state.people.has(person_id): return ""
+	if not state.people.has(state.head_id) or not state.people[state.head_id].alive: return ""
+	var person = state.people[person_id]
+	if not person.alive or person_id not in state.household["members"] or person.age < 18: return ""
+	if activity_id == "visit" and not state.village.households.has(target_id): return ""
+	var plan = Plan.new()
+	plan.id = "activity_%d" % next_id
+	plan.queue_order = next_id
+	next_id += 1
+	plan.activity_id = activity_id
+	plan.proposer_id = state.head_id
+	plan.participant_ids = [person_id]
+	# Intended participant; agreement remains empty until they consent at the start.
+	plan.accepted_participant_ids = [person_id]
+	plan.target_household_id = target_id
+	plan.location_id = CATALOG[activity_id]["location"]
+	plan.duration_months = CATALOG[activity_id]["months"]
+	plan.monthly_cost_cents = CATALOG[activity_id]["cost"]
+	plan.proposed_month = state.elapsed_months
+	plan.status = "queued"
+	plans[plan.id] = plan
+	_record(state, plan, person.name + ": added to their queue; agreement will be sought when they are available.", false)
+	return plan.id
+
+
+func queue_for(person_id: String) -> Array:
+	var result: Array = []
+	for plan in plans.values():
+		if person_id in plan.participant_ids and plan.started_month < 0 and plan.status in ["queued", "paused"]: result.append(plan)
+	result.sort_custom(func(a, b): return a.queue_order < b.queue_order)
+	return result
+
+
+func move(plan_id: String, direction: int) -> void:
+	if not plans.has(plan_id): return
+	var queue := queue_for(plans[plan_id].participant_ids[0])
+	var index := queue.find(plans[plan_id])
+	var other := index + direction
+	if index < 0 or other < 0 or other >= queue.size(): return
+	var old: int = queue[index].queue_order
+	queue[index].queue_order = queue[other].queue_order
+	queue[other].queue_order = old
+
+
+func pause_plan(state, plan_id: String) -> void:
+	if not plans.has(plan_id): return
+	var plan = plans[plan_id]
+	if plan.status == "paused":
+		plan.status = "queued" if plan.started_month < 0 else "active"
+		plan.interruption_reason = ""
+		_record(state, plan, "Resumed by the family head.", false)
+	elif plan.status in ["queued", "active", "interrupted"]:
+		plan.status = "paused"
+		plan.interruption_reason = "Paused by the family head"
+		_record(state, plan, plan.interruption_reason, false)
+
+
+func queue_reason(state, plan) -> String:
+	if plan.status == "paused": return "Paused by the family head"
+	var queue := queue_for(plan.participant_ids[0])
+	if not queue.is_empty() and queue[0] != plan: return "Waiting for earlier plans"
+	return reason(state, plan.participant_ids[0], plan.activity_id, plan.target_household_id)
+
+
+func _start_queues(state) -> void:
+	for person_id in state.household["members"]:
+		var queue := queue_for(person_id)
+		if queue.is_empty(): continue
+		var pending = queue[0]
+		if not queue_reason(state, pending).is_empty(): continue
+		var result := propose(state, person_id, pending.activity_id, pending.target_household_id)
+		if result.get("accepted", false):
+			var started = plans[result["plan_id"]]
+			plans.erase(started.id)
+			started.id = pending.id
+			started.queue_order = pending.queue_order
+			started.proposed_month = pending.proposed_month
+			plans[pending.id] = started
+			_record(state, started, state.people[person_id].name + ": started after agreement.")
+		else:
+			pending.status = "failed"
+			pending.outcome = {"description": result.get("response", "They did not agree to start.")}

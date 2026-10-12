@@ -10,7 +10,7 @@ static func refresh(host, card: PanelContainer, person) -> void:
 	var state = host.game_clock.state
 	_add(host, stats, "health", person.health, "Current health", host.TEXT_KNOWN if person.health == "Well" else host.EventPresentation.BAD)
 	_add(host, stats, "skill", str(person.education.get("level", "none")).capitalize(), "Education level", host.TEXT_MAIN)
-	var income: int = roundi(person.monthly_income_cents * state.economy.event_income_multiplier * (0.5 if not person.life_state.get("illness", {}).is_empty() else 1.0))
+	var income: int = state.economy.earnings(person)
 	if not person.in_household or not state.travel.current(person.id).is_empty():
 		income = 0
 	_add(host, stats, "coins", state.economy.money(income) + "/month", "Current monthly earnings entering the family purse", host.TEXT_KNOWN if income > 0 else host.TEXT_MUTED)

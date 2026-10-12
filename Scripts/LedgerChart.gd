@@ -1,4 +1,5 @@
 extends Control
+const Economy = preload("res://Simulation/Economy.gd")
 ## Read-only chart of actual settled accounts, in the game's stable lire currency.
 const Archive = preload("res://Scripts/ArchiveTheme.gd")
 const SERIES := {"treasury": "Household treasury", "income": "Household income", "expenses": "Household expenses", "savings": "Net household savings"}
@@ -24,7 +25,7 @@ func set_series(value: String) -> void:
 func amount(entry: Dictionary) -> int:
 	match series:
 		"income": return int(entry["income_cents"])
-		"expenses": return int(entry["food_cents"]) + int(entry["tuition_cents"])
+		"expenses": return Economy.total_expenses(entry)
 		"savings": return int(entry["net_cents"])
 	return int(entry["closing_cents"])
 

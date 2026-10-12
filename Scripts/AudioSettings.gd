@@ -28,6 +28,7 @@ func _ready() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 	var close := Button.new()
+	close.name = "CloseSettings"
 	close.text = "Close"
 	Archive.style_button(close)
 	close.pressed.connect(hide)

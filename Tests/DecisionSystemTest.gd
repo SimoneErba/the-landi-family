@@ -97,7 +97,7 @@ func _run() -> void:
 	var employment = _state(worker)
 	_advance(employment, 8)
 	assert(employment.people["Adult"].career_id == "factory_worker", "Eligible work is found without a player request")
-	assert(employment.people["Adult"].monthly_income_cents == 4500)
+	assert(employment.people["Adult"].monthly_income_cents == 2800)
 	assert(employment.last_requests.is_empty(), "Autonomous decisions do not masquerade as requests")
 	assert(employment.people["Adult"].memories[-1]["kind"] == "decision")
 
@@ -123,6 +123,7 @@ func _run() -> void:
 	assert(education.people["Adult"].decision_state["plan"]["action"].begins_with("funding:"))
 	assert(education.people["Adult"].education["study"].is_empty(), "New study needs agreement on the household purse")
 	var proposed: String = education.people["Adult"].decision_state["plan"]["action"].replace("funding:", "train:")
+	education.economy.cash_cents = 1000000 # Isolate agreement from the new course reserve requirement.
 	assert(education.request("Adult", proposed)["outcome"] == "accepted")
 	assert(not education.people["Adult"].education["study"].is_empty())
 
